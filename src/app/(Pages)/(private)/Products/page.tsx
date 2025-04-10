@@ -1,20 +1,17 @@
 'use client';
 import React, { useState, useEffect } from 'react';
-import Image from 'next/image';
 import axios from 'axios';
+import { Button } from '@/Components/ui/button';
+import Link from 'next/link';
+import { FiEdit2, FiTrash2 } from 'react-icons/fi';
 
 // TypeScript interface for Product
 interface Product {
-    id: number;
-    title: string;
+    _id: string;
     price: number;
     description: string;
     category: string;
-    image: string;
-    rating: {
-        rate: number;
-        count: number;
-    };
+    name: string;
 }
 
 export default function ProductsPage() {
@@ -23,20 +20,17 @@ export default function ProductsPage() {
     const [selectedCategory, setSelectedCategory] = useState<string>('all');
     const [categories, setCategories] = useState<string[]>([]);
 
-    // Fetch products from an API (using fake store API as an example)
     useEffect(() => {
         const fetchProducts = async () => {
             try {
-                const res = await axios.get('https://fakestoreapi.com/products');
+                const res = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/company/product/fetch`);
                 const data = res.data;
-                setProducts(data);
-                console.log(data)
-                // Extract unique categories
-                const uniqueCategories = [...new Set(data.map((product: Product) => product.category))];
+                setProducts(data.products);
+
+                const uniqueCategories = [...new Set(data.products.map((product: Product) => product.category))];
                 setCategories(uniqueCategories as string[]);
                 setLoading(false);
             } catch (error) {
-                console.error('Error fetching products:', error);
                 setLoading(false);
             }
         };
@@ -56,8 +50,13 @@ export default function ProductsPage() {
     }
 
     return (
-        <div className="min-h-screen bg-gray-100 py-8 px-4 sm:px-6 lg:px-8">
+        <div className=" min-h-screen py-8 px-4 sm:px-6 lg:px-8">
             {/* Category Filter */}
+            <div className="">
+                <Button>
+                    <Link href="/Products/add">Add Product</Link>
+                </Button>
+            </div>
             <div className="max-w-7xl mx-auto mb-8">
                 <div className="flex flex-wrap gap-2 justify-center">
                     <button
@@ -89,37 +88,33 @@ export default function ProductsPage() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                     {filteredProducts.map((product) => (
                         <div
-                            key={product.id}
+                            key={product._id}
                             className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300"
                         >
-                            <div className="relative h-64 w-full">
-                                <img
-                                    src={product.image}
-                                    alt={product.title}
-                                    className="object-contain p-4 w-full aspect-square"
-                                />
-                            </div>
+
                             <div className="p-4">
                                 <h3 className="text-lg font-semibold text-gray-800 line-clamp-2 mb-2">
-                                    {product.title}
+                                    {product?.name}
                                 </h3>
-                                <p className="text-gray-600 text-sm line-clamp-3 mb-4">
+                                <p className="text-gray-600 text-sm line-clamp-3 mb-4 h-12 overflow-auto">
                                     {product.description}
                                 </p>
                                 <div className="flex items-center justify-between">
                                     <span className="text-xl font-bold text-blue-600">
                                         ${product.price.toFixed(2)}
                                     </span>
-                                    <div className="flex items-center">
-                                        <span className="text-yellow-400 mr-1">★</span>
-                                        <span className="text-sm text-gray-600">
-                                            {product.rating.rate} ({product.rating.count})
-                                        </span>
-                                    </div>
+
                                 </div>
-                                <button className="mt-4 w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 transition-colors duration-200">
-                                    Add to Cart
-                                </button>
+                                <div className="flex gap-2 mt-4">
+                                    <Button variant="default" className="w-1/2 flex items-center justify-center gap-2">
+                                        <FiEdit2 className="w-4 h-4" />
+                                        Edit
+                                    </Button>
+                                    <Button variant="destructive" className="w-1/2 flex items-center justify-center gap-2">
+                                        <FiTrash2 className="w-4 h-4" />
+                                        Delete
+                                    </Button>
+                                </div>
                             </div>
                         </div>
                     ))}

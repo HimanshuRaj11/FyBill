@@ -12,7 +12,7 @@ export default function page() {
     const [Billing, setBilling] = useState(false)
 
     return (
-        <div>
+        <div className=''>
             <Dashboard />
 
         </div>

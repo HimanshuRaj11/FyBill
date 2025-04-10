@@ -10,12 +10,15 @@ import axios from 'axios'
 import { FetchUser, LogoutUser } from '@/app/Redux/Slice/User.slice'
 import { useDispatch, useSelector } from 'react-redux'
 import { motion } from 'framer-motion'
+import { useRouter } from 'next/navigation'
 const base_url = process.env.NEXT_PUBLIC_BASE_URL
 
 
 export default function Navbar() {
+    const router = useRouter();
     const dispatch = useDispatch();
     const { User } = useSelector((state: any) => state.User);
+    const user = User?.user
 
     const ConnectDb = async () => {
         try {
@@ -27,6 +30,7 @@ export default function Navbar() {
     }
 
     const Logout = () => {
+        router.push('/')
         dispatch(LogoutUser() as any);
     }
     useEffect(() => {
@@ -122,13 +126,13 @@ export default function Navbar() {
                                             <AvatarFallback>JD</AvatarFallback>
                                         </Avatar>
                                         <div>
-                                            <p className="font-medium text-gray-800">John Doe</p>
-                                            <p className="text-xs text-gray-500">john@example.com</p>
+                                            <p className="font-medium text-gray-800">{user?.name}</p>
+                                            <p className="text-xs text-gray-500">{user?.email}</p>
                                         </div>
                                     </div>
                                 </Link>
                                 <DropdownMenuSeparator className="my-2" />
-                                <Link href={'/Settings'}>
+                                <Link href={'/Setting'}>
                                     <DropdownMenuItem className="cursor-pointer p-2 rounded-lg hover:bg-indigo-50 transition-colors">
                                         <Settings className="h-4 w-4 mr-2 text-indigo-600" />
                                         <span>Settings</span>

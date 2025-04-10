@@ -4,6 +4,8 @@ import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Eye, EyeOff } from 'lucide-react'
+import axios from 'axios'
+import { toast } from 'react-toastify'
 
 const staffSchema = z.object({
     name: z.string().min(2, 'Name must be at least 2 characters'),
@@ -11,10 +13,10 @@ const staffSchema = z.object({
     phone: z.string().regex(/^\+?[1-9]\d{1,14}$/, 'Please enter a valid phone number'),
     role: z.enum(['manager', 'staff', 'admin', 'supervisor']),
     password: z.string()
-        .min(8, 'Password must be at least 8 characters')
-        .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
-        .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
-        .regex(/[0-9]/, 'Password must contain at least one number'),
+        .min(6, 'Password must be at least 8 characters'),
+    // .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
+    // .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
+    // .regex(/[0-9]/, 'Password must contain at least one number'),
     confirmPassword: z.string()
 }).refine((data) => data.password === data.confirmPassword, {
     message: "Passwords don't match",
@@ -23,7 +25,7 @@ const staffSchema = z.object({
 
 type StaffFormData = z.infer<typeof staffSchema>
 
-export default function AddStaff() {
+export default function AddStaff({ setShowAddStaffModal }: { setShowAddStaffModal: (show: boolean) => void }) {
     const [showPassword, setShowPassword] = useState(false)
     const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
@@ -36,14 +38,19 @@ export default function AddStaff() {
         resolver: zodResolver(staffSchema)
     })
 
-    const onSubmit = async (data: StaffFormData) => {
+    const onSubmit = async (Data: StaffFormData) => {
         try {
-            // Simulate API call
-            await new Promise(resolve => setTimeout(resolve, 1000))
-            console.log(data)
+
+            const { data } = await axios.post(`${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/Staff/Register`, Data)
+            if (data.success) {
+                toast.success('Staff added successfully')
+                setShowAddStaffModal(false)
+            }
             reset()
+
         } catch (error) {
-            console.error(error)
+            toast.error('Failed to add staff')
+            return
         }
     }
 
@@ -60,7 +67,7 @@ export default function AddStaff() {
                         type="text"
                         {...register('name')}
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                        placeholder="John Doe"
+                        placeholder="Enter your name"
                     />
                     {errors.name && (
                         <p className="mt-1 text-sm text-red-600">{errors.name.message}</p>
@@ -75,7 +82,7 @@ export default function AddStaff() {
                         type="email"
                         {...register('email')}
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                        placeholder="john@example.com"
+                        placeholder="name@example.com"
                     />
                     {errors.email && (
                         <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>
@@ -90,7 +97,7 @@ export default function AddStaff() {
                         type="tel"
                         {...register('phone')}
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                        placeholder="+1234567890"
+                        placeholder="1234567890"
                     />
                     {errors.phone && (
                         <p className="mt-1 text-sm text-red-600">{errors.phone.message}</p>

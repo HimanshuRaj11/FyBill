@@ -27,6 +27,7 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+
   return (
     <html lang="en">
       <body
@@ -37,8 +38,7 @@ export default function RootLayout({
           <ToastContainer />
           <Navbar />
           <div className="mt-20">
-            <Sidebar />
-            <div className="ml-[16rem] px-4 pb-4">
+            <div className="px-4 pb-4">
               {children}
             </div>
           </div>

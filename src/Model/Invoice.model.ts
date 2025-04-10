@@ -7,6 +7,11 @@ interface Product {
     amount: number;
 }
 
+interface Tax {
+    taxName: string;
+    percentage: number;
+}
+
 export interface IInvoice extends Document {
     invoiceId: string;
     companyId: mongoose.Types.ObjectId;
@@ -17,11 +22,10 @@ export interface IInvoice extends Document {
     issueDate: Date;
     products: Product[];
     subTotal: number;
-    taxPercentage: number;
-    taxAmount: number;
+    taxes?: Tax[];
     grandTotal: number;
-    staffId?: mongoose.Types.ObjectId;
-    paymentMode: "CASH" | "CARD" | "BANK_TRANSFER" | "UPI" | "OTHER";
+    createdBy: mongoose.Types.ObjectId;
+    paymentMode: string;
     notes?: string;
     createdAt: Date;
     updatedAt: Date;
@@ -32,6 +36,11 @@ const ProductSchema: Schema = new Schema({
     rate: { type: Number, required: true },
     quantity: { type: Number, required: true },
     amount: { type: Number, required: true },
+});
+
+const TaxSchema: Schema = new Schema({
+    taxName: { type: String, required: true },
+    percentage: { type: Number, required: true },
 });
 
 const InvoiceSchema: Schema = new Schema<IInvoice>(
@@ -45,13 +54,11 @@ const InvoiceSchema: Schema = new Schema<IInvoice>(
         issueDate: { type: Date, required: true },
         products: { type: [ProductSchema], required: true },
         subTotal: { type: Number, required: true },
-        taxPercentage: { type: Number, default: 0 },
-        taxAmount: { type: Number, required: true },
+        taxes: { type: [TaxSchema], },
         grandTotal: { type: Number, required: true },
-        staffId: { type: mongoose.Schema.Types.ObjectId, ref: "Staff" },
+        createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
         paymentMode: {
             type: String,
-            enum: ["CASH", "CARD", "BANK_TRANSFER", "UPI", "OTHER"],
             default: "CASH",
         },
         notes: { type: String },

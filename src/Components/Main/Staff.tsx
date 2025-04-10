@@ -1,67 +1,53 @@
 "use client"
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Button } from '../ui/button'
 import { Plus, Search, Filter, X } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import AddStaff from './Addstaff'
+import axios from 'axios'
+import moment from 'moment'
 
 interface StaffMember {
-    id: string
+    _id: string
     name: string
     role: string
     email: string
     phone: string
-    joinDate: string
-    status: 'active' | 'inactive'
+    createdAt: string
     avatar: string
 }
 
 export default function Staff() {
     const [showAddStaffModal, setShowAddStaffModal] = useState(false)
     const [searchQuery, setSearchQuery] = useState('')
-    const [filterStatus, setFilterStatus] = useState<'all' | 'active' | 'inactive'>('all')
-
+    const [filterStatus, setFilterStatus] = useState<'all' | 'staff' | 'admin' | 'manager' | 'Owner'>('all')
+    const [loading, setLoading] = useState(true)
     // Dummy data
-    const staffMembers: StaffMember[] = [
-        {
-            id: '1',
-            name: 'John Doe',
-            role: 'Manager',
-            email: 'john@example.com',
-            phone: '+1 234 567 890',
-            joinDate: '2023-01-15',
-            status: 'active',
-            avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=John'
-        },
-        {
-            id: '2',
-            name: 'Jane Smith',
-            role: 'Staff',
-            email: 'jane@example.com',
-            phone: '+1 234 567 891',
-            joinDate: '2023-02-20',
-            status: 'active',
-            avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Jane'
-        },
-        {
-            id: '3',
-            name: 'Jane Smith',
-            role: 'Staff',
-            email: 'jane@example.com',
-            phone: '+1 234 567 891',
-            joinDate: '2023-02-20',
-            status: 'active',
-            avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Jane'
-        },
-        // Add more dummy data as needed
-    ]
-
+    const [staffMembers, setStaffMembers] = useState<StaffMember[]>([])
     const filteredStaff = staffMembers.filter(staff => {
         const matchesSearch = staff.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
             staff.email.toLowerCase().includes(searchQuery.toLowerCase())
-        const matchesFilter = filterStatus === 'all' || staff.status === filterStatus
+        const matchesFilter = filterStatus === 'all' || staff.role === filterStatus
         return matchesSearch && matchesFilter
     })
+
+
+    useEffect(() => {
+        const fetchStaff = async () => {
+            const { data } = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/Staff/Fetch`)
+            setStaffMembers(data.staff);
+            setLoading(false)
+        }
+        fetchStaff()
+    }, [])
+
+    if (loading) {
+        return (
+            <div className="min-h-screen flex items-center justify-center">
+                <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-500"></div>
+            </div>
+        );
+    }
 
     return (
         <div className="p-4 md:p-6 max-w-7xl mx-auto">
@@ -94,12 +80,14 @@ export default function Staff() {
                 </div>
                 <select
                     value={filterStatus}
-                    onChange={(e) => setFilterStatus(e.target.value as 'all' | 'active' | 'inactive')}
+                    onChange={(e) => setFilterStatus(e.target.value as 'all' | 'staff' | 'admin' | 'manager' | 'Owner')}
                     className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                 >
-                    <option value="all">All Status</option>
-                    <option value="active">Active</option>
-                    <option value="inactive">Inactive</option>
+                    <option value="all">All</option>
+                    <option value="Owner">Owner</option>
+                    <option value="manager">Manager</option>
+                    <option value="staff">Staff</option>
+                    <option value="admin">Admin</option>
                 </select>
             </div>
 
@@ -107,7 +95,7 @@ export default function Staff() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {filteredStaff.map((staff) => (
                     <div
-                        key={staff.id}
+                        key={staff._id}
                         className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 hover:shadow-md transition-shadow"
                     >
                         <div className="flex items-center space-x-4">
@@ -123,12 +111,12 @@ export default function Staff() {
                                 <p className="text-sm text-gray-500 truncate">{staff.role}</p>
                             </div>
                             <span
-                                className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${staff.status === 'active'
+                                className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${staff.role === 'staff'
                                     ? 'bg-green-100 text-green-800'
                                     : 'bg-red-100 text-red-800'
                                     }`}
                             >
-                                {staff.status}
+                                {staff.role}
                             </span>
                         </div>
                         <div className="mt-4 space-y-1">
@@ -139,7 +127,7 @@ export default function Staff() {
                                 <span className="font-medium">Phone:</span> {staff.phone}
                             </p>
                             <p className="text-sm text-gray-600">
-                                <span className="font-medium">Joined:</span> {staff.joinDate}
+                                <span className="font-medium">Joined:</span> {moment(staff.createdAt).format('MMM DD, YYYY')}
                             </p>
                         </div>
                     </div>
@@ -169,7 +157,7 @@ export default function Staff() {
                             >
                                 <X className="h-4 w-4" />
                             </Button>
-                            <AddStaff />
+                            <AddStaff setShowAddStaffModal={setShowAddStaffModal} />
                         </motion.div>
                     </motion.div>
                 )}

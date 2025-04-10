@@ -3,6 +3,8 @@ import React, { useState } from 'react';
 import Image from 'next/image';
 import { useSelector } from 'react-redux';
 import axios from 'axios';
+import { Button } from '@/Components/ui/button';
+import Link from 'next/link';
 
 interface UserProfile {
     name: string;
@@ -53,7 +55,7 @@ export default function ProfilePage() {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8 rounded-md">
+        <div className=" min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8 rounded-md">
             <div className="max-w-3xl mx-auto">
                 {/* Profile Header */}
                 <div className="bg-white rounded-lg shadow-md overflow-hidden">
@@ -220,6 +222,16 @@ export default function ProfilePage() {
                             </div>
                         </div>
                     </div>
+                </div>
+
+                <div className="mt-6 bg-white rounded-lg shadow-md p-6 space-y-6">
+                    <Button>
+                        <Link href="/Company/Register">
+                            Add Company
+                        </Link>
+                    </Button>
+
+
                 </div>
             </div>
         </div>

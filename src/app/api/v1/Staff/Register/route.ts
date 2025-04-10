@@ -1,55 +1,44 @@
-
-
-import StaffModel from "@/Model/User.model";
-import { z } from "zod";
-import bcrypt from "bcrypt";
-import jwt from 'jsonwebtoken'
-import mongoose from "mongoose";
+import bcrypt from "bcryptjs";
 import { NextResponse } from "next/server";
 import connectDB from "@/lib/DB";
+import { verifyUser } from "@/lib/verifyUser";
+import UserModel from "@/Model/User.model";
+const salt = bcrypt.genSaltSync(10);
 
-interface TokenData {
-    _id: mongoose.Schema.Types.ObjectId;
-}
-// 1. Zod schema for validation
 
-const staffSchema = z.object({
-    companyId: z.string().length(24, "Invalid ID"),
-    name: z.string().min(2),
-    phone: z.string().min(10),
-    email: z.string().email(),
-    password: z.string().min(6, "Password should be at least 6 characters"),
-    address: z.string().optional(),
-    role: z.string().optional(),
-});
 
-export default async function POST(request: Request) {
-    if (request.method !== "POST") {
-        return NextResponse.json({ message: "Method not allowed" });
-    }
+export async function POST(request: Request) {
+
 
     try {
-        await connectDB();
+        // await connectDB();
+        const userId = await verifyUser();
 
-        const parsed = staffSchema.safeParse(await request.json());
-        if (!parsed.success) {
-            return NextResponse.json({ errors: parsed.error.flatten().fieldErrors });
+        const User = await UserModel.findById({ _id: userId })
+
+        if (!User) {
+            return NextResponse.json({ message: "User not found" });
         }
+        const userCompanyId = User.companyId
 
-        const { companyId, name, phone, email, password, address, role } = await request.json();
+        const { name, phone, email, password, address, role } = await request.json();
+
+
+
 
         // 2. Check if staff with email already exists
-        const existing = await StaffModel.findOne({ email });
+        const existing = await UserModel.findOne({ email });
         if (existing) {
-            return NextResponse.json({ message: "Staff with this email already exists" });
+            return NextResponse.json({ message: "Staff with this email already exists", success: true });
         }
 
         // 3. Hash password
-        const hashedPassword = await bcrypt.hash(password, 10);
+        const hashedPassword = bcrypt.hashSync(password, salt);
+
 
         // 4. Create staff entry
-        const newStaff = await StaffModel.create({
-            companyId,
+        const newStaff = await UserModel.create({
+            companyId: userCompanyId,
             name,
             phone,
             email,
@@ -58,23 +47,8 @@ export default async function POST(request: Request) {
             password: hashedPassword,
         });
 
-        const tokenData: TokenData = {
-            _id: newStaff._id
-        };
 
-        // Create token
-        const token: string = jwt.sign(tokenData, process.env.TOKEN_SECRET as string);
-
-        const response = NextResponse.json({ message: `Hii! ${name}, Welcome to FyBill` });
-        response.cookies.set("FyBill_auth_token", token, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === "production", // Secure cookie in production
-            sameSite: "strict",
-            path: "/",
-            maxAge: 60 * 60 * 24 * 365
-        });
-
-        return NextResponse.json({ message: "Staff registered", staff: newStaff });
+        return NextResponse.json({ message: "Staff registered", });
     } catch (error) {
         console.error("Error registering staff:", error);
         return NextResponse.json({ message: "Internal server error" });
