@@ -31,8 +31,7 @@ export async function DELETE(request: Request) {
         });
 
         // Update owner user to remove company association
-
-        user.updateOne({
+        await user.updateOne({
             $unset: { companyId: "" }
         });
 

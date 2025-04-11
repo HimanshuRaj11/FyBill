@@ -16,13 +16,16 @@ export async function POST(req: Request) {
         if (User.companyId) {
             return NextResponse.json({ message: "Company already registered" });
         }
-        const Company = await CompanyModel.create({
-            name: companyName,
+        const address = {
             street: street,
             city: city,
             state: state,
             country: country,
             zipCode: zipCode,
+        }
+        const Company = await CompanyModel.create({
+            name: companyName,
+            address: address,
             email: contactEmail,
             phone: contactPhone,
             industry: industry,
