@@ -28,7 +28,6 @@ export default function Page({ params }: { params: Promise<{ InvoiceId: string }
             </div>
         );
     }
-    console.log(invoice);
 
     return (
         <div>
