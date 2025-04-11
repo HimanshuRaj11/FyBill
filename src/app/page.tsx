@@ -6,7 +6,6 @@ import Link from 'next/link'
 import { ArrowRight, FileText, Users, Package, ChartBar, Shield, Clock, Globe } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useSelector } from 'react-redux'
-import BillingComponentTest from '@/Components/Other/createBillTest'
 export default function Page() {
   const router = useRouter()
   const { User } = useSelector((state: any) => state.User)
