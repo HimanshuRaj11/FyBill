@@ -22,9 +22,9 @@ export async function GET() {
         if (!category) {
             return NextResponse.json({ success: false, message: "Category not found" }, { status: 404 });
         }
-        console.log(category);
         return NextResponse.json({ success: true, category });
     } catch (error) {
+        console.log(error);
         return NextResponse.json({ success: false, message: "Failed to fetch category", error: error as Error }, { status: 500 });
     }
 }   

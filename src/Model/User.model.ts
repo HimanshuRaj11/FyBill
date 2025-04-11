@@ -7,10 +7,12 @@ export interface IUser extends Document {
     email?: string;
     password: string,
     profilePic?: string;
-    country?: string;
-    state?: string;
-    city?: string;
-    zipCode?: string;
+    address?: {
+        country?: string;
+        state?: string;
+        city?: string;
+        zipCode?: string;
+    },
     isAdmin: boolean,
     role?: string;
     isActive: boolean;
@@ -27,10 +29,12 @@ const UserSchema: Schema = new Schema<IUser>(
         email: { type: String, required: true },
         password: { type: String, required: true },
         profilePic: { type: String },
-        country: { type: String },
-        state: { type: String },
-        city: { type: String },
-        zipCode: { type: String },
+        address: {
+            country: { type: String },
+            state: { type: String },
+            city: { type: String },
+            zipCode: { type: String }
+        },
         isAdmin: { type: Boolean, default: false },
         role: { type: String, default: "Owner" },
         isActive: { type: Boolean, default: true },

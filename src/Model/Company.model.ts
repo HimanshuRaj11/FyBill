@@ -2,11 +2,13 @@ import mongoose, { Schema, Document } from "mongoose";
 
 export interface ICompany extends Document {
     name: string;
-    street: string;
-    city: string;
-    state: string;
-    country: string;
-    zipCode: string;
+    address: {
+        street: string;
+        city: string;
+        state: string;
+        country: string;
+        zipCode: string;
+    };
     email?: string;
     phone: string;
     gstNumber?: string;
@@ -31,11 +33,13 @@ export interface ICompany extends Document {
 const CompanySchema: Schema = new Schema<ICompany>(
     {
         name: { type: String, required: true },
-        street: { type: String, required: true },
-        city: { type: String, required: true },
-        state: { type: String, required: true },
-        country: { type: String, required: true },
-        zipCode: { type: String, required: true },
+        address: {
+            street: { type: String, required: true },
+            city: { type: String, required: true },
+            state: { type: String, required: true },
+            country: { type: String, required: true },
+            zipCode: { type: String, required: true }
+        },
         email: { type: String },
         phone: { type: String, required: true },
         gstNumber: { type: String },

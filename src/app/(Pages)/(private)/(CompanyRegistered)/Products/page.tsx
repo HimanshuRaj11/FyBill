@@ -16,6 +16,8 @@ interface Product {
 
 export default function ProductsPage() {
     const [products, setProducts] = useState<Product[]>([]);
+
+
     const [loading, setLoading] = useState(true);
     const [selectedCategory, setSelectedCategory] = useState<string>('all');
     const [categories, setCategories] = useState<string[]>([]);
@@ -63,11 +65,14 @@ export default function ProductsPage() {
     return (
         <div className=" min-h-screen py-8 px-4 sm:px-6 lg:px-8">
             {/* Category Filter */}
-            <div className="">
+            <div className="w-full flex justify-end mb-4">
                 <Button>
                     <Link href="/Products/add">Add Product</Link>
                 </Button>
             </div>
+
+            <div className="w-full border-t border-gray-800 my-4"></div>
+
             <div className="max-w-7xl mx-auto mb-8">
                 <div className="flex flex-wrap gap-2 justify-center">
                     <button

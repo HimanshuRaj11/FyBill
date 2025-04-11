@@ -10,10 +10,15 @@ export default function RootLayout({
 }: Readonly<{
     children: React.ReactNode;
 }>) {
-    const { Company } = useSelector((state: any) => state.Company)
+    const { Company, loading } = useSelector((state: any) => state.Company)
     const company = Company?.company
 
-    if (!company) {
+    if (loading) {
+        return <div className="min-h-screen flex items-center justify-center">
+            <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-500"></div>
+        </div>
+    }
+    if (!loading && !company) {
         return <NotCompany />
     }
 

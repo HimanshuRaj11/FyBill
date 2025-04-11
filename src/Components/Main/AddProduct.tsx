@@ -8,6 +8,7 @@ import { toast } from 'react-toastify'
 import { z } from 'zod'
 import { useSelector } from 'react-redux'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 
 const productSchema = z.object({
     name: z.string().min(1, "Product name is required"),
@@ -22,6 +23,7 @@ type ProductFormData = z.infer<typeof productSchema>
 
 export default function AddProduct() {
     const [loading, setLoading] = useState(false)
+
     const [errors, setErrors] = useState<Partial<ProductFormData>>({})
     const { User } = useSelector((state: any) => state.User);
     const user = User?.user
@@ -97,16 +99,48 @@ export default function AddProduct() {
             setLoading(false)
         }
     }
-
-    const [categories, setCategories] = useState<string[]>([]);
-
     useEffect(() => {
+        setLoading(true)
         const fetchCategories = async () => {
             const response = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/company/Product_category/fetch`);
             setCategories(response.data.category.category);
+            setLoading(false)
         };
         fetchCategories();
     }, []);
+
+
+
+
+    const [categories, setCategories] = useState<string[]>([]);
+    if (!loading && categories.length === 0) {
+        return (
+            <div className="min-h-screen flex flex-col items-center justify-center space-y-6">
+                <div className="text-center space-y-4">
+                    <h2 className="text-3xl font-bold text-gray-900">No Product Categories Found</h2>
+                    <p className="text-gray-600">Please add product categories before creating products</p>
+                </div>
+                <Button className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg flex items-center space-x-2">
+                    <Link href="/Setting" className="flex items-center">
+                        <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                        </svg>
+                        Add Product Categories
+                    </Link>
+                </Button>
+            </div>
+        )
+    }
+    if (loading) {
+
+        return (
+            <div className="min-h-screen flex items-center justify-center">
+                <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-500"></div>
+            </div>
+        )
+    }
+
+
 
     return (
         <div className="w-full max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-md">

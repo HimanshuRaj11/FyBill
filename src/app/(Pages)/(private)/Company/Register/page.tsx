@@ -16,6 +16,9 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/Components/ui/select'
+import { useRouter } from 'next/navigation';
+import { useSelector } from 'react-redux';
+
 
 const companySchema = z.object({
     companyName: z.string()
@@ -26,7 +29,8 @@ const companySchema = z.object({
     state: z.string().min(1, 'State is required'),
     country: z.string().min(1, 'Country is required'),
     zipCode: z.string()
-        .regex(/^\d{5}(-\d{4})?$/, 'Invalid ZIP code format'),
+        .min(4, 'ZIP code must be at least 4 characters')
+        .max(10, 'ZIP code must be less than 10 characters'),
     industry: z.string().min(1, 'Industry is required'),
     companySize: z.string().min(1, 'Company size is required'),
     website: z.string()
@@ -68,8 +72,12 @@ const industries = [
 ];
 
 export default function CompanyRegistration() {
-
-
+    const router = useRouter()
+    const { Company } = useSelector((state: any) => state.Company)
+    const company = Company?.company
+    if (company) {
+        router.push('/Dashboard');
+    }
     const {
         register,
         handleSubmit,
@@ -96,9 +104,12 @@ export default function CompanyRegistration() {
 
     const onSubmit = async (data: CompanyFormValues) => {
         try {
-            const response = await axios.post(`${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/company/Register`, data);
-            toast.success('Company registered successfully!');
-            reset();
+            const res = await axios.post(`${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/company/Register`, data);
+            if (res.data.success) {
+                router.push('/Dashboard');
+                toast.success('Company registered successfully!');
+                reset();
+            }
         } catch (error: any) {
             toast.error(error.response?.data?.message || 'Failed to register company');
         }
