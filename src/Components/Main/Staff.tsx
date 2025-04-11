@@ -7,6 +7,7 @@ import AddStaff from './Addstaff'
 import axios from 'axios'
 import moment from 'moment'
 import { useSelector } from 'react-redux'
+import { toast } from 'react-toastify'
 
 interface StaffMember {
     _id: string
@@ -48,10 +49,12 @@ export default function Staff() {
             setLoading(true)
             const { data } = await axios.post(`${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/Staff/delete`, { _id: id }, { withCredentials: true })
             if (data.success) {
+                toast.success(data.message)
                 fetchStaff()
             }
             setLoading(false)
-        } catch (error) {
+        } catch (error: any) {
+            toast.error(error.response.data.error)
             setLoading(false)
         }
     }
@@ -156,6 +159,7 @@ export default function Staff() {
                             </p>
                         </div>
                         {(user?.role === "admin" || user?.role === "Owner") && (
+
                             <div className="mt-4 flex justify-end">
                                 <Button
                                     variant="destructive"

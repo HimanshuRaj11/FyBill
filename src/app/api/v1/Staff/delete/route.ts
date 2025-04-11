@@ -17,6 +17,13 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
         }
 
+        if (User.role === "Owner") {
+            return NextResponse.json({ error: "Owner cannot be deleted" }, { status: 400 })
+        }
+        if (User._id === User_id) {
+            return NextResponse.json({ error: "You cannot delete yourself" }, { status: 400 })
+        }
+
         const { _id } = await request.json();
         const Staff = await UserModel.findById({ _id: _id })
         if (!Staff) {
