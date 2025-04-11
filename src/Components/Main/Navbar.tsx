@@ -9,7 +9,6 @@ import Link from 'next/link'
 import axios from 'axios'
 import { FetchUser, LogoutUser } from '@/app/Redux/Slice/User.slice'
 import { useDispatch, useSelector } from 'react-redux'
-import { motion } from 'framer-motion'
 import { useRouter } from 'next/navigation'
 import { FetchCompany } from '@/app/Redux/Slice/Company.slice'
 const base_url = process.env.NEXT_PUBLIC_BASE_URL
@@ -29,6 +28,8 @@ export default function Navbar() {
             await axios.get(`${base_url}/api/v1/db`)
 
         } catch (error) {
+            console.log(error);
+
             return error
         }
     }
