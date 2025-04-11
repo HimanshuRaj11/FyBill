@@ -39,6 +39,7 @@ export async function POST(req: Request) {
         return NextResponse.json({ message: 'Company registered successfully' });
     } catch (error) {
         console.log(error);
+
         return NextResponse.json({ message: 'Company registration failed' }, { status: 500 });
     }
 }

@@ -48,6 +48,7 @@ export default function SettingsPage() {
             setTaxes(taxesRes.data.tax.taxes);
             setEditedTaxes(taxesRes.data.tax.taxes);
             setCategories(categoriesRes.data.category.category);
+            setLoading(false);
         } catch (error) {
             toast.error('Failed to load settings');
         }

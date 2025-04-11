@@ -99,14 +99,14 @@ export default function AddProduct() {
             setLoading(false)
         }
     }
+    const fetchCategories = async () => {
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/company/Product_category/fetch`);
+        setCategories(response.data.category.category);
+    };
     useEffect(() => {
         setLoading(true)
-        const fetchCategories = async () => {
-            const response = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/company/Product_category/fetch`);
-            setCategories(response.data.category.category);
-            setLoading(false)
-        };
         fetchCategories();
+        setLoading(false)
     }, []);
 
 
