@@ -16,7 +16,6 @@ export default function page() {
         }
         fetchProducts();
     }, []);
-    console.log(products);
     if (products.length === 0) {
         return (
             <div className="min-h-screen flex flex-col items-center justify-center space-y-6">
