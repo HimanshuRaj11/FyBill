@@ -19,13 +19,13 @@ export async function POST(request: Request) {
 
         const existing = await UserModel.findOne({ email })
         if (!existing) {
-            return NextResponse.json({ message: "Email not Found!!" });
+            return NextResponse.json({ message: "Wrong Credentials!!" });
         }
 
         const CheckPassword = bcrypt.compareSync(password, existing.password);
 
         if (!CheckPassword) {
-            return NextResponse.json({ message: "Authentication Failed!" });
+            return NextResponse.json({ message: "Wrong Credentials!!" });
         }
 
         const tokenData: TokenData = {

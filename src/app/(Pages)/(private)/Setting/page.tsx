@@ -7,6 +7,7 @@ import { Switch } from '@/Components/ui/switch';
 import { toast } from 'react-toastify';
 
 interface Tax {
+    _id?: string;
     taxName: string;
     percentage: number;
 }
@@ -20,7 +21,7 @@ export default function SettingsPage() {
     const [editCategoryMode, setEditCategoryMode] = useState(false);
     const [newTax, setNewTax] = useState({ taxName: '', percentage: 0 });
     const [newCategory, setNewCategory] = useState('');
-
+    const [editedTaxes, setEditedTaxes] = useState<Tax[]>([]);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -30,9 +31,8 @@ export default function SettingsPage() {
                     axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/company/Product_category/fetch`)
                 ]);
 
-
                 setTaxes(taxesRes.data.tax.taxes);
-
+                setEditedTaxes(taxesRes.data.tax.taxes);
                 setCategories(categoriesRes.data.category.category);
             } catch (error) {
                 toast.error('Failed to load settings');
@@ -57,10 +57,17 @@ export default function SettingsPage() {
         }
     };
 
-    const handleUpdateTax = async (index: number, updatedTax: Tax) => {
+    const handleTaxChange = (index: number, updatedTax: Tax) => {
+        const newEditedTaxes = [...editedTaxes];
+        newEditedTaxes[index] = updatedTax;
+        setEditedTaxes(newEditedTaxes);
+    };
+
+    const handleUpdateTax = async (index: number) => {
         try {
             setLoading(true);
-            const res = await axios.put(`${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/tax/update`, updatedTax);
+            const updatedTax = editedTaxes[index];
+            const res = await axios.post(`${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/company/Tax/update`, updatedTax);
             if (res.data.success) {
                 const updatedTaxes = [...taxes];
                 updatedTaxes[index] = updatedTax;
@@ -69,6 +76,27 @@ export default function SettingsPage() {
             }
         } catch (error) {
             toast.error('Failed to update tax');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleDeleteTax = async (taxId: string | undefined) => {
+        if (!taxId) return;
+        try {
+            setLoading(true);
+            console.log(taxId);
+            const res = await axios.post(`${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/company/Tax/delete`, {
+                taxId: taxId
+            });
+            if (res.data.success) {
+                const updatedTaxes = taxes.filter((tax) => tax._id !== taxId);
+                setTaxes(updatedTaxes);
+                setEditedTaxes(updatedTaxes);
+                toast.success('Tax deleted successfully');
+            }
+        } catch (error) {
+            toast.error('Failed to delete tax');
         } finally {
             setLoading(false);
         }
@@ -135,24 +163,24 @@ export default function SettingsPage() {
                         {taxes?.map((tax, index) => (
                             <div key={index} className="flex items-center gap-4">
                                 <Input
-                                    value={tax.taxName}
-                                    onChange={(e) => handleUpdateTax(index, { ...tax, taxName: e.target.value })}
+                                    value={editedTaxes[index]?.taxName || tax.taxName}
+                                    onChange={(e) => handleTaxChange(index, { ...editedTaxes[index], taxName: e.target.value })}
                                     className="w-1/2"
                                     disabled={!editTaxMode}
                                 />
                                 <Input
                                     type="number"
-                                    value={tax.percentage}
-                                    onChange={(e) => handleUpdateTax(index, { ...tax, percentage: Number(e.target.value) })}
+                                    value={editedTaxes[index]?.percentage || tax.percentage}
+                                    onChange={(e) => handleTaxChange(index, { ...editedTaxes[index], percentage: Number(e.target.value) })}
                                     className="w-1/4"
                                     disabled={!editTaxMode}
                                 />
                                 {editTaxMode && (
                                     <>
-                                        <Button onClick={() => handleUpdateTax(index, tax)} size="sm">
+                                        <Button onClick={() => handleUpdateTax(index)} size="sm">
                                             Update
                                         </Button>
-                                        <Button variant="destructive" size="sm">
+                                        <Button variant="destructive" size="sm" onClick={() => handleDeleteTax(tax._id)}>
                                             Remove
                                         </Button>
                                     </>

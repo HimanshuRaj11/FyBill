@@ -115,13 +115,16 @@ export default function Login() {
                 router.push('/Dashboard')
                 dispatch(FetchUser() as any);
                 toast.success(data.message)
+                return;
+            }
+            else {
+                toast.error(data.message)
+                return;
             }
         } catch (error: any) {
-            if (error.response) {
-                toast.error(error.response.data.message || 'Login failed');
-            } else {
-                toast.error('An error occurred during login');
-            }
+
+            toast.error(error.response.data.message || 'Login failed');
+
         } finally {
             setIsLoading(false);
         }

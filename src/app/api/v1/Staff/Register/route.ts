@@ -1,6 +1,5 @@
 import bcrypt from "bcryptjs";
 import { NextResponse } from "next/server";
-import connectDB from "@/lib/DB";
 import { verifyUser } from "@/lib/verifyUser";
 import UserModel from "@/Model/User.model";
 const salt = bcrypt.genSaltSync(10);

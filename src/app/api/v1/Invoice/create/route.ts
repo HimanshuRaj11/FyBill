@@ -26,7 +26,8 @@ export async function POST(request: Request) {
             phoneNumber,
             products,
             subTotal,
-            taxes,
+            appliedTaxes,
+            totalTaxAmount,
             grandTotal,
             paymentMode
         } = await request.json();
@@ -43,7 +44,8 @@ export async function POST(request: Request) {
             issueDate: new Date(),
             products,
             subTotal,
-            taxes,
+            appliedTaxes,
+            totalTaxAmount,
             grandTotal,
             paymentMode,
             createdBy: User._id
@@ -52,6 +54,7 @@ export async function POST(request: Request) {
         return Response.json({ message: "Invoice created successfully", invoice }, { status: 200 });
 
     } catch (error) {
+        console.log(error);
         return Response.json({ message: "Internal server error", error }, { status: 500 });
     }
 

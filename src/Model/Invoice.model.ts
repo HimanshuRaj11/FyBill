@@ -22,7 +22,8 @@ export interface IInvoice extends Document {
     issueDate: Date;
     products: Product[];
     subTotal: number;
-    taxes?: Tax[];
+    appliedTaxes?: Tax[];
+    totalTaxAmount: number;
     grandTotal: number;
     createdBy: mongoose.Types.ObjectId;
     paymentMode: string;
@@ -39,8 +40,10 @@ const ProductSchema: Schema = new Schema({
 });
 
 const TaxSchema: Schema = new Schema({
-    taxName: { type: String, required: true },
-    percentage: { type: Number, required: true },
+    taxName: { type: String, },
+    percentage: { type: Number, },
+    amount: { type: Number, },
+
 });
 
 const InvoiceSchema: Schema = new Schema<IInvoice>(
@@ -54,7 +57,8 @@ const InvoiceSchema: Schema = new Schema<IInvoice>(
         issueDate: { type: Date, required: true },
         products: { type: [ProductSchema], required: true },
         subTotal: { type: Number, required: true },
-        taxes: { type: [TaxSchema], },
+        appliedTaxes: { type: [TaxSchema], },
+        totalTaxAmount: { type: Number, required: true },
         grandTotal: { type: Number, required: true },
         createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
         paymentMode: {

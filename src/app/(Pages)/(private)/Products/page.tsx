@@ -4,7 +4,7 @@ import axios from 'axios';
 import { Button } from '@/Components/ui/button';
 import Link from 'next/link';
 import { FiEdit2, FiTrash2 } from 'react-icons/fi';
-
+import { toast } from 'react-toastify';
 // TypeScript interface for Product
 interface Product {
     _id: string;
@@ -20,20 +20,31 @@ export default function ProductsPage() {
     const [selectedCategory, setSelectedCategory] = useState<string>('all');
     const [categories, setCategories] = useState<string[]>([]);
 
-    useEffect(() => {
-        const fetchProducts = async () => {
-            try {
-                const res = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/company/product/fetch`);
-                const data = res.data;
-                setProducts(data.products);
+    const deleteProduct = async (id: string) => {
+        const res = await axios.post(`${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/company/product/delete`, { _id: id });
+        const data = res.data;
+        if (data.success) {
+            toast.success(data.message);
+            fetchProducts();
+        } else {
+            toast.error(data.error);
+        }
+    }
 
-                const uniqueCategories = [...new Set(data.products.map((product: Product) => product.category))];
-                setCategories(uniqueCategories as string[]);
-                setLoading(false);
-            } catch (error) {
-                setLoading(false);
-            }
-        };
+    const fetchProducts = async () => {
+        try {
+            const res = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/company/product/fetch`);
+            const data = res.data;
+            setProducts(data.products);
+
+            const uniqueCategories = [...new Set(data.products.map((product: Product) => product.category))];
+            setCategories(uniqueCategories as string[]);
+            setLoading(false);
+        } catch (error) {
+            setLoading(false);
+        }
+    };
+    useEffect(() => {
         fetchProducts();
     }, []);
 
@@ -110,7 +121,7 @@ export default function ProductsPage() {
                                         <FiEdit2 className="w-4 h-4" />
                                         Edit
                                     </Button>
-                                    <Button variant="destructive" className="w-1/2 flex items-center justify-center gap-2">
+                                    <Button variant="destructive" className="w-1/2 flex items-center justify-center gap-2" onClick={() => deleteProduct(product._id)}>
                                         <FiTrash2 className="w-4 h-4" />
                                         Delete
                                     </Button>

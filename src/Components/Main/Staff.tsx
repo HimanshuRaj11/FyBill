@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import AddStaff from './Addstaff'
 import axios from 'axios'
 import moment from 'moment'
+import { useSelector } from 'react-redux'
 
 interface StaffMember {
     _id: string
@@ -18,26 +19,46 @@ interface StaffMember {
 }
 
 export default function Staff() {
+    const { User } = useSelector((state: any) => state.User);
+    const user = User?.user
+
+
     const [showAddStaffModal, setShowAddStaffModal] = useState(false)
     const [searchQuery, setSearchQuery] = useState('')
     const [filterStatus, setFilterStatus] = useState<'all' | 'staff' | 'admin' | 'manager' | 'Owner'>('all')
     const [loading, setLoading] = useState(true)
     // Dummy data
     const [staffMembers, setStaffMembers] = useState<StaffMember[]>([])
+
+    const fetchStaff = async () => {
+        const { data } = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/Staff/Fetch`)
+        setStaffMembers(data.staff);
+        setLoading(false)
+    }
+
+
     const filteredStaff = staffMembers.filter(staff => {
         const matchesSearch = staff.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
             staff.email.toLowerCase().includes(searchQuery.toLowerCase())
         const matchesFilter = filterStatus === 'all' || staff.role === filterStatus
         return matchesSearch && matchesFilter
     })
+    const handleDelete = async (id: string) => {
+        try {
+            setLoading(true)
+            const { data } = await axios.post(`${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/Staff/delete`, { _id: id }, { withCredentials: true })
+            if (data.success) {
+                fetchStaff()
+            }
+            setLoading(false)
+        } catch (error) {
+            setLoading(false)
+        }
+    }
 
 
     useEffect(() => {
-        const fetchStaff = async () => {
-            const { data } = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/Staff/Fetch`)
-            setStaffMembers(data.staff);
-            setLoading(false)
-        }
+
         fetchStaff()
     }, [])
 
@@ -57,13 +78,17 @@ export default function Staff() {
                     <h1 className="text-2xl md:text-3xl font-bold text-gray-800">Staff Management</h1>
                     <p className="text-gray-500 mt-1">Manage your team members and their roles</p>
                 </div>
-                <Button
-                    onClick={() => setShowAddStaffModal(true)}
-                    className="bg-indigo-600 hover:bg-indigo-700 text-white !rounded-lg whitespace-nowrap flex items-center gap-2"
-                >
-                    <Plus className="h-4 w-4" />
-                    Add Staff Member
-                </Button>
+                {
+                    user?.role === "admin" || user?.role === "Owner" && (
+                        <Button
+                            onClick={() => setShowAddStaffModal(true)}
+                            className="bg-indigo-600 hover:bg-indigo-700 text-white !rounded-lg whitespace-nowrap flex items-center gap-2"
+                        >
+                            <Plus className="h-4 w-4" />
+                            Add Staff Member
+                        </Button>
+                    )
+                }
             </div>
 
             {/* Search and Filter Section */}
@@ -130,6 +155,18 @@ export default function Staff() {
                                 <span className="font-medium">Joined:</span> {moment(staff.createdAt).format('MMM DD, YYYY')}
                             </p>
                         </div>
+                        {(user?.role === "admin" || user?.role === "Owner") && (
+                            <div className="mt-4 flex justify-end">
+                                <Button
+                                    variant="destructive"
+                                    size="sm"
+                                    onClick={() => handleDelete(staff._id)}
+                                    className="text-sm"
+                                >
+                                    Delete
+                                </Button>
+                            </div>
+                        )}
                     </div>
                 ))}
             </div>

@@ -1,15 +1,22 @@
 'use client'
 import { useRef, useState } from "react";
 import { Button } from "../ui/button";
-import { Download, Printer, Share2, Mail } from "lucide-react";
+import { Download, Printer, Share2, Mail, Trash2 } from "lucide-react";
 import { motion } from "framer-motion";
 import { IInvoice } from "@/Model/Invoice.model";
 import moment from "moment";
+import axios from "axios";
+import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
+import { useSelector } from "react-redux";
 
-export default function InvoiceDisplay({ invoice }: { invoice: IInvoice }) {
+export default function InvoiceDisplay({ invoice }: { invoice: any }) {
+    const { User } = useSelector((state: any) => state.User);
+    const user = User?.user
+
     const [isPrinting, setIsPrinting] = useState(false);
     const invoiceRef = useRef<HTMLDivElement>(null);
-
+    const router = useRouter();
     const handlePrint = () => {
         if (invoiceRef.current) {
             setIsPrinting(true);
@@ -25,10 +32,16 @@ export default function InvoiceDisplay({ invoice }: { invoice: IInvoice }) {
 
     if (!invoice) return <div className="p-4 text-center text-gray-500">No invoice data available</div>;
 
-    const subtotal = invoice.products.reduce((sum, item) => sum + item.amount, 0);
-    const tax = subtotal * 0.1;
-    const total = subtotal + tax;
 
+    const deleteInvoice = async () => {
+        const { data } = await axios.delete(`${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/Invoice/${invoice.invoiceId}/delete`, { withCredentials: true });
+        if (data.success) {
+            toast.success("Invoice deleted successfully");
+            router.back();
+        } else {
+            toast.error("Failed to delete invoice");
+        }
+    }
     return (
         <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             {/* Header with actions */}
@@ -41,22 +54,31 @@ export default function InvoiceDisplay({ invoice }: { invoice: IInvoice }) {
                     </div>
                 </div>
                 <div className="flex flex-wrap justify-center sm:justify-end gap-2">
-                    <Button variant="outline" className="flex items-center gap-2 hover:bg-gray-100 text-sm sm:text-base">
+
+                    <Button variant="outline" className="flex items-center gap-2 hover:bg-gray-100 text-sm sm:text-base cursor-pointer">
                         <Download className="h-4 w-4" />
                         <span className="hidden sm:inline">Download</span>
                     </Button>
-                    <Button variant="outline" className="flex items-center gap-2 hover:bg-gray-100 text-sm sm:text-base">
+                    <Button variant="outline" className="flex items-center gap-2 hover:bg-gray-100 text-sm sm:text-base cursor-pointer">
                         <Share2 className="h-4 w-4" />
                         <span className="hidden sm:inline">Share</span>
                     </Button>
-                    <Button variant="outline" className="flex items-center gap-2 hover:bg-gray-100 text-sm sm:text-base">
+                    <Button variant="outline" className="flex items-center gap-2 hover:bg-gray-100 text-sm sm:text-base cursor-pointer">
                         <Mail className="h-4 w-4" />
                         <span className="hidden sm:inline">Email</span>
                     </Button>
+                    {
+                        user?.role === "admin" || user?.role === "Owner" && (
+                            <Button onClick={deleteInvoice} variant="outline" className="flex items-center gap-2 hover:bg-red-100 text-red-600 text-sm sm:text-base cursor-pointer">
+                                <Trash2 className="h-4 w-4" />
+                                <span className="hidden sm:inline">Delete</span>
+                            </Button>
+                        )
+                    }
                     <Button
                         onClick={handlePrint}
                         disabled={isPrinting}
-                        className="bg-indigo-600 hover:bg-indigo-700 text-white flex items-center gap-2 text-sm sm:text-base"
+                        className="bg-indigo-600 hover:bg-indigo-700 text-white flex items-center gap-2 text-sm sm:text-base cursor-pointer"
                     >
                         <Printer className="h-4 w-4" />
                         <span>{isPrinting ? 'Printing...' : 'Print'}</span>
@@ -127,19 +149,19 @@ export default function InvoiceDisplay({ invoice }: { invoice: IInvoice }) {
                                     <td className="p-4 text-gray-700 font-medium" colSpan={3}>SUBTOTAL</td>
                                     <td className="p-4 text-gray-800 text-right font-bold">${invoice.subTotal.toFixed(2)}</td>
                                 </tr>
-                                {invoice?.taxes?.map((tax: any, index: any) => (
+                                {invoice?.appliedTaxes?.map((tax: any, index: any) => (
                                     <tr key={index}>
                                         <td className="p-4 text-gray-700" colSpan={3}>
                                             {tax.taxName} ({tax.percentage}%)
                                         </td>
                                         <td className="p-4 text-gray-800 text-right">
-                                            ${((tax.percentage / 100) * invoice.subTotal).toFixed(2)}
+                                            ${tax.amount}
                                         </td>
                                     </tr>
                                 ))}
                                 <tr className="border-t-2 border-gray-200 bg-gray-100">
                                     <td className="p-4 text-gray-800 font-bold text-lg" colSpan={3}>GRAND TOTAL</td>
-                                    <td className="p-4 text-gray-800 font-bold text-lg text-right">${total.toFixed(2)}</td>
+                                    <td className="p-4 text-gray-800 font-bold text-lg text-right">${invoice.grandTotal.toFixed(2)}</td>
                                 </tr>
                             </tfoot>
                         </table>
@@ -163,6 +185,30 @@ export default function InvoiceDisplay({ invoice }: { invoice: IInvoice }) {
                     </div>
                 </div>
             </motion.div>
+
+            {/* User Details */}
+            <div className='flex justify-end mt-8 bg-gradient-to-r from-gray-50 to-gray-100 p-4 rounded-lg shadow-sm'>
+                <div className='flex flex-col sm:flex-row gap-4 sm:gap-6'>
+                    <div className='flex items-center gap-2'>
+                        <span className='text-gray-400'>Created By:</span>
+                        <p className='text-gray-700 font-medium hover:text-blue-600 transition-colors'>
+                            {invoice?.createdBy?.name}
+                        </p>
+                    </div>
+                    <div className='flex items-center gap-2'>
+                        <span className='text-gray-400'>Email:</span>
+                        <p className='text-gray-700 font-medium hover:text-blue-600 transition-colors'>
+                            {invoice?.createdBy?.email}
+                        </p>
+                    </div>
+                    <div className='flex items-center gap-2'>
+                        <span className='text-gray-400'>Phone:</span>
+                        <p className='text-gray-700 font-medium hover:text-blue-600 transition-colors'>
+                            {invoice?.createdBy?.phone}
+                        </p>
+                    </div>
+                </div>
+            </div>
         </div>
     );
 }

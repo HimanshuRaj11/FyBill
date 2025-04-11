@@ -35,8 +35,8 @@ const CompanySchema: Schema = new Schema<ICompany>(
         zipCode: { type: String, required: true },
         email: { type: String },
         phone: { type: String, required: true },
-        gstNumber: { type: String }, // For Indian companies
-        panNumber: { type: String }, // Optional for taxation
+        gstNumber: { type: String },
+        panNumber: { type: String },
         logoUrl: { type: String },
         website: { type: String },
         description: { type: String, required: true },
@@ -44,8 +44,8 @@ const CompanySchema: Schema = new Schema<ICompany>(
         staffIds: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
         industry: { type: String, required: true },
         companySize: { type: String, required: true },
-        currency: { type: String, required: true },
-        currencySymbol: { type: String, required: true },
+        currency: { type: String, required: true, default: "USD" },
+        currencySymbol: { type: String, required: true, default: "$" },
     },
     {
         timestamps: true,

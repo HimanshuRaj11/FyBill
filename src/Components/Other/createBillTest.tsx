@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Dialog, DialogContent } from "../ui/dialog";
-import InvoiceDisplay from "./InvoiceDisplay";
 import axios from "axios";
 import { toast } from "react-toastify";
 interface Product {
@@ -13,9 +12,11 @@ interface Product {
     amount: number;
 }
 
-export default function BillingComponent() {
+export default function BillingComponentTest() {
 
     const [invoice, setInvoice] = useState<any>(null);
+
+
 
     const [clientName, setClientName] = useState("");
     const [phoneNumber, setPhoneNumber] = useState("");
@@ -23,7 +24,6 @@ export default function BillingComponent() {
     const [rate, setRate] = useState<number>(0);
     const [quantity, setQuantity] = useState<number>(0);
     const [products, setProducts] = useState<Product[]>([]);
-
     const [editIndex, setEditIndex] = useState<number | null>(null);
     const [showInvoice, setShowInvoice] = useState(false);
     const [filteredProducts, setFilteredProducts] = useState<any[]>([]);
@@ -36,41 +36,35 @@ export default function BillingComponent() {
     let totalTaxAmount = 0;
     const [grandTotal, setGrandTotal] = useState<number>(0);
     const [paymentMode, setPaymentMode] = useState<string>("");
+
     const [AppliedTaxes, setAppliedTaxes] = useState<any[]>([]);
 
-    useEffect(() => {
-        setAppliedTaxes([])
-        taxes.map((tax) => {
-            const taxAmount = subTotal * tax.percentage / 100;
-            setAppliedTaxes((prev) => [...prev, {
-                taxName: tax.taxName,
-                percentage: tax.percentage,
-                amount: taxAmount
-            }])
+    console.log(AppliedTaxes);
 
-        })
-    }, [subTotal])
 
     useEffect(() => {
         setSubTotal(products.reduce((sum, product) => sum + product.amount, 0));
+        taxes.map((tax) => {
+            const taxAmount = subTotal * tax.percentage / 100;
+            console.log(taxAmount, "taxAmount", subTotal, "subTotal", tax.percentage, "tax.percentage");
+
+            totalTaxAmount = totalTaxAmount + taxAmount;
+
+            setAppliedTaxes(prevTaxes => [...prevTaxes, {
+                taxName: tax.taxName,
+                percentage: tax.percentage,
+                taxAmount: taxAmount,
+            }]);
+        })
+
+    }, [subTotal]);
+
+    useEffect(() => {
         setGrandTotal(Number((subTotal + totalTaxAmount).toFixed(2)));
     }, [subTotal, products]);
 
 
     const handleAddProduct = () => {
-        if (!productName.trim()) {
-            toast.error("Please enter product name");
-            return;
-        }
-        if (!rate || rate <= 0) {
-            toast.error("Please enter a valid rate");
-            return;
-        }
-        if (!quantity || quantity <= 0) {
-            toast.error("Please enter a valid quantity");
-            return;
-        }
-
         const newProduct: Product = {
             name: productName,
             rate,
@@ -128,11 +122,9 @@ export default function BillingComponent() {
                 phoneNumber,
                 products,
                 subTotal,
+                taxes,
                 grandTotal,
                 paymentMode,
-                appliedTaxes: AppliedTaxes,
-                totalTaxAmount,
-
             })
             if (data.invoice) {
                 setInvoice(data.invoice);
@@ -285,8 +277,6 @@ export default function BillingComponent() {
                     </div>
                     {taxes.map((tax, index) => {
                         const taxAmount = subTotal * tax.percentage / 100;
-                        totalTaxAmount = totalTaxAmount + taxAmount;
-
                         return (
                             <div key={index} className="flex justify-between items-center">
                                 <span className="text-sm font-medium">{tax.taxName} ({tax.percentage}%):</span>
@@ -294,7 +284,7 @@ export default function BillingComponent() {
                             </div>
                         )
                     })}
-                    <div className="flex justify-between items-center border-t pt-4">
+                    <div className="flex justify-between items-center border-t pt-4 font-bold">
                         <span>Total Tax Amount:</span>
                         <span>₹{totalTaxAmount}</span>
                     </div>
@@ -322,11 +312,6 @@ export default function BillingComponent() {
                 </div>
             </div>
 
-            <Dialog open={showInvoice} onOpenChange={setShowInvoice}>
-                <DialogContent className="max-w-7xl w-full max-h-[90vh] overflow-auto">
-                    <InvoiceDisplay invoice={invoice} />
-                </DialogContent>
-            </Dialog>
         </>
     );
 }

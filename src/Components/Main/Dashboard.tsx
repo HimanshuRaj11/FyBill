@@ -1,8 +1,11 @@
 "use client"
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Button } from '../ui/button'
 import { Download, ChevronDown, Filter, Search, RefreshCw } from 'lucide-react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card'
+import axios from 'axios'
+import moment from 'moment'
+import Link from 'next/link'
 
 
 export default function Dashboard() {
@@ -11,12 +14,24 @@ export default function Dashboard() {
     const [searchQuery, setSearchQuery] = useState('')
     const [isFilterOpen, setIsFilterOpen] = useState(false)
 
-    // Simulate loading data
-    const handleRefresh = () => {
-        setIsLoading(true)
-        setTimeout(() => {
+    const [Invoice, setInvoice] = useState([])
+    const FetchInvoice: () => Promise<void> = async () => {
+        try {
+            setIsLoading(true)
+            const { data } = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/Invoice/fetch?limit=10&sort=-createdAt`)
+            setInvoice(data.invoices)
             setIsLoading(false)
-        }, 1500)
+        } catch (error) {
+            setIsLoading(false)
+        }
+    }
+
+    useEffect(() => {
+        FetchInvoice()
+    }, [])
+
+    const handleRefresh = () => {
+        FetchInvoice()
     }
 
     return (
@@ -37,13 +52,6 @@ export default function Dashboard() {
                     >
                         <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
                         Refresh
-                    </Button>
-                    <Button
-                        variant="outline"
-                        className="!rounded-lg whitespace-nowrap flex items-center gap-2"
-                    >
-                        <Download className="h-4 w-4" />
-                        Export
                     </Button>
 
                 </div>
@@ -200,25 +208,22 @@ export default function Dashboard() {
                                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Invoice</th>
                                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer</th>
                                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
-                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Mode of Payment</th>
                                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                                 </tr>
                             </thead>
                             <tbody className="bg-white divide-y divide-gray-200">
-                                {[1, 2, 3, 4, 5].map((item) => (
-                                    <tr key={item} className="hover:bg-gray-50">
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-indigo-600">INV-{1000 + item}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Customer {item}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${(Math.random() * 1000).toFixed(2)}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap">
-                                            <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${item % 3 === 0 ? 'bg-green-100 text-green-800' :
-                                                item % 3 === 1 ? 'bg-yellow-100 text-yellow-800' :
-                                                    'bg-red-100 text-red-800'
-                                                }`}>
-                                                {item % 3 === 0 ? 'Paid' : item % 3 === 1 ? 'Pending' : 'Overdue'}
-                                            </span>
+                                {Invoice?.map((invoice: any) => (
+                                    <tr key={invoice.invoiceId} className="hover:bg-gray-50">
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-indigo-600">{invoice.invoiceId}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500"> {invoice.clientName}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${invoice.grandTotal}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 ">{invoice.paymentMode} </td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{moment(invoice.createdAt).format('MMM DD, YYYY')}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            <Link href={`/Invoice/${invoice.invoiceId}`} className='text-blue-500'>View</Link>
                                         </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2023-{String(item).padStart(2, '0')}-{String(item * 5).padStart(2, '0')}</td>
                                     </tr>
                                 ))}
                             </tbody>

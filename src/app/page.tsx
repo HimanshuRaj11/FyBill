@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { ArrowRight, FileText, Users, Package, ChartBar, Shield, Clock, Globe } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useSelector } from 'react-redux'
+import BillingComponentTest from '@/Components/Other/createBillTest'
 export default function Page() {
   const router = useRouter()
   const { User } = useSelector((state: any) => state.User)
@@ -129,9 +130,7 @@ export default function Page() {
               <Button size="lg" className="bg-white text-blue-600 hover:bg-gray-100 text-lg px-8 py-6 rounded-xl">
                 <Link href="/Login">Start Free Trial</Link>
               </Button>
-              <Button size="lg" variant="outline" className="border-white text-white hover:bg-blue-700 text-lg px-8 py-6 rounded-xl">
-                Schedule Demo
-              </Button>
+
             </div>
           </motion.div>
         </div>

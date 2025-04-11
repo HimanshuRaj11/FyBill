@@ -16,14 +16,20 @@ export async function POST(request: Request) {
         const Company = await CompanyModel.findById({ _id: User.companyId });
         if (!Company) { return NextResponse.json({ success: false, message: "Company not found" }, { status: 404 }) }
 
-        const { taxId } = await request.json();
         const tax = await TaxModel.findOne({ companyId: Company._id });
         if (!tax) { return NextResponse.json({ success: false, message: "Tax not found" }, { status: 404 }) }
 
-        tax.taxes = tax.taxes.filter((tax: any) => tax._id.toString() !== taxId);
+        const { taxName, percentage, _id } = await request.json();
+
+        const updatedTax = tax.taxes.find((tax: any) => tax._id.toString() === _id);
+        if (!updatedTax) { return NextResponse.json({ success: false, message: "Tax not found" }, { status: 404 }) }
+
+        updatedTax.taxName = taxName;
+        updatedTax.percentage = percentage;
+
         await tax.save();
 
-        return NextResponse.json({ success: true, message: "Tax deleted" }, { status: 200 })
+        return NextResponse.json({ success: true, message: "Tax updated", }, { status: 200 })
 
 
     } catch (error) {

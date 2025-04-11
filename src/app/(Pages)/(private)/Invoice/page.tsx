@@ -5,19 +5,34 @@ import { InvoiceButton } from '@/Components/ui/invoice-button'
 import axios from 'axios'
 import moment from 'moment';
 import Link from 'next/link';
+import { Button } from '@/Components/ui/button';
+import { useSelector } from 'react-redux';
 
 export default function pages() {
+    const { User } = useSelector((state: any) => state.User);
+    const user = User?.user
     const [invoices, setInvoices] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(true);
+    const [actionMode, setActionMode] = useState<boolean>(false);
+
+
+    const fetchInvoices = async () => {
+        const { data } = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/Invoice/fetch`)
+        if (data.success) {
+            setInvoices(data.invoices);
+        }
+        setIsLoading(false);
+    }
+    const handleDelete = async (invoiceId: string) => {
+        setIsLoading(true);
+        const { data } = await axios.delete(`${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/Invoice/${invoiceId}/delete`, { withCredentials: true })
+        if (data.success) {
+            setInvoices(invoices.filter((invoice) => invoice.invoiceId !== invoiceId))
+        }
+        setIsLoading(false);
+    }
 
     useEffect(() => {
-        const fetchInvoices = async () => {
-            const { data } = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/Invoice/fetch`)
-            if (data.success) {
-                setInvoices(data.invoices);
-            }
-            setIsLoading(false);
-        }
         fetchInvoices();
     }, [])
     if (isLoading) {
@@ -30,24 +45,17 @@ export default function pages() {
     return (
         <div className='p-4 '>
             <div className="w-full flex flex-col">
-                <div className="flex justify-between items-center">
-                    <h1 className='text-4xl font-bold'>Overview</h1>
+                <div className="flex justify-between items-center mb-4">
+                    {
+                        user?.role === "admin" || user?.role === "Owner" && (
+                            <Button className='cursor-pointer' onClick={() => setActionMode(!actionMode)}>
+                                {actionMode ? 'Cancel Action' : 'Take Action'}
+                            </Button>
+                        )
+                    }
                     <InvoiceButton companyId="123" className="px-6" />
                 </div>
-                <div className="grid grid-cols-3 gap-4 mb-4 mt-4">
-                    <div className="flex flex-col items-center justify-center h-24 rounded-lg bg-white shadow-sm dark:bg-gray-800 p-4 transition-all hover:shadow-md">
-                        <p className="text-gray-500 text-sm">Total Income</p>
-                        <h2 className="text-2xl font-bold mt-1">$4,997</h2>
-                    </div>
-                    <div className="flex flex-col items-center justify-center h-24 rounded-lg bg-white shadow-sm dark:bg-gray-800 p-4 transition-all hover:shadow-md">
-                        <p className="text-gray-500 text-sm">Pending Bills</p>
-                        <h2 className="text-2xl font-bold mt-1">3</h2>
-                    </div>
-                    <div className="flex flex-col items-center justify-center h-24 rounded-lg bg-white shadow-sm dark:bg-gray-800 p-4 transition-all hover:shadow-md">
-                        <p className="text-gray-500 text-sm">Total Expenses</p>
-                        <h2 className="text-2xl font-bold mt-1">$1,234</h2>
-                    </div>
-                </div>
+
             </div>
 
             <div className="w-full bg-white rounded-lg shadow-sm p-4 mb-4">
@@ -78,7 +86,7 @@ export default function pages() {
                     <tbody>
                         {
                             invoices.map((invoice) => (
-                                <tr className="bg-white border-b hover:bg-gray-50 transition-colors">
+                                <tr key={invoice._id} className="bg-white border-b hover:bg-gray-50 transition-colors">
                                     <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
                                         {invoice.invoiceId}
                                     </th>
@@ -90,8 +98,17 @@ export default function pages() {
                                             {invoice.paymentMode}
                                         </span>
                                     </td>
-                                    <td className="px-6 py-4">
-                                        <Link href={`/Invoice/${invoice.invoiceId}`} className="text-blue-600 hover:text-blue-800 font-medium">View</Link>
+                                    <td className="px-6 py-4 flex items-center gap-2">
+                                        <Link href={`/Invoice/${invoice.invoiceId}`} className="text-blue-600 hover:text-blue-800 font-medium">
+                                            <Button variant="outline" className='cursor-pointer'>
+                                                View
+                                            </Button>
+                                        </Link>
+                                        {
+                                            actionMode && (
+                                                <Button onClick={() => handleDelete(invoice.invoiceId)} variant="destructive" className='cursor-pointer'>Delete</Button>
+                                            )
+                                        }
                                     </td>
                                 </tr>
                             ))}

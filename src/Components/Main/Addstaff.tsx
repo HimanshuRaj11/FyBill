@@ -6,6 +6,8 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { Eye, EyeOff } from 'lucide-react'
 import axios from 'axios'
 import { toast } from 'react-toastify'
+import { useSelector } from 'react-redux'
+import { useRouter } from 'next/navigation'
 
 const staffSchema = z.object({
     name: z.string().min(2, 'Name must be at least 2 characters'),
@@ -26,6 +28,14 @@ const staffSchema = z.object({
 type StaffFormData = z.infer<typeof staffSchema>
 
 export default function AddStaff({ setShowAddStaffModal }: { setShowAddStaffModal: (show: boolean) => void }) {
+    const { User } = useSelector((state: any) => state.User);
+    const user = User?.user
+    const router = useRouter()
+    if (user?.role !== "admin" && user?.role !== "Owner") {
+        toast.error("You are not authorized to add staff")
+        router.back()
+        return
+    }
     const [showPassword, setShowPassword] = useState(false)
     const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 

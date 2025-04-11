@@ -6,6 +6,8 @@ import { Input } from "@/Components/ui/input"
 import { Textarea } from "@/Components/ui/textarea"
 import { toast } from 'react-toastify'
 import { z } from 'zod'
+import { useSelector } from 'react-redux'
+import { useRouter } from 'next/navigation'
 
 const productSchema = z.object({
     name: z.string().min(1, "Product name is required"),
@@ -21,6 +23,14 @@ type ProductFormData = z.infer<typeof productSchema>
 export default function AddProduct() {
     const [loading, setLoading] = useState(false)
     const [errors, setErrors] = useState<Partial<ProductFormData>>({})
+    const { User } = useSelector((state: any) => state.User);
+    const user = User?.user
+    const router = useRouter()
+    if (user?.role !== "admin" && user?.role !== "Owner") {
+        toast.error("You are not authorized to add Products")
+        router.back()
+        return
+    }
 
     const initialData: ProductFormData = {
         name: '',
