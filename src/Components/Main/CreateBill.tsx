@@ -20,8 +20,8 @@ export default function BillingComponent() {
     const [clientName, setClientName] = useState("");
     const [phoneNumber, setPhoneNumber] = useState("");
     const [productName, setProductName] = useState("");
-    const [rate, setRate] = useState<number>(0);
-    const [quantity, setQuantity] = useState<number>(0);
+    const [rate, setRate] = useState<number>();
+    const [quantity, setQuantity] = useState<number>(1);
     const [products, setProducts] = useState<Product[]>([]);
 
     const [editIndex, setEditIndex] = useState<number | null>(null);
@@ -153,37 +153,38 @@ export default function BillingComponent() {
 
 
 
-
     // Fetching Data
+    const FetchProducts = async () => {
+        const { data } = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/company/product/fetch`)
+        if (data.success) {
+            setProductsList(data?.products);
+        }
+    }
+    const fetchTaxData = async () => {
+        const { data } = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/company/Tax/fetch`)
+        setTaxes(data.tax.taxes);
+    }
     useEffect(() => {
-        const FetchProducts = async () => {
-            const { data } = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/company/product/fetch`)
-            if (data.success) {
-                setProductsList(data?.product?.products);
-                setFilteredProducts(data?.product?.products);
-            }
-        }
         FetchProducts();
-
-        const fetchData = async () => {
-            const { data } = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/company/Tax/fetch`)
-            setTaxes(data.tax.taxes);
-        }
-        fetchData();
+        fetchTaxData();
     }, [])
 
     const handleProductSearch = (searchTerm: string) => {
+        console.log(searchTerm);
+
         setProductName(searchTerm);
         setShowProductDropdown(true);
+        console.log(productsList);
         const filtered = productsList?.filter(product =>
             product.name.toLowerCase().includes(searchTerm.toLowerCase())
         );
         setFilteredProducts(filtered);
+        console.log(filteredProducts);
     };
 
     const handleProductSelect = (product: any) => {
         setProductName(product.name);
-        setRate(product.rate || 0);
+        setRate(product.price || 0);
         setShowProductDropdown(false);
     };
 
@@ -213,6 +214,7 @@ export default function BillingComponent() {
                             onChange={(e) => handleProductSearch(e.target.value)}
                             onFocus={() => setShowProductDropdown(true)}
                         />
+
                         {showProductDropdown && filteredProducts?.length > 0 && (
                             <div className="absolute z-10 w-full bg-white border rounded-md shadow-lg mt-1 max-h-48 overflow-y-auto">
                                 {filteredProducts.map((product, index) => (

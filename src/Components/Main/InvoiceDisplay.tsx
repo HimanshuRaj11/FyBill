@@ -98,7 +98,7 @@ export default function InvoiceDisplay({ invoice }: { invoice: any }) {
                         <div className="flex flex-row justify-between">
                             <h2 className="text-3xl sm:text-4xl font-bold text-gray-800">INVOICE</h2>
                             <div className="bg-indigo-50 text-indigo-700 px-6 py-3 rounded-lg font-bold text-lg">
-                                #{invoice.invoiceId}
+                                {invoice.invoiceId}
                             </div>
                         </div>
                         <div className="space-y-4">
@@ -139,15 +139,15 @@ export default function InvoiceDisplay({ invoice }: { invoice: any }) {
                                     <tr key={index} className="hover:bg-gray-50 transition-colors duration-150">
                                         <td className="p-4 text-gray-800">{product.name}</td>
                                         <td className="p-4 text-gray-800 text-right">{product.quantity}</td>
-                                        <td className="p-4 text-gray-800 text-right">${product.rate.toFixed(2)}</td>
-                                        <td className="p-4 text-gray-800 text-right font-medium">${product.amount.toFixed(2)}</td>
+                                        <td className="p-4 text-gray-800 text-right">{invoice.currency} {product.rate.toFixed(2)}</td>
+                                        <td className="p-4 text-gray-800 text-right font-medium">{invoice.currency} {product.amount.toFixed(2)}</td>
                                     </tr>
                                 ))}
                             </tbody>
                             <tfoot className="bg-gray-50">
                                 <tr className="border-t-2 border-gray-200">
                                     <td className="p-4 text-gray-700 font-medium" colSpan={3}>SUBTOTAL</td>
-                                    <td className="p-4 text-gray-800 text-right font-bold">${invoice.subTotal.toFixed(2)}</td>
+                                    <td className="p-4 text-gray-800 text-right font-bold">{invoice.currency} {invoice.subTotal.toFixed(2)}</td>
                                 </tr>
                                 {invoice?.appliedTaxes?.map((tax: any, index: any) => (
                                     <tr key={index}>
@@ -155,13 +155,13 @@ export default function InvoiceDisplay({ invoice }: { invoice: any }) {
                                             {tax.taxName} ({tax.percentage}%)
                                         </td>
                                         <td className="p-4 text-gray-800 text-right">
-                                            ${tax.amount}
+                                            {invoice.currency} {tax.amount}
                                         </td>
                                     </tr>
                                 ))}
                                 <tr className="border-t-2 border-gray-200 bg-gray-100">
                                     <td className="p-4 text-gray-800 font-bold text-lg" colSpan={3}>GRAND TOTAL</td>
-                                    <td className="p-4 text-gray-800 font-bold text-lg text-right">${invoice.grandTotal.toFixed(2)}</td>
+                                    <td className="p-4 text-gray-800 font-bold text-lg text-right">{invoice.currency} {invoice.grandTotal.toFixed(2)}</td>
                                 </tr>
                             </tfoot>
                         </table>

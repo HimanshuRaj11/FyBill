@@ -20,8 +20,11 @@ export interface ICompany extends Document {
     updatedAt: Date;
     industry: string;
     companySize: string;
-    currency: string;
-    currencySymbol: string;
+    currency: {
+        name: string;
+        code: string;
+        symbol: string;
+    };
 }
 
 
@@ -44,8 +47,11 @@ const CompanySchema: Schema = new Schema<ICompany>(
         staffIds: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
         industry: { type: String, required: true },
         companySize: { type: String, required: true },
-        currency: { type: String, required: true, default: "USD" },
-        currencySymbol: { type: String, required: true, default: "$" },
+        currency: {
+            name: { type: String, required: true, default: "United States Dollar" },
+            code: { type: String, required: true, default: "USD" },
+            symbol: { type: String, required: true, default: "$" },
+        },
     },
     {
         timestamps: true,

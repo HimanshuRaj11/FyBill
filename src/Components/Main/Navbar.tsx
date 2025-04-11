@@ -11,6 +11,7 @@ import { FetchUser, LogoutUser } from '@/app/Redux/Slice/User.slice'
 import { useDispatch, useSelector } from 'react-redux'
 import { motion } from 'framer-motion'
 import { useRouter } from 'next/navigation'
+import { FetchCompany } from '@/app/Redux/Slice/Company.slice'
 const base_url = process.env.NEXT_PUBLIC_BASE_URL
 
 
@@ -19,6 +20,9 @@ export default function Navbar() {
     const dispatch = useDispatch();
     const { User } = useSelector((state: any) => state.User);
     const user = User?.user
+
+    const { Company } = useSelector((state: any) => state.Company);
+    const company = Company?.company
 
     const ConnectDb = async () => {
         try {
@@ -36,6 +40,7 @@ export default function Navbar() {
     useEffect(() => {
         ConnectDb();
         dispatch(FetchUser() as any);
+        dispatch(FetchCompany() as any);
     }, [])
     return (
 
@@ -46,6 +51,16 @@ export default function Navbar() {
                         FyBill
                     </div>
                 </Link>
+                {
+                    company && (
+                        <Link href={'/Dashboard'}>
+                            <div className="logo font-bold text-3xl text-green-700 px-2 py-1 rounded-lg bg-green-50">
+                                {company?.name}
+                            </div>
+                        </Link>
+                    )
+                }
+
                 <div className="flex items-center w-1/3">
                     <div className="relative w-full max-w-md">
                         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />

@@ -22,10 +22,12 @@ export async function POST(request: NextRequest) {
         if (!company) {
             return NextResponse.json({ success: false, error: 'Company not found' });
         }
-        const { name, price, description, category } = await request.json();
-        const product = await ProductModel.create({ name, price, description, category, companyId: company._id });
-
-        return NextResponse.json({ success: true, product });
+        const { _id, name, price, description, category } = await request.json();
+        const product = await ProductModel.findByIdAndUpdate({ _id: _id }, { name, price, description, category });
+        if (!product) {
+            return NextResponse.json({ success: false, error: 'Product not found' });
+        }
+        return NextResponse.json({ success: true, message: "Product updated" });
     } catch (error) {
         return NextResponse.json({ success: false, error: error instanceof Error ? error.message : 'An unknown error occurred' });
     }

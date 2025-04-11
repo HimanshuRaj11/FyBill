@@ -9,6 +9,8 @@ import { Button } from '../ui/button';
 export default function Sidebar() {
     const { User } = useSelector((state: any) => state.User)
     const user = User?.user
+
+
     const pathname = usePathname();
     const isActive = (path: string) => path === pathname || pathname.startsWith(path);
 

@@ -48,6 +48,7 @@ export async function POST(request: Request) {
             totalTaxAmount,
             grandTotal,
             paymentMode,
+            currency: Company.currency.symbol,
             createdBy: User._id
         })
 

@@ -30,6 +30,7 @@ export interface IInvoice extends Document {
     notes?: string;
     createdAt: Date;
     updatedAt: Date;
+    currency: string;
 }
 
 const ProductSchema: Schema = new Schema({
@@ -65,6 +66,7 @@ const InvoiceSchema: Schema = new Schema<IInvoice>(
             type: String,
             default: "CASH",
         },
+        currency: { type: String, required: true },
         notes: { type: String },
     },
     {

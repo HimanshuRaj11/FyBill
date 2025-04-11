@@ -6,6 +6,7 @@ import { toast } from "react-toastify"
 import { FiUser, FiMail, FiPhone, FiLock, FiEye, FiEyeOff } from 'react-icons/fi'
 import { FetchUser } from '@/app/Redux/Slice/User.slice'
 import { useDispatch } from 'react-redux'
+import { useRouter } from 'next/router'
 
 const base_url = process.env.NEXT_PUBLIC_BASE_URL
 interface InterfaceInitialInputData {
@@ -24,6 +25,7 @@ interface ValidationErrors {
 
 export default function Register() {
     const dispatch = useDispatch();
+    const router = useRouter();
     const initialInputData: InterfaceInitialInputData = {
         name: "",
         phone: "",
@@ -128,6 +130,7 @@ export default function Register() {
         try {
             const { data } = await axios.post(`${base_url}/api/v1/auth/Register`, InputData)
             if (data.success) {
+                router.push('/Dashboard')
                 dispatch(FetchUser() as any);
                 toast.success(data.message)
                 setInputData(initialInputData)

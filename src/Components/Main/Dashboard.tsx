@@ -6,15 +6,19 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui
 import axios from 'axios'
 import moment from 'moment'
 import Link from 'next/link'
-
+import { useSelector } from 'react-redux'
+import DashboardTopCards from '../Other/DashboardTopCards'
 
 export default function Dashboard() {
+    const { Company } = useSelector((state: any) => state.Company)
+    const company = Company?.company
     const [isLoading, setIsLoading] = useState(false)
 
     const [searchQuery, setSearchQuery] = useState('')
     const [isFilterOpen, setIsFilterOpen] = useState(false)
 
     const [Invoice, setInvoice] = useState([])
+
     const FetchInvoice: () => Promise<void> = async () => {
         try {
             setIsLoading(true)
@@ -33,6 +37,8 @@ export default function Dashboard() {
     const handleRefresh = () => {
         FetchInvoice()
     }
+
+
 
     return (
         <div className="p-4 md:p-6 max-w-7xl mx-auto">
@@ -93,15 +99,7 @@ export default function Dashboard() {
                                         <option>Custom range</option>
                                     </select>
                                 </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
-                                    <select className="w-full border border-gray-300 rounded-md p-2 text-sm">
-                                        <option>All</option>
-                                        <option>Paid</option>
-                                        <option>Pending</option>
-                                        <option>Overdue</option>
-                                    </select>
-                                </div>
+
                                 <div className="flex justify-end">
                                     <Button variant="outline" size="sm" className="mr-2">Reset</Button>
                                     <Button size="sm">Apply</Button>
@@ -113,62 +111,11 @@ export default function Dashboard() {
             </div>
 
             {/* Stats Cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-6">
-                <Card className="hover:shadow-md transition-shadow duration-200">
-                    <CardHeader className="pb-2">
-                        <CardTitle className="text-sm font-medium text-gray-500">Total Revenue</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold">$124,563.00</div>
-                        <div className="flex items-center mt-1">
-                            <span className="bg-green-100 text-green-800 border-green-800 border-2 rounded-2xl px-2 hover:bg-green-100">+12.5%</span>
-                            <span className="text-xs text-gray-500 ml-2">vs last month</span>
-                        </div>
-                    </CardContent>
-                </Card>
+            <DashboardTopCards Invoice={Invoice} />
 
-                <Card className="hover:shadow-md transition-shadow duration-200">
-                    <CardHeader className="pb-2">
-                        <CardTitle className="text-sm font-medium text-gray-500">Monthly Recurring Revenue</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold">$38,000.00</div>
-                        <div className="flex items-center mt-1">
-                            <span className="bg-green-100 border-green-800 border-2 rounded-2xl px-2 text-green-800 hover:bg-green-100">+5.3%</span>
-                            <span className="text-xs text-gray-500 ml-2">vs last month</span>
-                        </div>
-                    </CardContent>
-                </Card>
-
-                <Card className="hover:shadow-md transition-shadow duration-200">
-                    <CardHeader className="pb-2">
-                        <CardTitle className="text-sm font-medium text-gray-500">Active Subscriptions</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold">2,543</div>
-                        <div className="flex items-center mt-1">
-                            <span className="border-green-800 border-2 rounded-2xl px-2 bg-green-100 text-green-800 hover:bg-green-100">+7.1%</span>
-                            <span className="text-xs text-gray-500 ml-2">vs last month</span>
-                        </div>
-                    </CardContent>
-                </Card>
-
-                <Card className="hover:shadow-md transition-shadow duration-200">
-                    <CardHeader className="pb-2">
-                        <CardTitle className="text-sm font-medium text-gray-500">Pending Invoices</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold">18</div>
-                        <div className="flex items-center mt-1">
-                            <span className="bg-amber-100 border-amber-800 border-2 rounded-2xl px-2 text-amber-800 hover:bg-amber-100">$12,350.00</span>
-                            <span className="text-xs text-gray-500 ml-2">total amount</span>
-                        </div>
-                    </CardContent>
-                </Card>
-            </div>
 
             {/* Charts */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 mb-6">
+            {/* <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 mb-6">
                 <Card className="hover:shadow-md transition-shadow duration-200">
                     <CardHeader>
                         <CardTitle>Revenue Overview</CardTitle>
@@ -192,7 +139,7 @@ export default function Dashboard() {
                         </div>
                     </CardContent>
                 </Card>
-            </div>
+            </div> */}
 
             {/* Recent Activity */}
             <Card className="hover:shadow-md transition-shadow duration-200">
@@ -218,7 +165,7 @@ export default function Dashboard() {
                                     <tr key={invoice.invoiceId} className="hover:bg-gray-50">
                                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-indigo-600">{invoice.invoiceId}</td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500"> {invoice.clientName}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${invoice.grandTotal}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{invoice.currency}{invoice.grandTotal}</td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 ">{invoice.paymentMode} </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{moment(invoice.createdAt).format('MMM DD, YYYY')}</td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">

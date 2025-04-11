@@ -13,11 +13,15 @@ export default function RootLayout({
     const { Company } = useSelector((state: any) => state.Company)
     const company = Company?.company
 
+    if (!company) {
+        return <NotCompany />
+    }
 
     return (
 
         <div className="mt-20">
-            <div className={`px-4 pb-4`}>
+            <Sidebar />
+            <div className={`${company ? 'sm:ml-[16rem]' : ''} px-4 pb-4`}>
                 {children}
             </div>
 

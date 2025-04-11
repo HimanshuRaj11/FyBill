@@ -12,17 +12,20 @@ export async function POST(req: Request) {
         const User = await UserModel.findById({ _id: User_id });
         if (!User) { return NextResponse.json({ success: false, message: "User not found" }, { status: 404 }) }
 
-        const Company = await CompanyModel.findById({ _id: User.Company_id });
+        const Company = await CompanyModel.findById({ _id: User.companyId });
         if (!Company) { return NextResponse.json({ success: false, message: "Company not found" }, { status: 404 }) }
 
-        const { currency, currencySymbol } = await req.json();
+        const { currency } = await req.json();
+        console.log(currency);
 
-        await Company.updateOne({ currency: currency }, { currencySymbol: currencySymbol });
+        await Company.updateOne({ currency: currency });
 
         await Company.save();
 
         return NextResponse.json({ success: true, message: "Currency Updated" }, { status: 200 })
     } catch (error) {
+        console.log(error);
+
         return NextResponse.json({ success: false, message: "Internal Server Error" }, { status: 500 })
     }
 }
