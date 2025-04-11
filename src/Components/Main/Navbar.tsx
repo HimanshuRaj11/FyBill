@@ -125,7 +125,7 @@ export default function Navbar() {
                             <DropdownMenuTrigger asChild>
                                 <div className="flex items-center cursor-pointer hover:bg-gray-100 p-1 rounded-full transition-colors">
                                     <Avatar className="h-8 w-8 ">
-                                        <AvatarImage className='rounded-full cursor-pointer' src="https://public.readdy.ai/ai/img_res/467ac9af453200b5d205aec00e01f5ef.jpg" />
+                                        <AvatarImage className='rounded-full cursor-pointer' src="/avatar.png" />
                                         <AvatarFallback>JD</AvatarFallback>
                                     </Avatar>
                                 </div>
@@ -135,7 +135,7 @@ export default function Navbar() {
                                 <Link href={'/Profile'}>
                                     <div className="flex items-center p-2 mb-2p-2 rounded-lg hover:bg-indigo-50 transition-colors border-2">
                                         <Avatar className="h-10 w-10 mr-3">
-                                            <AvatarImage className='rounded-full' src="https://public.readdy.ai/ai/img_res/467ac9af453200b5d205aec00e01f5ef.jpg" />
+                                            <AvatarImage className='rounded-full' src="/avatar.png" />
                                             <AvatarFallback>JD</AvatarFallback>
                                         </Avatar>
                                         <div>

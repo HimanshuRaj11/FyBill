@@ -33,7 +33,7 @@ export default function ProfilePage() {
                         <div className="absolute -bottom-16 left-8">
                             <div className="relative w-32 h-32 rounded-full border-4 border-white overflow-hidden bg-white">
                                 <Image
-                                    src={user?.profilePic || "/images/default-avatar.png"}
+                                    src={user?.profilePic || "/avatar.png"}
                                     alt="Profile Picture"
                                     fill
                                     className="object-cover"
