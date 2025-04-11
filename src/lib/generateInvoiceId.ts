@@ -11,6 +11,6 @@ export function generateInvoiceId() {
     const seconds = now.getSeconds().toString().padStart(2, "0"); // Seconds (00-59)
 
 
-    return `#${year}${month}${hours}${minutes}${seconds}${randomLetter}`;
+    return `${year}${month}${hours}${minutes}${seconds}${randomLetter}`;
 
 }
