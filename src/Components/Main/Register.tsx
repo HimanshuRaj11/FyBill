@@ -6,8 +6,7 @@ import { toast } from "react-toastify"
 import { FiUser, FiMail, FiPhone, FiLock, FiEye, FiEyeOff } from 'react-icons/fi'
 import { FetchUser } from '@/app/Redux/Slice/User.slice'
 import { useDispatch } from 'react-redux'
-import { useRouter } from 'next/router'
-
+import { useRouter } from 'next/navigation'
 const base_url = process.env.NEXT_PUBLIC_BASE_URL
 interface InterfaceInitialInputData {
     name: string,
