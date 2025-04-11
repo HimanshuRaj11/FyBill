@@ -26,10 +26,7 @@ export default function Navbar() {
     const ConnectDb = async () => {
         try {
             await axios.get(`${base_url}/api/v1/db`)
-
         } catch (error) {
-            console.log(error);
-
             return error
         }
     }
