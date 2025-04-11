@@ -40,7 +40,7 @@ export async function POST(request: Request) {
             clientName,
             clientPhone: phoneNumber,
             companyName: Company.name,
-            companyAddress: Company.street + " " + Company.city + " " + Company.state + " " + Company.country + " " + Company.zipCode,
+            companyAddress: Company.address.street + " " + Company.address.city + " " + Company.address.state + " " + Company.address.country + " " + Company.address.zipCode,
             issueDate: new Date(),
             products,
             subTotal,
