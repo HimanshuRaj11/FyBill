@@ -10,8 +10,8 @@ export default function RootLayout({
 }: Readonly<{
     children: React.ReactNode;
 }>) {
-    const { Company, loading } = useSelector((state: any) => state.Company)
-    const company = Company?.company
+    const { User, loading } = useSelector((state: any) => state.User)
+    const company = User?.companyId
 
     if (loading) {
         return <div className="min-h-screen flex items-center justify-center">

@@ -10,10 +10,6 @@ export default function RootLayout({
 }: Readonly<{
     children: React.ReactNode;
 }>) {
-    const { Company } = useSelector((state: any) => state.Company)
-    const company = Company?.company
-
-
     return (
 
         <div className="mt-20">
