@@ -1,6 +1,7 @@
 'use client'
 import NotCompany from "@/Components/Main/NotCompany";
 import Sidebar from "@/Components/Main/Sidebar";
+import { useRouter } from "next/router";
 import { useSelector } from "react-redux";
 
 
@@ -10,6 +11,7 @@ export default function RootLayout({
 }: Readonly<{
     children: React.ReactNode;
 }>) {
+    const router = useRouter()
     const { User, loading } = useSelector((state: any) => state.User)
     const company = User?.companyId
 
@@ -18,7 +20,9 @@ export default function RootLayout({
             <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-500"></div>
         </div>
     }
-    if (!loading && !company) {
+    if (!User) {
+        router.push('/')
+    } else if (!loading && !company) {
         return <NotCompany />
     }
 
