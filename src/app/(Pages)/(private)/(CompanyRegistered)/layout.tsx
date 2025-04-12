@@ -1,7 +1,7 @@
 'use client'
 import NotCompany from "@/Components/Main/NotCompany";
 import Sidebar from "@/Components/Main/Sidebar";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import { useSelector } from "react-redux";
 
 
