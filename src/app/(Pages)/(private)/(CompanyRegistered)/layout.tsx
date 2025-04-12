@@ -13,7 +13,7 @@ export default function RootLayout({
 }>) {
     const router = useRouter()
     const { User, loading } = useSelector((state: any) => state.User)
-    const company = User?.companyId
+    const company = User?.user?.companyId
 
     if (loading) {
         return <div className="min-h-screen flex items-center justify-center">
