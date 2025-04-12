@@ -5,17 +5,20 @@ import { FaBars, FaTachometerAlt, FaFileInvoice, FaUsers, FaBox, FaCog, FaSignIn
 import { useSelector } from 'react-redux';
 import { usePathname } from 'next/navigation';
 import { Button } from '../ui/button';
-
+import { useRouter } from 'next/navigation';
 export default function Sidebar() {
     const { User } = useSelector((state: any) => state.User)
     const user = User?.user
+    const router = useRouter()
 
+    if (!user) {
+        router.push('/')
+    }
 
     const pathname = usePathname();
     const isActive = (path: string) => path === pathname || pathname.startsWith(path);
 
     const [ShowSidebar, setShowSidebar] = useState(false)
-
     return (
         <div>
             {
