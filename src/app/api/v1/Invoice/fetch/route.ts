@@ -21,7 +21,7 @@ export async function GET() {
         if (!company) {
             return NextResponse.json({ message: "Company not found", success: false }, { status: 404 });
         }
-        const invoices = await InvoiceModel.find({ companyId: companyId }).sort({ createdAt: -1 });
+        const invoices = await InvoiceModel.find({ companyId: companyId }).sort({ createdAt: -1 }).lean()
 
         return NextResponse.json({ invoices, success: true }, { status: 200 });
 

@@ -11,7 +11,7 @@ export async function GET(request: Request) {
         }
         const userCompanyId = user.companyId;
 
-        const staff = await UserModel.find({ companyId: userCompanyId })
+        const staff = await UserModel.find({ companyId: userCompanyId }).select("-password").lean()
 
         return NextResponse.json({ staff });
 

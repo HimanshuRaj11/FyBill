@@ -18,7 +18,7 @@ export async function GET() {
             return NextResponse.json({ success: false, message: "Company not found" }, { status: 404 });
         }
 
-        const tax = await TaxModel.findOne({ companyId: company._id });
+        const tax = await TaxModel.findOne({ companyId: company._id }).lean()
         if (!tax) {
             return NextResponse.json({ success: false, message: "Tax not found" }, { status: 404 });
         }

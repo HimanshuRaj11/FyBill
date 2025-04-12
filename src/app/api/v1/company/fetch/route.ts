@@ -12,7 +12,7 @@ export async function GET(request: Request) {
         }
         const userCompanyId = user.companyId;
 
-        const company = await CompanyModel.findById({ _id: userCompanyId })
+        const company = await CompanyModel.findById({ _id: userCompanyId }).lean()
 
         return NextResponse.json({ company });
 
