@@ -7,7 +7,6 @@ export async function POST(request: Request) {
 
     try {
         const Unique_id = generateInvoiceId();
-        console.log(Unique_id);
 
         const User_id = await verifyUser();
         if (!User_id) {
