@@ -15,7 +15,6 @@ export default function Page({ params }: { params: Promise<{ InvoiceId: string }
             const { data } = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/Invoice/${resolvedParams.InvoiceId}`, { withCredentials: true });
             if (data.success) {
                 setInvoice(data.invoice);
-                console.log(data.invoice);
                 setIsLoading(false);
             }
         } catch (error) {

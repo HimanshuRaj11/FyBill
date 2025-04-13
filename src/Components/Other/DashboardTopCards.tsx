@@ -8,7 +8,7 @@ export default function DashboardTopCards({ Invoice }: { Invoice: any }) {
     const { Company } = useSelector((state: any) => state.Company)
     const company = Company?.company
     const totalRevenue = Invoice.reduce((acc: number, invoice: any) => acc + invoice.grandTotal, 0)
-    const totalTaxes = Invoice.reduce((acc: number, invoice: any) => acc + invoice.totalTaxAmount, 0)
+    const totalTaxes = Invoice.reduce((acc: number, invoice: any) => acc + invoice.totalTaxAmount, 0).toFixed(2)
     const ActualRevenue = totalRevenue - totalTaxes
     const totalInvoice = Invoice.length
     return (
