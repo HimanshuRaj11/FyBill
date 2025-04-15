@@ -55,18 +55,7 @@ export default function InvoiceDisplay({ invoice }: { invoice: any }) {
                 </div>
                 <div className="flex flex-wrap justify-center sm:justify-end gap-2">
 
-                    <Button variant="outline" className="flex items-center gap-2 hover:bg-gray-100 text-sm sm:text-base cursor-pointer">
-                        <Download className="h-4 w-4" />
-                        <span className="hidden sm:inline">Download</span>
-                    </Button>
-                    <Button variant="outline" className="flex items-center gap-2 hover:bg-gray-100 text-sm sm:text-base cursor-pointer">
-                        <Share2 className="h-4 w-4" />
-                        <span className="hidden sm:inline">Share</span>
-                    </Button>
-                    <Button variant="outline" className="flex items-center gap-2 hover:bg-gray-100 text-sm sm:text-base cursor-pointer">
-                        <Mail className="h-4 w-4" />
-                        <span className="hidden sm:inline">Email</span>
-                    </Button>
+
                     {
                         user?.role === "admin" || user?.role === "Owner" && (
                             <Button onClick={deleteInvoice} variant="outline" className="flex items-center gap-2 hover:bg-red-100 text-red-600 text-sm sm:text-base cursor-pointer">

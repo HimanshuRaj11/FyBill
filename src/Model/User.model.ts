@@ -8,6 +8,7 @@ export interface IUser extends Document {
     password: string,
     profilePic?: string;
     address?: {
+        street?: string;
         country?: string;
         state?: string;
         city?: string;
@@ -30,6 +31,7 @@ const UserSchema: Schema = new Schema<IUser>(
         password: { type: String, required: true },
         profilePic: { type: String },
         address: {
+            street: { type: String },
             country: { type: String },
             state: { type: String },
             city: { type: String },

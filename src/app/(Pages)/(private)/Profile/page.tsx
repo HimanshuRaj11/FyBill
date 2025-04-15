@@ -268,17 +268,7 @@ export default function ProfilePage() {
                                     </div>
                                 </div>
                             </div>
-                            {
-                                user?.role === "Owner" && user?.companyId === null && (
-                                    <div className="mt-6 bg-white rounded-lg  p-6 space-y-6">
-                                        <Button>
-                                            <Link href="/Company/Edit">
-                                                Edit Company Details
-                                            </Link>
-                                        </Button>
-                                    </div>
-                                )
-                            }
+
                             {
                                 user?.role === "Owner" && user?.companyId && (
                                     <div className="mt-6 bg-white rounded-lg  p-6 space-y-6">

@@ -87,9 +87,11 @@ export default function pages() {
                         {
                             invoices.map((invoice) => (
                                 <tr key={invoice._id} className="bg-white border-b hover:bg-gray-50 transition-colors">
-                                    <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
-                                        {invoice.invoiceId}
-                                    </th>
+                                    <Link href={`/Invoice/${invoice.invoiceId}`} className="text-blue-600 hover:text-blue-800 font-medium">
+                                        <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
+                                            #{invoice.invoiceId}
+                                        </th>
+                                    </Link>
                                     <td className="px-6 py-4">{invoice.clientName}</td>
                                     <td className="px-6 py-4">{moment(invoice.createdAt).format('DD/MM/YYYY')}</td>
                                     <td className="px-6 py-4 font-medium">${invoice.grandTotal}</td>

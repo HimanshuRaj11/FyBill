@@ -190,140 +190,159 @@ export default function BillingComponent() {
 
     return (
         <>
-            <div className="max-w-4xl mx-auto p-6 bg-white rounded-2xl shadow-2xl  ">
-                <h1 className="text-2xl font-bold mb-4">Create Bill</h1>
+            <div className=" flex justify-between ">
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                    <Input
-                        placeholder="Client Name"
-                        value={clientName}
-                        onChange={(e) => setClientName(e.target.value)}
-                    />
-                    <Input
-                        placeholder="Phone Number"
-                        value={phoneNumber}
-                        onChange={(e) => setPhoneNumber(e.target.value)}
-                    />
+
+                <div className="w-[50%] mx-auto p-6 bg-white rounded-2xl shadow-2xl  ">
+                    <h1 className="text-2xl font-bold mb-4">Create Bill</h1>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                        <Input
+                            placeholder="Client Name"
+                            value={clientName}
+                            onChange={(e) => setClientName(e.target.value)}
+                        />
+                        <Input
+                            placeholder="Phone Number"
+                            value={phoneNumber}
+                            onChange={(e) => setPhoneNumber(e.target.value)}
+                        />
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4 items-end">
+
+                        <div className="relative">
+                            <Input
+                                placeholder="Product Name"
+                                value={productName}
+                                onChange={(e) => handleProductSearch(e.target.value)}
+                                onFocus={() => setShowProductDropdown(true)}
+                            />
+
+                            {showProductDropdown && filteredProducts?.length > 0 && (
+                                <div className="absolute z-10 w-full bg-white border rounded-md shadow-lg mt-1 max-h-48 overflow-y-auto">
+                                    {filteredProducts.map((product, index) => (
+                                        <div
+                                            key={index}
+                                            className="p-2 hover:bg-gray-100 cursor-pointer"
+                                            onClick={() => handleProductSelect(product)}
+                                        >
+                                            {product.name}
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium mb-1">Rate</label>
+                            <Input
+                                type="number"
+                                placeholder="Rate"
+                                value={rate}
+                                onChange={(e) => setRate(Number(e.target.value))}
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium mb-1">Quantity</label>
+                            <Input
+                                type="number"
+                                placeholder="Quantity"
+                                value={quantity}
+                                onChange={(e) => setQuantity(Number(e.target.value))}
+                            />
+                        </div>
+                        <Button onClick={handleAddProduct} className="w-full cursor-pointer">
+                            {editIndex !== null ? "Update Product" : "Add Product"}
+                        </Button>
+                    </div>
+
+                    <div className="mt-6">
+                        <label className="block text-sm font-medium mb-2">Payment Mode</label>
+                        <select
+                            className="w-full p-2 border rounded-md bg-white"
+                            onChange={(e) => setPaymentMode(e.target.value)}
+                            defaultValue=""
+                        >
+                            <option value="" disabled>Select Payment Mode</option>
+                            <option value="cash">Cash</option>
+                            <option value="upi">UPI</option>
+                            <option value="card">Card</option>
+                            <option value="netBanking">Net Banking</option>
+                        </select>
+                    </div>
+
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4 items-end">
-                    <div className="relative">
-                        <Input
-                            placeholder="Product Name"
-                            value={productName}
-                            onChange={(e) => handleProductSearch(e.target.value)}
-                            onFocus={() => setShowProductDropdown(true)}
-                        />
-
-                        {showProductDropdown && filteredProducts?.length > 0 && (
-                            <div className="absolute z-10 w-full bg-white border rounded-md shadow-lg mt-1 max-h-48 overflow-y-auto">
-                                {filteredProducts.map((product, index) => (
-                                    <div
-                                        key={index}
-                                        className="p-2 hover:bg-gray-100 cursor-pointer"
-                                        onClick={() => handleProductSelect(product)}
-                                    >
-                                        {product.name}
-                                    </div>
-                                ))}
-                            </div>
-                        )}
+                <div className="mx-auto p-6 bg-white rounded-2xl shadow-2xl">
+                    <div className="flex justify-around">
+                        <div className="">
+                            <label className="block text-sm font-medium mb-1">Name</label>
+                            <span>{clientName}</span>
+                        </div>
+                        <div className="">
+                            <label className="block text-sm font-medium mb-1">Phone Number</label>
+                            <span>{phoneNumber}</span>
+                        </div>
                     </div>
-                    <div>
-                        <label className="block text-sm font-medium mb-1">Rate</label>
-                        <Input
-                            type="number"
-                            placeholder="Rate"
-                            value={rate}
-                            onChange={(e) => setRate(Number(e.target.value))}
-                        />
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium mb-1">Quantity</label>
-                        <Input
-                            type="number"
-                            placeholder="Quantity"
-                            value={quantity}
-                            onChange={(e) => setQuantity(Number(e.target.value))}
-                        />
-                    </div>
-                    <Button onClick={handleAddProduct} className="w-full cursor-pointer">
-                        {editIndex !== null ? "Update Product" : "Add Product"}
-                    </Button>
-                </div>
-                <table className="w-full border mt-6 text-left">
-                    <thead className="bg-gray-100">
-                        <tr>
-                            <th className="p-2">Product Name</th>
-                            <th className="p-2">Rate</th>
-                            <th className="p-2">Quantity</th>
-                            <th className="p-2">Amount</th>
-                            <th className="p-2">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {products.map((product, index) => (
-                            <tr key={index} className="border-t">
-                                <td className="p-2">{product.name}</td>
-                                <td className="p-2">₹{product.rate}</td>
-                                <td className="p-2">{product.quantity}</td>
-                                <td className="p-2">₹{product.amount}</td>
-                                <td className="p-2 space-x-2">
-                                    <Button size="sm" variant="outline" onClick={() => handleEdit(index)}>
-                                        Edit
-                                    </Button>
-                                    <Button size="sm" variant="destructive" onClick={() => handleDelete(index)}>
-                                        Delete
-                                    </Button>
-                                </td>
+                    <table className="w-full border mt-6 text-left">
+                        <thead className="bg-gray-100">
+                            <tr>
+                                <th className="p-2">Product Name</th>
+                                <th className="p-2">Rate</th>
+                                <th className="p-2">Quantity</th>
+                                <th className="p-2">Amount</th>
+                                <th className="p-2">Actions</th>
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
-                <div className="mt-6 space-y-4">
-                    <div className="flex justify-between items-center border-t pt-4">
-                        <span className="text-sm font-medium">Sub Total:</span>
-                        <span>₹{subTotal}</span>
-                    </div>
-                    {taxes.map((tax, index) => {
-                        const taxAmount = subTotal * tax.percentage / 100;
-                        totalTaxAmount = totalTaxAmount + taxAmount;
+                        </thead>
+                        <tbody>
+                            {products.map((product, index) => (
+                                <tr key={index} className="border-t">
+                                    <td className="p-2">{product.name}</td>
+                                    <td className="p-2">₹{product.rate}</td>
+                                    <td className="p-2">{product.quantity}</td>
+                                    <td className="p-2">₹{product.amount}</td>
+                                    <td className="p-2 space-x-2">
+                                        <Button size="sm" variant="outline" onClick={() => handleEdit(index)}>
+                                            Edit
+                                        </Button>
+                                        <Button size="sm" variant="destructive" onClick={() => handleDelete(index)}>
+                                            Delete
+                                        </Button>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                    <div className="mt-6 space-y-4">
+                        <div className="flex justify-between items-center border-t pt-4">
+                            <span className="text-sm font-medium">Sub Total:</span>
+                            <span>₹{subTotal}</span>
+                        </div>
+                        {taxes.map((tax, index) => {
+                            const taxAmount = subTotal * tax.percentage / 100;
+                            totalTaxAmount = totalTaxAmount + taxAmount;
 
-                        return (
-                            <div key={index} className="flex justify-between items-center">
-                                <span className="text-sm font-medium">{tax.taxName} ({tax.percentage}%):</span>
-                                <span>₹{taxAmount}</span>
-                            </div>
-                        )
-                    })}
-                    <div className="flex justify-between items-center border-t pt-4">
-                        <span>Total Tax Amount:</span>
-                        <span>₹{totalTaxAmount}</span>
+                            return (
+                                <div key={index} className="flex justify-between items-center">
+                                    <span className="text-sm font-medium">{tax.taxName} ({tax.percentage}%):</span>
+                                    <span>₹{taxAmount}</span>
+                                </div>
+                            )
+                        })}
+                        <div className="flex justify-between items-center border-t pt-4">
+                            <span>Total Tax Amount:</span>
+                            <span>₹{totalTaxAmount}</span>
+                        </div>
+                        <div className="flex justify-between items-center border-t pt-4 font-bold">
+                            <span>Grand Total:</span>
+                            <span>₹{grandTotal}</span>
+                        </div>
                     </div>
-                    <div className="flex justify-between items-center border-t pt-4 font-bold">
-                        <span>Grand Total:</span>
-                        <span>₹{grandTotal}</span>
+                    <div className="flex justify-end my-4">
+                        <Button onClick={OnContinue} disabled={products.length === 0 || clientName === "" || phoneNumber === "" || paymentMode === ""} className="cursor-pointer w-full">Continue</Button>
                     </div>
-                </div>
-                <div className="mt-6">
-                    <label className="block text-sm font-medium mb-2">Payment Mode</label>
-                    <select
-                        className="w-full p-2 border rounded-md bg-white"
-                        onChange={(e) => setPaymentMode(e.target.value)}
-                        defaultValue=""
-                    >
-                        <option value="" disabled>Select Payment Mode</option>
-                        <option value="cash">Cash</option>
-                        <option value="upi">UPI</option>
-                        <option value="card">Card</option>
-                        <option value="netBanking">Net Banking</option>
-                    </select>
-                </div>
-                <div className="flex justify-end my-4">
-                    <Button onClick={OnContinue} className="cursor-pointer w-full">Continue</Button>
                 </div>
             </div>
-
             <Dialog open={showInvoice} onOpenChange={setShowInvoice}>
                 <DialogContent className="max-w-7xl w-full max-h-[90vh] overflow-auto">
                     <InvoiceDisplay invoice={invoice} />

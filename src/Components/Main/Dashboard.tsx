@@ -163,7 +163,9 @@ export default function Dashboard() {
                             <tbody className="bg-white divide-y divide-gray-200">
                                 {Invoice?.map((invoice: any) => (
                                     <tr key={invoice.invoiceId} className="hover:bg-gray-50">
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-indigo-600">{invoice.invoiceId}</td>
+                                        <Link href={`/Invoice/${invoice.invoiceId}`} className='text-blue-600 hover:text-blue-800 font-medium'>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-indigo-600">#{invoice.invoiceId}</td>
+                                        </Link>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500"> {invoice.clientName}</td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{invoice.currency}{invoice.grandTotal}</td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 ">{invoice.paymentMode} </td>
