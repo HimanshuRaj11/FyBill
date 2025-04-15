@@ -1,3 +1,4 @@
+'use client'
 import React, { useState } from 'react';
 
 export default function ResetPasswordPage() {
@@ -21,8 +22,9 @@ export default function ResetPasswordPage() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
+          className='border-2 border-gray-300 rounded-md p-2'
         />
-        <button type="submit">Reset Password</button>
+        <button type="submit" className='bg-blue-500 text-white p-2 rounded-md'>Reset Password</button>
       </form>
       {message && <p>{message}</p>}
     </div>
