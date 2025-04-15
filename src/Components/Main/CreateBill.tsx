@@ -6,6 +6,7 @@ import { Dialog, DialogContent } from "../ui/dialog";
 import InvoiceDisplay from "./InvoiceDisplay";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { Minus, Plus, Trash2 } from "lucide-react";
 interface Product {
     name: string;
     rate: number;
@@ -27,7 +28,6 @@ export default function BillingComponent() {
     const [editIndex, setEditIndex] = useState<number | null>(null);
     const [showInvoice, setShowInvoice] = useState(false);
     const [filteredProducts, setFilteredProducts] = useState<any[]>([]);
-    const [showProductDropdown, setShowProductDropdown] = useState(false);
 
     const [taxes, setTaxes] = useState<any[]>([]);
     const [productsList, setProductsList] = useState<any[]>([]);
@@ -57,52 +57,38 @@ export default function BillingComponent() {
     }, [subTotal, products]);
 
 
-    const handleAddProduct = () => {
-        if (!productName.trim()) {
-            toast.error("Please enter product name");
-            return;
-        }
-        if (!rate || rate <= 0) {
-            toast.error("Please enter a valid rate");
-            return;
-        }
-        if (!quantity || quantity <= 0) {
-            toast.error("Please enter a valid quantity");
-            return;
-        }
+    const AddProduct = (product: any) => {
 
-        const newProduct: Product = {
-            name: productName,
-            rate,
-            quantity,
-            amount: rate * quantity,
-        };
-
-        if (editIndex !== null) {
-            const updated = [...products];
-            updated[editIndex] = newProduct;
-            setProducts(updated);
-            setEditIndex(null);
+        if (products.find((p) => p.name === product.name)) {
+            setProducts(products.map((p) => p.name === product.name ? { ...p, quantity: p.quantity + 1, amount: p.amount + product.price } : p));
         } else {
-            setProducts([...products, newProduct]);
+            setProducts([...products, {
+                name: product.name,
+                rate: product.price,
+                quantity: 1,
+                amount: product.price
+            }]);
         }
-
-        setProductName("");
-        setRate(0);
-        setQuantity(0);
-    };
+    }
 
     const handleDelete = (index: number) => {
         setProducts(products.filter((_, i) => i !== index));
     };
 
-    const handleEdit = (index: number) => {
-        const product = products[index];
-        setProductName(product.name);
-        setRate(product.rate);
-        setQuantity(product.quantity);
-        setEditIndex(index);
+    const handleQuantityChange = (product: any, value: number) => {
+        if (value == 1) {
+            setProducts(products.map((p) => p.name === product.name ? { ...p, quantity: p.quantity + 1, amount: p.amount + product.rate } : p));
+        }
+        else if (value == -1) {
+            if (product.quantity > 1) {
+                setProducts(products.map((p) => p.name === product.name ? { ...p, quantity: p.quantity - 1, amount: p.amount - product.rate } : p));
+            }
+            else {
+                setProducts(products.filter((p) => p.name !== product.name));
+            }
+        }
     };
+
 
     const OnContinue = async () => {
         try {
@@ -158,6 +144,7 @@ export default function BillingComponent() {
         const { data } = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/company/product/fetch`)
         if (data.success) {
             setProductsList(data?.products);
+            setFilteredProducts(data?.products);
         }
     }
     const fetchTaxData = async () => {
@@ -170,23 +157,14 @@ export default function BillingComponent() {
     }, [])
 
     const handleProductSearch = (searchTerm: string) => {
-        console.log(searchTerm);
-
         setProductName(searchTerm);
-        setShowProductDropdown(true);
-        console.log(productsList);
         const filtered = productsList?.filter(product =>
             product.name.toLowerCase().includes(searchTerm.toLowerCase())
         );
         setFilteredProducts(filtered);
-        console.log(filteredProducts);
+
     };
 
-    const handleProductSelect = (product: any) => {
-        setProductName(product.name);
-        setRate(product.price || 0);
-        setShowProductDropdown(false);
-    };
 
     return (
         <>
@@ -216,45 +194,22 @@ export default function BillingComponent() {
                                 placeholder="Product Name"
                                 value={productName}
                                 onChange={(e) => handleProductSearch(e.target.value)}
-                                onFocus={() => setShowProductDropdown(true)}
                             />
+                        </div>
 
-                            {showProductDropdown && filteredProducts?.length > 0 && (
-                                <div className="absolute z-10 w-full bg-white border rounded-md shadow-lg mt-1 max-h-48 overflow-y-auto">
-                                    {filteredProducts.map((product, index) => (
-                                        <div
-                                            key={index}
-                                            className="p-2 hover:bg-gray-100 cursor-pointer"
-                                            onClick={() => handleProductSelect(product)}
-                                        >
-                                            {product.name}
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium mb-1">Rate</label>
-                            <Input
-                                type="number"
-                                placeholder="Rate"
-                                value={rate}
-                                onChange={(e) => setRate(Number(e.target.value))}
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium mb-1">Quantity</label>
-                            <Input
-                                type="number"
-                                placeholder="Quantity"
-                                value={quantity}
-                                onChange={(e) => setQuantity(Number(e.target.value))}
-                            />
-                        </div>
-                        <Button onClick={handleAddProduct} className="w-full cursor-pointer">
-                            {editIndex !== null ? "Update Product" : "Add Product"}
-                        </Button>
                     </div>
+
+                    {/* List of Products */}
+                    <div className="flex flex-wrap gap-4 overflow-y-auto max-h-[300px]">
+
+                        {filteredProducts?.map((product: any, index: any) => (
+                            <div onClick={() => AddProduct(product)} key={index} className="bg-gray-300 hover:bg-gray-400 hover:shadow-md transition-all duration-300 p-4 cursor-pointer rounded-md">
+                                <h3 className="text-lg font-bold">{product.name}</h3>
+                                <p className="text-sm">₹{product.price}</p>
+                            </div>
+                        ))}
+                    </div>
+
 
                     <div className="mt-6">
                         <label className="block text-sm font-medium mb-2">Payment Mode</label>
@@ -273,6 +228,7 @@ export default function BillingComponent() {
 
                 </div>
 
+                {/*  */}
                 <div className="mx-auto p-6 bg-white rounded-2xl shadow-2xl">
                     <div className="flex justify-around">
                         <div className="">
@@ -299,14 +255,19 @@ export default function BillingComponent() {
                                 <tr key={index} className="border-t">
                                     <td className="p-2">{product.name}</td>
                                     <td className="p-2">₹{product.rate}</td>
-                                    <td className="p-2">{product.quantity}</td>
+                                    <td className="p-2 flex items-center gap-2">
+                                        <Button size="sm" className="cursor-pointer" variant="outline" onClick={() => handleQuantityChange(product, -1)}>
+                                            <Minus />
+                                        </Button>
+                                        {product.quantity}
+                                        <Button size="sm" className="cursor-pointer" variant="outline" onClick={() => handleQuantityChange(product, 1)}>
+                                            <Plus />
+                                        </Button>
+                                    </td>
                                     <td className="p-2">₹{product.amount}</td>
                                     <td className="p-2 space-x-2">
-                                        <Button size="sm" variant="outline" onClick={() => handleEdit(index)}>
-                                            Edit
-                                        </Button>
-                                        <Button size="sm" variant="destructive" onClick={() => handleDelete(index)}>
-                                            Delete
+                                        <Button size="sm" className="cursor-pointer" variant="destructive" onClick={() => handleDelete(index)}>
+                                            <Trash2 />
                                         </Button>
                                     </td>
                                 </tr>
@@ -342,6 +303,8 @@ export default function BillingComponent() {
                         <Button onClick={OnContinue} disabled={products.length === 0 || clientName === "" || phoneNumber === "" || paymentMode === ""} className="cursor-pointer w-full">Continue</Button>
                     </div>
                 </div>
+
+                {/*  */}
             </div>
             <Dialog open={showInvoice} onOpenChange={setShowInvoice}>
                 <DialogContent className="max-w-7xl w-full max-h-[90vh] overflow-auto">

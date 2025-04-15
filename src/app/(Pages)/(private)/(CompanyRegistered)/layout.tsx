@@ -1,6 +1,7 @@
 'use client'
 import NotCompany from "@/Components/Main/NotCompany";
 import Sidebar from "@/Components/Main/Sidebar";
+import { usePathname } from 'next/navigation'
 
 import { useSelector } from "react-redux";
 
@@ -11,6 +12,7 @@ export default function RootLayout({
 }: Readonly<{
     children: React.ReactNode;
 }>) {
+    const pathname = usePathname()
 
     const { User, loading } = useSelector((state: any) => state.User)
     const company = User?.user?.companyId
@@ -24,11 +26,12 @@ export default function RootLayout({
         return <NotCompany />
     }
 
+
     return (
 
         <div className="mt-20">
-            <Sidebar />
-            <div className={`${company ? 'sm:ml-[16rem]' : ''} px-4 pb-4`}>
+            {pathname != '/Bills/Create' && <Sidebar />}
+            <div className={`${company && pathname != '/Bills/Create' ? 'sm:ml-[16rem]' : ''} px-4 pb-4`}>
                 {children}
             </div>
 

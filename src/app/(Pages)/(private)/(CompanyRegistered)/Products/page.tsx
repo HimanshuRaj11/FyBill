@@ -5,6 +5,7 @@ import { Button } from '@/Components/ui/button';
 import Link from 'next/link';
 import { FiEdit2, FiTrash2 } from 'react-icons/fi';
 import { toast } from 'react-toastify';
+import { useSelector } from 'react-redux';
 // TypeScript interface for Product
 interface Product {
     _id: string;
@@ -15,6 +16,8 @@ interface Product {
 }
 
 export default function ProductsPage() {
+    const { Company } = useSelector((state: any) => state.Company);
+    const company = Company?.company;
     const [products, setProducts] = useState<Product[]>([]);
 
 
@@ -117,7 +120,7 @@ export default function ProductsPage() {
                                 </p>
                                 <div className="flex items-center justify-between">
                                     <span className="text-xl font-bold text-blue-600">
-                                        ${product.price.toFixed(2)}
+                                        {company?.currency.symbol} {product.price.toFixed(2)}
                                     </span>
 
                                 </div>
