@@ -7,7 +7,7 @@ import InvoiceDisplay from "./InvoiceDisplay";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { Minus, Plus, Trash2 } from "lucide-react";
-import qz from "qz-tray";
+import { Br, Cut, Line, Printer, Text, Row, render } from "react-thermal-printer";
 
 interface Product {
     name: string;
@@ -31,29 +31,50 @@ export default function BillingComponent() {
     const [grandTotal, setGrandTotal] = useState<number>(0);
     const [paymentMode, setPaymentMode] = useState<string>("");
     const [appliedTaxes, setAppliedTaxes] = useState<any[]>([]);
+    const [printer, setPrinter] = useState<USBDevice | null>(null);
     const [printerStatus, setPrinterStatus] = useState<"Disconnected" | "Connecting" | "Connected" | "Error">("Disconnected");
 
-    // Connect to QZ Tray on component mount
+    // Connect to USB printer on component mount
     useEffect(() => {
-        setPrinterStatus("Connecting");
-        qz.websocket
-            .connect()
-            .then(() => {
+        const connectPrinter = async () => {
+            try {
+                setPrinterStatus("Connecting");
+                const devices = await navigator.usb.getDevices();
+                const existingDevice = devices.find((device: any) => device.productName?.toLowerCase().includes("star")); // Adjust for your printer
+                if (existingDevice) {
+                    setPrinter(existingDevice);
+                    setPrinterStatus("Connected");
+                    return;
+                }
+
+                const device = await navigator.usb.requestDevice({
+                    filters: [{ vendorId: 0x0519 }], // Epson vendor ID; adjust if needed (e.g., Star: 0x0519)
+                });
+                await device.open();
+                await device.selectConfiguration(1);
+                await device.claimInterface(0); // Adjust interface based on printer
+                setPrinter(device);
                 setPrinterStatus("Connected");
-                console.log("Connected to QZ Tray");
-            })
-            .catch((err: Error) => {
+                toast.success("Printer connected");
+            } catch (err) {
+                console.error("USB connection failed:", err);
                 setPrinterStatus("Error");
-                console.error("QZ Tray connection failed:", err);
-                toast.error("Failed to connect to printer service");
-            });
+                toast.error("Failed to connect to printer");
+            }
+        };
+
+        if (navigator.usb) {
+            connectPrinter();
+        } else {
+            setPrinterStatus("Error");
+            toast.error("WebUSB not supported in this browser");
+        }
 
         // Cleanup on unmount
         return () => {
-            qz.websocket
-                .disconnect()
-                .then(() => console.log("Disconnected from QZ Tray"))
-                .catch((err) => console.error("Disconnect error:", err));
+            if (printer) {
+                printer.close().catch((err: any) => console.error("Error closing printer:", err));
+            }
         };
     }, []);
 
@@ -131,72 +152,66 @@ export default function BillingComponent() {
         }
     };
 
-    const formatBill = (invoice: any) => {
-        const companyDetails = `
-      ${invoice.companyName}
-      ${invoice.companyAddress}
-      Invoice No: #${invoice.invoiceId}
-      Date: ${new Date().toLocaleDateString()}
-      --------------------------------
-    `;
-        const clientDetails = `
-      Bill To:
-      ${invoice.clientName}
-      Phone: ${invoice.clientPhone}
-      --------------------------------
-    `;
-        const itemsHeader = `
-      Item          Qty   Rate    Total
-      --------------------------------
-    `;
-        const items = invoice.products
-            .map(
-                (item: any) =>
-                    `${("").padEnd(2, " ")}${item.name.padEnd(15, "       ")}${item.quantity.toString().padEnd(6, " ")}${item.rate
-                        .toFixed(2)
-                        .padEnd(8, " ")}${(item.quantity * item.rate).toFixed(2)}`
-            )
-            .join("\n");
-        const totals = `
-      --------------------------------
-      Subtotal: ${invoice.subTotal.toFixed(2)}
-      ${invoice.appliedTaxes
-                .map((tax: any) => `${tax.taxName.padEnd(4, " ")}(${tax.percentage.toString().padEnd(2, " ")}%) ${tax.amount.toFixed(2)}`)
-                .join("\n")}
-      Total Tax: ${invoice.totalTaxAmount.toFixed(2)}
-      --------------------------------
-      Grand Total: ${invoice.grandTotal.toFixed(2)}
-      --------------------------------
-      Payment Mode: ${invoice.paymentMode}
-      --------------------------------
-      Thank You!
-    `;
-        return `${companyDetails}${clientDetails}${itemsHeader}${items}${totals}`;
-    };
+    // Define the receipt as a React component
+    const Receipt = ({ invoice }: { invoice: any }) => (
+        <Printer type="star" width={42} characterSet="korea">
+            <Text align="center" bold={true}>
+                {invoice.companyName || "Your Company"}
+            </Text>
+            <Text align="center">{invoice.companyAddress || "123 Main St"}</Text>
+            <Text align="center">Invoice No: {invoice.invoiceId}</Text>
+            <Text align="center">Date: {new Date().toLocaleDateString()}</Text>
+            <Line />
+            <Text>Bill To:</Text>
+            <Text>{invoice.clientName}</Text>
+            <Text>Phone: {invoice.clientPhone}</Text>
+            <Line />
+            <Row left="Item" right="Qty  Rate  Total" />
+            <Line />
+            {invoice.products.map((item: any, index: number) => (
+                <Row
+                    key={index}
+                    left={item.name}
+                    right={`${item.quantity}  ${item.rate.toFixed(2)}  ${(item.quantity * item.rate).toFixed(2)}`}
+                />
+            ))}
+            <Line />
+            <Row left="Subtotal:" right={invoice.subTotal.toFixed(2)} />
+            {invoice.appliedTaxes.map((tax: any, index: number) => (
+                <Row key={index} left={`${tax.taxName} (${tax.percentage}%)`} right={tax.amount.toFixed(2)} />
+            ))}
+            <Row left="Total Tax:" right={invoice.appliedTaxes.reduce((sum: number, tax: any) => sum + tax.amount, 0).toFixed(2)} />
+            <Line />
+            <Row left="Grand Total:" right={invoice.grandTotal.toFixed(2)} />
+            <Row left="Payment" right={invoice.paymentMode} />
+            <Line />
+            <Text align="center">Thank You!</Text>
+            <Br />
+            <Cut />
+        </Printer>
+    );
 
     const handlePrint = async (invoiceToPrint: any) => {
-        const billContent = formatBill(invoiceToPrint);
 
-        qz.websocket.connect().then(() => {
-            return qz.printers.find();
-        }).then((printers) => {
-            console.log(printers);
-            let config = qz.configs.create('PDF');
-            return qz.print(config, [{
-                type: 'pixel',
-                format: 'html',
-                flavor: 'plain',
-                data: billContent
-            }]);
-        }).then(() => {
-            return qz.websocket.disconnect();
-        }).then(() => {
-            process.exit(0);
-        }).catch((err) => {
-            toast.error("Failed to print bill",);
-            process.exit(1);
-        });
+        if (printerStatus !== "Connected" || !printer) {
+            toast.error("Printer not connected");
+            return;
+        }
 
+        try {
+            // Render the receipt to Uint8Array
+            const data = await render(<Receipt invoice={invoiceToPrint} />);
+            console.log(data);
+
+
+            // Send data to USB printer
+            const endpointNumber = 1; // Adjust based on your printer’s endpoint (check via device.usbDevice.endpoints)
+            await printer.transferOut(endpointNumber, data);
+            toast.success("Bill printed successfully");
+        } catch (err) {
+            console.error("Printing failed:", err);
+            toast.error("Failed to print bill. Check printer connection.");
+        }
     };
 
     const OnContinue = async () => {
@@ -233,13 +248,13 @@ export default function BillingComponent() {
 
             if (data.invoice) {
                 setInvoice(data.invoice);
+                setShowInvoice(true);
                 setClientName("");
                 setPhoneNumber("");
                 setProducts([]);
                 setSubTotal(0);
                 setGrandTotal(0);
                 setPaymentMode("");
-                // Print the invoice after creation
                 await handlePrint(data.invoice);
             }
         } catch (error) {
@@ -451,7 +466,7 @@ export default function BillingComponent() {
             </div>
             <Dialog open={showInvoice} onOpenChange={setShowInvoice}>
                 <DialogContent className="max-w-7xl w-full max-h-[90vh] overflow-auto">
-                    <InvoiceDisplay invoice={invoice} />
+                    <Receipt invoice={invoice} />
                 </DialogContent>
             </Dialog>
         </>

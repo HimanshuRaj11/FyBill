@@ -42,6 +42,7 @@
     "react-hook-form": "^7.55.0",
     "react-icons": "^5.5.0",
     "react-redux": "^9.2.0",
+    "react-thermal-printer": "^0.21.0",
     "react-toastify": "^11.0.5",
     "tailwind-merge": "^3.1.0",
     "tw-animate-css": "^1.2.5",
@@ -57,9 +58,10 @@
     "@types/qz-tray": "^2.2.1",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@types/web": "^0.0.219",
     "eslint": "^9",
     "eslint-config-next": "15.2.4",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5.8.3"
   }
 }
