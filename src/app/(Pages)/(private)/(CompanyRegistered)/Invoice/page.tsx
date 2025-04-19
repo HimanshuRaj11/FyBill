@@ -8,7 +8,7 @@ import Link from 'next/link';
 import { Button } from '@/Components/ui/button';
 import { useSelector } from 'react-redux';
 
-export default function pages() {
+export default function Pages() {
     const { User } = useSelector((state: any) => state.User);
     const user = User?.user
     const [invoices, setInvoices] = useState<any[]>([]);

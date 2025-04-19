@@ -1,9 +1,3 @@
-'use client'
-import NotCompany from "@/Components/Main/NotCompany";
-import Sidebar from "@/Components/Main/Sidebar";
-import { useSelector } from "react-redux";
-
-
 
 export default function RootLayout({
     children,

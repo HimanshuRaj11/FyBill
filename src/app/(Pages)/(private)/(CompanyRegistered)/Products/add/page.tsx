@@ -4,7 +4,7 @@ import React from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/Components/ui/button'
 import { FiArrowLeft } from 'react-icons/fi'
-export default function page() {
+export default function Page() {
     const router = useRouter()
 
     return (
