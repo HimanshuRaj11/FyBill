@@ -14,7 +14,7 @@ export default function Page() {
     if (user) {
       router.push('/Dashboard')
     }
-  }, [user])
+  }, [user, router])
   return (
     <div className="min-h-screen">
       {/* Hero Section */}

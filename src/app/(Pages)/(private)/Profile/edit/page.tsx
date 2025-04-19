@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import Image from 'next/image';
 import { useSelector } from 'react-redux';
 import { Button } from '@/Components/ui/button';
@@ -36,14 +36,7 @@ export default function ProfilePage() {
         'Retail',
         'Other',
     ];
-
-    useEffect(() => {
-
-        setFormData(initialFormData);
-        setCompanyData(initialCompanyData);
-    }, [user, company]);
-
-    const initialFormData = {
+    const initialFormData = useMemo(() => ({
         email: user?.email || '',
         phone: user?.phone || '',
         address: {
@@ -53,9 +46,9 @@ export default function ProfilePage() {
             zipCode: user?.address?.zipCode || '',
             country: user?.address?.country || '',
         },
-    };
+    }), [user]);
 
-    const initialCompanyData = {
+    const initialCompanyData = useMemo(() => ({
         name: company?.name || '',
         email: company?.email || '',
         phone: company?.phone || '',
@@ -70,7 +63,14 @@ export default function ProfilePage() {
         companySize: company?.companySize || '',
         industry: company?.industry || '',
         description: company?.description || '',
-    };
+    }), [company]);
+
+    useEffect(() => {
+
+        setFormData(initialFormData);
+        setCompanyData(initialCompanyData);
+    }, [user, company, initialFormData, initialCompanyData]);
+
 
     const [formData, setFormData] = useState(initialFormData);
     const [companyData, setCompanyData] = useState(initialCompanyData);

@@ -23,7 +23,7 @@ export default function Page({ params }: { params: Promise<{ InvoiceId: string }
     }
     useEffect(() => {
         fetchInvoice();
-    }, [resolvedParams.InvoiceId]);
+    }, []);
 
     if (isLoading) {
         return (
