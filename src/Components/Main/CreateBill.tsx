@@ -76,7 +76,7 @@ export default function BillingComponent() {
                 printer.close().catch((err: any) => console.error("Error closing printer:", err));
             }
         };
-    }, []);
+    }, [printer]);
 
     // Tax calculation
     useEffect(() => {
