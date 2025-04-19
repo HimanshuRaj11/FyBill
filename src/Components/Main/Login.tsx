@@ -190,7 +190,7 @@ export default function Login() {
                             Forgot password?
                         </Link>
                         <div className="text-gray-600">
-                            Don't have an account? <Link href={'/Register'} className="text-indigo-600 hover:text-indigo-800 font-medium transition-colors duration-200">Sign Up</Link>
+                            {`Don't`} have an account? <Link href={'/Register'} className="text-indigo-600 hover:text-indigo-800 font-medium transition-colors duration-200">Sign Up</Link>
                         </div>
                     </div>
 

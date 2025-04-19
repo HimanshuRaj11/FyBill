@@ -28,17 +28,8 @@ const staffSchema = z.object({
 type StaffFormData = z.infer<typeof staffSchema>
 
 export default function AddStaff({ setShowAddStaffModal }: { setShowAddStaffModal: (show: boolean) => void }) {
-    const { User } = useSelector((state: any) => state.User);
-    const user = User?.user
-    const router = useRouter()
-    if (user?.role !== "admin" && user?.role !== "Owner") {
-        toast.error("You are not authorized to add staff")
-        router.back()
-        return
-    }
     const [showPassword, setShowPassword] = useState(false)
     const [showConfirmPassword, setShowConfirmPassword] = useState(false)
-
     const {
         register,
         handleSubmit,
@@ -47,6 +38,16 @@ export default function AddStaff({ setShowAddStaffModal }: { setShowAddStaffModa
     } = useForm<StaffFormData>({
         resolver: zodResolver(staffSchema)
     })
+
+    const { User } = useSelector((state: any) => state.User);
+    const user = User?.user
+    const router = useRouter()
+    if (user?.role !== "admin" && user?.role !== "Owner") {
+        toast.error("You are not authorized to add staff")
+        router.back()
+        return
+    }
+
 
     const onSubmit = async (Data: StaffFormData) => {
         try {

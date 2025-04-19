@@ -17,7 +17,7 @@ export default function NotCompany() {
                 <div className="space-y-4">
                     <h2 className="text-3xl font-bold text-gray-900">No Company Registered</h2>
                     <p className="text-gray-600">
-                        It looks like you haven't registered your company yet. Register your company to access all features and start managing your business efficiently.
+                        It looks like you {`haven't`} registered your company yet. Register your company to access all features and start managing your business efficiently.
                     </p>
                 </div>
 

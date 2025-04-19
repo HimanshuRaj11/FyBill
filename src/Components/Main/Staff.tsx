@@ -8,6 +8,7 @@ import axios from 'axios'
 import moment from 'moment'
 import { useSelector } from 'react-redux'
 import { toast } from 'react-toastify'
+import Image from 'next/image'
 
 interface StaffMember {
     _id: string
@@ -127,10 +128,12 @@ export default function Staff() {
                         className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 hover:shadow-md transition-shadow"
                     >
                         <div className="flex items-center space-x-4">
-                            <img
+                            <Image
                                 src={staff.avatar}
                                 alt={staff.name}
                                 className="h-12 w-12 rounded-full"
+                                width={100}
+                                height={100}
                             />
                             <div className="flex-1 min-w-0">
                                 <p className="text-sm font-medium text-gray-900 truncate">

@@ -39,7 +39,7 @@ export default function Navbar() {
         ConnectDb();
         dispatch(FetchUser() as any);
         dispatch(FetchCompany() as any);
-    }, [])
+    }, [dispatch])
     return (
 
         <header className="bg-white shadow-sm z-50 top-0 w-full fixed ">
