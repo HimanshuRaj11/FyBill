@@ -4,6 +4,7 @@ export const worldCurrencies = [
     { name: "Japanese Yen", code: "JPY", symbol: "¥" },
     { name: "British Pound Sterling", code: "GBP", symbol: "£" },
     { name: "Australian Dollar", code: "AUD", symbol: "AUD$" }, // Often AUD$ to distinguish
+    { name: "Guyanese Dollar", code: "GYD", symbol: "$" }, // Often GYD$ to distinguish
     { name: "Canadian Dollar", code: "CAD", symbol: "CAD$" }, // Often CAD$ to distinguish
     { name: "Swiss Franc", code: "CHF", symbol: "Fr" },
     { name: "Chinese Yuan", code: "CNY", symbol: "¥" }, // Sometimes CN¥ to distinguish
