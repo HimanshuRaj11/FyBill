@@ -1,5 +1,5 @@
 'use client'
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import InvoiceDisplay from '@/Components/Main/InvoiceDisplay'
 import { IInvoice } from '@/Model/Invoice.model';
 import axios from 'axios';
@@ -9,10 +9,13 @@ export default function Page({ params }: { params: Promise<{ InvoiceId: string }
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const resolvedParams = React.use(params);
 
-    const fetchInvoice = async () => {
+    const fetchInvoice = useCallback(async () => {
         try {
             setIsLoading(true);
-            const { data } = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/Invoice/${resolvedParams.InvoiceId}`, { withCredentials: true });
+            const { data } = await axios.get(
+                `${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/Invoice/${resolvedParams.InvoiceId}`,
+                { withCredentials: true }
+            );
             if (data.success) {
                 setInvoice(data.invoice);
                 setIsLoading(false);
@@ -20,10 +23,12 @@ export default function Page({ params }: { params: Promise<{ InvoiceId: string }
         } catch (error) {
             setIsLoading(false);
         }
-    }
+    }, [resolvedParams.InvoiceId]);
+
     useEffect(() => {
         fetchInvoice();
-    }, []);
+    }, [fetchInvoice]);
+
 
     if (isLoading) {
         return (

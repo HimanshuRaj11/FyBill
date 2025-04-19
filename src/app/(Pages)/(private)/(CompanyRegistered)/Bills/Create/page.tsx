@@ -6,7 +6,7 @@ import axios from 'axios';
 import Link from 'next/link'
 import React, { useEffect, useState } from 'react'
 
-export default function page() {
+export default function Page() {
     const [products, setProducts] = useState<any[]>([]);
     const [loading, setLoading] = useState(false);
     const fetchProducts = async () => {
