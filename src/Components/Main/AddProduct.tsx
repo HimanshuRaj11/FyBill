@@ -21,26 +21,37 @@ const productSchema = z.object({
 
 type ProductFormData = z.infer<typeof productSchema>
 
+const initialData: ProductFormData = {
+    name: '',
+    price: '',
+    description: '',
+    category: '',
+}
+
 export default function AddProduct() {
     const [loading, setLoading] = useState(false)
+    const [categories, setCategories] = useState<string[]>([]);
+    const [formData, setFormData] = useState<ProductFormData>(initialData)
+
 
     const [errors, setErrors] = useState<Partial<ProductFormData>>({})
     const { User } = useSelector((state: any) => state.User);
     const user = User?.user
     const router = useRouter()
+    useEffect(() => {
+        setLoading(true)
+        fetchCategories();
+        setLoading(false)
+    }, []);
+
+
     if (user?.role !== "admin" && user?.role !== "Owner") {
         toast.error("You are not authorized to add Products")
         router.back()
         return
     }
 
-    const initialData: ProductFormData = {
-        name: '',
-        price: '',
-        description: '',
-        category: '',
-    }
-    const [formData, setFormData] = useState<ProductFormData>(initialData)
+
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const { name, value } = e.target
@@ -103,16 +114,11 @@ export default function AddProduct() {
         const response = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/company/Product_category/fetch`);
         setCategories(response.data.category.category);
     };
-    useEffect(() => {
-        setLoading(true)
-        fetchCategories();
-        setLoading(false)
-    }, []);
 
 
 
 
-    const [categories, setCategories] = useState<string[]>([]);
+
     if (!loading && categories.length === 0) {
         return (
             <div className="min-h-screen flex flex-col items-center justify-center space-y-6">
