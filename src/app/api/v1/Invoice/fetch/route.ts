@@ -1,4 +1,5 @@
 import { verifyUser } from "@/lib/verifyUser";
+import branchModel from "@/Model/branch.model";
 import CompanyModel from "@/Model/Company.model";
 import InvoiceModel from "@/Model/Invoice.model";
 import UserModel from "@/Model/User.model";
@@ -21,7 +22,10 @@ export async function GET() {
         if (!company) {
             return NextResponse.json({ message: "Company not found", success: false }, { status: 404 });
         }
-        const invoices = await InvoiceModel.find({ companyId: companyId }).sort({ createdAt: -1 }).lean()
+        const invoices = await InvoiceModel.find({ companyId: companyId }).populate({
+            path: 'branchId',
+            model: branchModel
+        }).sort({ createdAt: -1 }).lean()
 
         return NextResponse.json({ invoices, success: true }, { status: 200 });
 

@@ -15,7 +15,7 @@ const productSchema = z.object({
     price: z.string().min(1, "Price is required").refine((val) => !isNaN(Number(val)) && Number(val) > 0, {
         message: "Price must be a positive number"
     }),
-    description: z.string().min(10, "Description must be at least 10 characters"),
+    description: z.string().optional(),
     category: z.string().min(1, "Category is required"),
 })
 
@@ -36,7 +36,7 @@ export default function AddProduct() {
 
     const [errors, setErrors] = useState<Partial<ProductFormData>>({})
     const { User } = useSelector((state: any) => state.User);
-    const user = User?.user
+    const user = User
     const router = useRouter()
     useEffect(() => {
         setLoading(true)
@@ -207,7 +207,6 @@ export default function AddProduct() {
                         onChange={handleChange}
                         placeholder="Enter product description"
                         className="min-h-[100px]"
-                        required
                     />
                     {errors.description && <p className="text-red-500 text-sm mt-1">{errors.description}</p>}
                 </div>

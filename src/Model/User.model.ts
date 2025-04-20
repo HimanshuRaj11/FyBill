@@ -2,6 +2,7 @@ import mongoose, { Schema, Document } from "mongoose";
 
 export interface IUser extends Document {
     companyId: mongoose.Types.ObjectId;
+    branchId: mongoose.Types.ObjectId;
     name: string;
     phone: string;
     email?: string;
@@ -25,6 +26,7 @@ export interface IUser extends Document {
 const UserSchema: Schema = new Schema<IUser>(
     {
         companyId: { type: mongoose.Schema.Types.ObjectId, ref: "Company" },
+        branchId: { type: mongoose.Schema.Types.ObjectId, ref: "Branch" },
         name: { type: String, required: true },
         phone: { type: String, required: true },
         email: { type: String, required: true },

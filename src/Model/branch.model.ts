@@ -1,7 +1,8 @@
 import mongoose, { Schema, Document } from "mongoose";
 
-export interface ICompany extends Document {
-    name: string;
+export interface IBranch extends Document {
+    companyId: mongoose.Types.ObjectId;
+    branchName: string;
     address: {
         street: string;
         city: string;
@@ -13,27 +14,17 @@ export interface ICompany extends Document {
     phone: string;
     gstNumber?: string;
     panNumber?: string;
-    logoUrl?: string;
-    website?: string;
-    description: string;
     ownerId: mongoose.Types.ObjectId;
     staffIds: mongoose.Types.ObjectId[];
     createdAt: Date;
     updatedAt: Date;
-    industry: string;
-    companySize: string;
-    currency: {
-        name: string;
-        code: string;
-        symbol: string;
-    };
-    branch: mongoose.Types.ObjectId[];
 }
 
 
-const CompanySchema: Schema = new Schema<ICompany>(
+const BranchSchema: Schema = new Schema<IBranch>(
     {
-        name: { type: String, required: true },
+        companyId: { type: mongoose.Schema.Types.ObjectId, ref: "Company", required: true },
+        branchName: { type: String, required: true },
         address: {
             street: { type: String, required: true },
             city: { type: String, required: true },
@@ -45,23 +36,12 @@ const CompanySchema: Schema = new Schema<ICompany>(
         phone: { type: String, required: true },
         gstNumber: { type: String },
         panNumber: { type: String },
-        logoUrl: { type: String },
-        website: { type: String },
-        description: { type: String, required: true },
         ownerId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
         staffIds: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
-        industry: { type: String, required: true },
-        companySize: { type: String, required: true },
-        branch: [{ type: mongoose.Schema.Types.ObjectId, ref: "Branch" }],
-        currency: {
-            name: { type: String, required: true, default: "United States Dollar" },
-            code: { type: String, required: true, default: "USD" },
-            symbol: { type: String, required: true, default: "$" },
-        },
     },
     {
         timestamps: true,
     }
 );
 
-export default mongoose.models.Company || mongoose.model<ICompany>("Company", CompanySchema);
+export default mongoose.models.Branch || mongoose.model<IBranch>("Branch", BranchSchema);

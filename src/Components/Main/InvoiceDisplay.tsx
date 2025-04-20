@@ -12,7 +12,7 @@ import { useSelector } from "react-redux";
 
 export default function InvoiceDisplay({ invoice }: { invoice: any }) {
     const { User } = useSelector((state: any) => state.User);
-    const user = User?.user
+    const user = User
 
     const [isPrinting, setIsPrinting] = useState(false);
     const invoiceRef = useRef<HTMLDivElement>(null);

@@ -14,8 +14,8 @@ export default function RootLayout({
 }>) {
     const pathname = usePathname()
 
-    const { User, loading } = useSelector((state: any) => state.User)
-    const company = User?.user?.companyId
+    const { Company, loading } = useSelector((state: any) => state.Company)
+    const company = Company
 
     if (loading) {
         return <div className="min-h-screen flex items-center justify-center">

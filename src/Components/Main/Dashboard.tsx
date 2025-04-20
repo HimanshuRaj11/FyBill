@@ -11,7 +11,7 @@ import DashboardTopCards from '../Other/DashboardTopCards'
 
 export default function Dashboard() {
     const { Company } = useSelector((state: any) => state.Company)
-    const company = Company?.company
+    const company = Company
     const [isLoading, setIsLoading] = useState(false)
 
     const [searchQuery, setSearchQuery] = useState('')

@@ -20,7 +20,6 @@ const ProductSchema = new Schema<IProduct>({
     },
     description: {
         type: String,
-        required: [true, 'Description is required']
     },
     category: {
         type: String,

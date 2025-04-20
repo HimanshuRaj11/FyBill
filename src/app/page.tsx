@@ -9,7 +9,7 @@ import { useSelector } from 'react-redux'
 export default function Page() {
   const router = useRouter()
   const { User } = useSelector((state: any) => state.User)
-  const user = User?.user
+  const user = User
   useEffect(() => {
     if (user) {
       router.push('/Dashboard')

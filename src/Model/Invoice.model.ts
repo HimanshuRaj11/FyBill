@@ -15,6 +15,7 @@ interface Tax {
 export interface IInvoice extends Document {
     invoiceId: string;
     companyId: mongoose.Types.ObjectId;
+    branchId: mongoose.Types.ObjectId;
     clientName: string;
     clientPhone?: string;
     companyName?: string;
@@ -51,11 +52,13 @@ const InvoiceSchema: Schema = new Schema<IInvoice>(
     {
         invoiceId: { type: String, required: true, unique: true },
         companyId: { type: mongoose.Schema.Types.ObjectId, required: true, ref: "Company" },
-        clientName: { type: String, required: true },
-        clientPhone: { type: String },
-        companyName: { type: String },
-        companyAddress: { type: String },
-        issueDate: { type: Date, required: true },
+        branchId: { type: mongoose.Schema.Types.ObjectId, ref: "Branch" },
+        clientName: { type: String, default: "" },
+        clientPhone: { type: String, default: "" },
+        companyName: { type: String, default: "" },
+        companyAddress: { type: String, default: "" },
+
+        issueDate: { type: Date, default: new Date() },
         products: { type: [ProductSchema], required: true },
         subTotal: { type: Number, required: true },
         appliedTaxes: { type: [TaxSchema], },

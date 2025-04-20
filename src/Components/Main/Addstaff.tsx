@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -19,7 +19,8 @@ const staffSchema = z.object({
     // .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
     // .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
     // .regex(/[0-9]/, 'Password must contain at least one number'),
-    confirmPassword: z.string()
+    confirmPassword: z.string(),
+    branchId: z.string()
 }).refine((data) => data.password === data.confirmPassword, {
     message: "Passwords don't match",
     path: ["confirmPassword"]
@@ -30,6 +31,7 @@ type StaffFormData = z.infer<typeof staffSchema>
 export default function AddStaff({ setShowAddStaffModal }: { setShowAddStaffModal: (show: boolean) => void }) {
     const [showPassword, setShowPassword] = useState(false)
     const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+    const [branch, setBranch] = useState([])
     const {
         register,
         handleSubmit,
@@ -42,11 +44,22 @@ export default function AddStaff({ setShowAddStaffModal }: { setShowAddStaffModa
     const { User } = useSelector((state: any) => state.User);
     const user = User?.user
     const router = useRouter()
-    if (user?.role !== "admin" && user?.role !== "Owner") {
-        toast.error("You are not authorized to add staff")
-        router.back()
-        return
+
+    const fetchBranch = async () => {
+        try {
+            const { data } = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/company/branch/fetch`)
+            setBranch(data.branches)
+        } catch (error) {
+            console.log(error)
+            toast.error('Failed to fetch branch')
+        }
     }
+    useEffect(() => {
+        fetchBranch()
+    }, [])
+
+
+
 
 
     const onSubmit = async (Data: StaffFormData) => {
@@ -63,6 +76,12 @@ export default function AddStaff({ setShowAddStaffModal }: { setShowAddStaffModa
             toast.error('Failed to add staff')
             return
         }
+    }
+
+    if (user?.role !== "admin" && user?.role !== "Owner") {
+        toast.error("You are not authorized to add staff")
+        router.back()
+        return
     }
 
     return (
@@ -133,7 +152,27 @@ export default function AddStaff({ setShowAddStaffModal }: { setShowAddStaffModa
                         <p className="mt-1 text-sm text-red-600">{errors.role.message}</p>
                     )}
                 </div>
+                {
+                    branch?.length > 0 && (
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                                Branch
+                            </label>
+                            <select
+                                {...register('branchId')}
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                            >
+                                <option value="">Select a branch</option>
+                                {
+                                    branch?.map((branch: any) => (
+                                        <option key={branch._id} value={branch._id}>{branch.branchName}</option>
+                                    ))
+                                }
+                            </select>
 
+                        </div>
+                    )
+                }
                 <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                         Password

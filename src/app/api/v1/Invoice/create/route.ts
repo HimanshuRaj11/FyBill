@@ -3,6 +3,7 @@ import InvoiceModel from "@/Model/Invoice.model";
 import UserModel from "@/Model/User.model";
 import { generateInvoiceId } from "@/lib/generateInvoiceId";
 import CompanyModel from "@/Model/Company.model";
+import BranchModel from "@/Model/branch.model";
 export async function POST(request: Request) {
 
     try {
@@ -20,6 +21,13 @@ export async function POST(request: Request) {
         if (!Company) {
             return Response.json({ message: "Company not found" }, { status: 404 });
         }
+        const Branch = await BranchModel.findOne({ companyId: User.companyId })
+        let companyAddress = ''
+        if (Branch) {
+            companyAddress = Branch.address.street + " " + Branch.address.city + " " + Branch.address.state + " " + Branch.address.country + " " + Branch.address.zipCode
+        } else {
+            companyAddress = Company.address.street + " " + Company.address.city + " " + Company.address.state + " " + Company.address.country + " " + Company.address.zipCode
+        }
         const {
             clientName,
             phoneNumber,
@@ -28,9 +36,9 @@ export async function POST(request: Request) {
             appliedTaxes,
             totalTaxAmount,
             grandTotal,
-            paymentMode
+            paymentMode,
+            selectedBranch
         } = await request.json();
-
 
 
         const invoice = await InvoiceModel.create({
@@ -39,7 +47,7 @@ export async function POST(request: Request) {
             clientName,
             clientPhone: phoneNumber,
             companyName: Company.name,
-            companyAddress: Company.address.street + " " + Company.address.city + " " + Company.address.state + " " + Company.address.country + " " + Company.address.zipCode,
+            companyAddress,
             issueDate: new Date(),
             products,
             subTotal,
@@ -50,7 +58,9 @@ export async function POST(request: Request) {
             currency: Company.currency.symbol,
             createdBy: User._id
         })
-
+        if (User.branchId || selectedBranch) {
+            invoice.branchId = User.branchId || selectedBranch;
+        }
         return Response.json({ message: "Invoice created successfully", invoice }, { status: 200 });
 
     } catch (error) {

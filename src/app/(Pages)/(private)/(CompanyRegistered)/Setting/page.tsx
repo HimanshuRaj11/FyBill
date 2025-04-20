@@ -17,7 +17,7 @@ interface Tax {
 
 export default function SettingsPage() {
     const { Company } = useSelector((state: any) => state.Company);
-    const company = Company?.company;
+    const company = Company
 
     const [taxes, setTaxes] = useState<Tax[]>([]);
     const [categories, setCategories] = useState<string[]>([]);
@@ -40,14 +40,12 @@ export default function SettingsPage() {
 
     const fetchData = async () => {
         try {
-            const [taxesRes, categoriesRes] = await Promise.all([
-                axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/company/Tax/fetch`),
-                axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/company/Product_category/fetch`),
-            ]);
+            const categoriesRes = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/company/Product_category/fetch`);
+            const taxesRes = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/company/Tax/fetch`);
 
-            setTaxes(taxesRes.data.tax.taxes);
-            setEditedTaxes(taxesRes.data.tax.taxes);
-            setCategories(categoriesRes.data.category.category);
+            setTaxes(taxesRes?.data?.tax?.taxes || []);
+            setEditedTaxes(taxesRes?.data?.tax?.taxes || []);
+            setCategories(categoriesRes?.data?.category?.category || []);
             setLoading(false);
         } catch (error) {
             toast.error('Failed to load settings');
@@ -144,20 +142,19 @@ export default function SettingsPage() {
         }
     };
 
-    const handleUpdateCategory = async (index: number, updatedCategory: string) => {
+    const handleDeleteCategory = async (index: number, Category: string) => {
         try {
             setLoading(true);
-            const res = await axios.put(`${process.env.NEXT_PUBLIC_BASE_URL}/v1/api/category/update`, {
-                category: updatedCategory
+            const res = await axios.post(`${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/company/Product_category/delete`, {
+                categoryName: Category
             });
             if (res.data.success) {
-                const updatedCategories = [...categories];
-                updatedCategories[index] = updatedCategory;
+                const updatedCategories = categories.filter((cat) => cat !== Category);
                 setCategories(updatedCategories);
-                toast.success('Category updated successfully');
+                toast.success('Category deleted successfully');
             }
         } catch (error) {
-            toast.error('Failed to update category');
+            toast.error('Failed to delete category');
         } finally {
             setLoading(false);
         }
@@ -373,23 +370,17 @@ export default function SettingsPage() {
                             >
                                 <Input
                                     value={cat}
-                                    onChange={(e) => handleUpdateCategory(index, e.target.value)}
                                     className="w-3/4 border-2"
                                     disabled={!editCategoryMode}
                                 />
                                 {editCategoryMode && (
                                     <div className="flex gap-2">
-                                        <Button
-                                            onClick={() => handleUpdateCategory(index, cat)}
-                                            size="sm"
-                                            className="bg-blue-500 hover:bg-blue-600"
-                                        >
-                                            Update
-                                        </Button>
+
                                         <Button
                                             variant="destructive"
+                                            onClick={() => handleDeleteCategory(index, cat)}
                                             size="sm"
-                                            className="bg-red-500 hover:bg-red-600"
+                                            className="bg-red-500 cursor-pointer hover:bg-red-600"
                                         >
                                             Remove
                                         </Button>

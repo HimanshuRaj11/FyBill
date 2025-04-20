@@ -10,7 +10,8 @@ import { useSelector } from 'react-redux';
 
 export default function Pages() {
     const { User } = useSelector((state: any) => state.User);
-    const user = User?.user
+    const { Company } = useSelector((state: any) => state.Company);
+    const user = User
     const [invoices, setInvoices] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [actionMode, setActionMode] = useState<boolean>(false);
@@ -77,6 +78,11 @@ export default function Pages() {
                         <tr>
                             <th scope="col" className="px-6 py-4">Invoice Id</th>
                             <th scope="col" className="px-6 py-4">Client Name</th>
+                            {
+                                Company?.branch?.length > 0 && (
+                                    <th scope="col" className="px-6 py-4">Branch</th>
+                                )
+                            }
                             <th scope="col" className="px-6 py-4">Date</th>
                             <th scope="col" className="px-6 py-4">Total Price</th>
                             <th scope="col" className="px-6 py-4">Payment Mode</th>
@@ -93,6 +99,11 @@ export default function Pages() {
                                         </Link>
                                     </th>
                                     <td className="px-6 py-4">{invoice.clientName}</td>
+                                    {
+                                        Company?.branch?.length > 0 && (
+                                            <td className="px-6 py-4">{invoice?.branchId?.branchName}</td>
+                                        )
+                                    }
                                     <td className="px-6 py-4">{moment(invoice.createdAt).format('DD/MM/YYYY')}</td>
                                     <td className="px-6 py-4 font-medium">${invoice.grandTotal}</td>
                                     <td className="px-6 py-4">

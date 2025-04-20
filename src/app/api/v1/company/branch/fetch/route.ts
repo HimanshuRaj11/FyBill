@@ -7,20 +7,17 @@ import BranchModel from "@/Model/branch.model";
 export async function GET(request: Request) {
     try {
         const userId = await verifyUser();
-        const user = await UserModel.findById({ _id: userId });
+        const user = await UserModel.findById({ _id: userId })
         if (!user) {
             return NextResponse.json({ message: "User not found" });
         }
         const userCompanyId = user.companyId;
 
-        const company = await CompanyModel.findById({ _id: userCompanyId }).populate({
-            path: 'branch',
-            model: BranchModel
-        }).lean();
+        const branches = await BranchModel.find({ companyId: userCompanyId }).lean()
+        return NextResponse.json({ branches, success: true });
 
-        return NextResponse.json({ company });
 
     } catch (error) {
-        return NextResponse.json({ message: "Internal server error" });
+        return NextResponse.json({ message: "Internal server error", success: false }, { status: 500 });
     }
 }

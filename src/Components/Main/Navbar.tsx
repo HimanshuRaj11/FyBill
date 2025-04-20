@@ -18,10 +18,10 @@ export default function Navbar() {
     const router = useRouter();
     const dispatch = useDispatch();
     const { User } = useSelector((state: any) => state.User);
-    const user = User?.user
+    const user = User
 
     const { Company } = useSelector((state: any) => state.Company);
-    const company = Company?.company
+    const company = Company
 
     const ConnectDb = async () => {
         try {
@@ -52,23 +52,13 @@ export default function Navbar() {
                 {
                     company && (
                         <Link href={'/Dashboard'}>
-                            <div className="logo font-bold text-3xl text-green-700 px-2 py-1 rounded-lg bg-green-50">
+                            <div className="logo font-bold text-3xl px-2 py-1 rounded-lg underline font-mono">
                                 {company?.name}
                             </div>
                         </Link>
                     )
                 }
 
-                <div className="flex items-center w-1/3">
-                    <div className="relative w-full max-w-md">
-                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                        <Input
-                            type="text"
-                            placeholder="Search..."
-                            className="pl-10 border-gray-200 rounded-lg text-sm focus:ring-indigo-500 focus:border-indigo-500 w-full"
-                        />
-                    </div>
-                </div>
                 {
                     !User && (
                         <div className="">

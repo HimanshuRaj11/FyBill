@@ -28,7 +28,7 @@ const CompanySlice = createSlice({
             })
             .addCase(FetchCompany.fulfilled, (state, action) => {
                 state.loading = false;
-                state.Company = action.payload;
+                state.Company = action.payload.company;
                 state.error = false
             })
             .addCase(FetchCompany.rejected, (state) => {

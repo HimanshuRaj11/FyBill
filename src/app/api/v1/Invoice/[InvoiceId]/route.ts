@@ -1,4 +1,5 @@
 import { verifyUser } from "@/lib/verifyUser";
+import branchModel from "@/Model/branch.model";
 import CompanyModel from "@/Model/Company.model";
 import InvoiceModel from "@/Model/Invoice.model";
 import UserModel from "@/Model/User.model";
@@ -26,6 +27,9 @@ export async function GET(req: Request, { params }: { params: Promise<{ InvoiceI
         const invoice = await InvoiceModel.findOne({ invoiceId: InvoiceId }).populate({
             path: "createdBy",
             select: "_id email name phone role"
+        }).populate({
+            path: 'branchId',
+            model: branchModel
         })
 
         if (!invoice) {

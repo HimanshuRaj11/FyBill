@@ -1,5 +1,5 @@
 'use client';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { useSelector } from 'react-redux';
 import { Button } from '@/Components/ui/button';
@@ -9,9 +9,11 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 export default function ProfilePage() {
     const { User } = useSelector((state: any) => state.User);
-    const user = User?.user
+    const user = User
     const { Company } = useSelector((state: any) => state.Company)
-    const company = Company?.company
+    const company = Company
+    const [branches, setBranches] = useState([])
+
 
     const handleDeleteCompany = async () => {
         try {
@@ -23,9 +25,17 @@ export default function ProfilePage() {
             toast.error("Failed to delete company")
         }
     }
-
+    useEffect(() => {
+        const fetchBranches = async () => {
+            const response = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/company/branch/fetch`)
+            if (response.data.success) {
+                setBranches(response.data.branches)
+            }
+        }
+        fetchBranches()
+    }, [])
     return (
-        <div className=" min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8 rounded-md">
+        <div className=" min-h-screen ">
             <div className="max-w-3xl mx-auto">
                 {/* Profile Header */}
                 <div className="bg-white rounded-lg shadow-md overflow-hidden">
@@ -49,7 +59,7 @@ export default function ProfilePage() {
                                 <p className="text-sm text-gray-500">{user?.role}</p>
                             </div>
                             <Button>
-                                <Link href="/Profile/Edit">
+                                <Link href="/Profile/edit">
                                     Edit Profile
                                 </Link>
                             </Button>
@@ -189,6 +199,41 @@ export default function ProfilePage() {
                                         </p>
                                     </div>
                                 </div>
+                                <div>
+                                    <label className="text-sm font-medium text-gray-500">Website</label>
+                                    <div className="mt-1">
+                                        <a
+                                            href={company?.website}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="w-full px-3 py-2 border rounded-md bg-gray-50 border-gray-200 hover:text-blue-600 transition-colors block"
+                                        >
+                                            {company?.website}
+                                        </a>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label className="text-sm font-medium text-gray-500">Company Size</label>
+                                    <div className="mt-1">
+                                        <p className="w-full px-3 py-2 border rounded-md bg-gray-50 border-gray-200">
+                                            {company?.companySize}
+                                        </p>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label className="text-sm font-medium text-gray-500">Industry</label>
+                                    <div className="mt-1">
+                                        <p className="w-full px-3 py-2 border rounded-md bg-gray-50 border-gray-200">
+                                            {company?.industry}
+                                        </p>
+                                    </div>
+                                </div>
+                                <div>
+
+                                </div>
+                                <div className="">
+                                    <h1 className='text-md font-medium text-gray-900'>Company Address:</h1>
+                                </div>
                                 <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-4">
                                     <div>
                                         <label className="text-sm font-medium text-gray-500">Street</label>
@@ -231,43 +276,84 @@ export default function ProfilePage() {
                                         </div>
                                     </div>
 
-                                    <div>
-                                        <label className="text-sm font-medium text-gray-500">Website</label>
-                                        <div className="mt-1">
-                                            <a
-                                                href={company?.website}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                className="w-full px-3 py-2 border rounded-md bg-gray-50 border-gray-200 hover:text-blue-600 transition-colors block"
-                                            >
-                                                {company?.website}
-                                            </a>
-                                        </div>
+
+
+                                </div>
+
+                            </div>
+                            {
+                                branches?.length > 0 && (
+                                    <div className="mt-6">
+                                        <h1 className='text-xl font-semibold text-gray-900'>Branch Details</h1>
+                                        {
+                                            branches.map((branch: any) => (
+                                                <div className="mt-4 border rounded-lg p-4" key={branch._id}>
+                                                    <h1 className='text-md font-medium text-gray-900'>Branch Name:
+                                                        <span className='text-sm ml-2 font-medium text-gray-500'>{branch?.branchName}</span>
+                                                    </h1>
+                                                    <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-4">
+                                                        <div>
+                                                            <label className="text-sm font-medium text-gray-500">Street</label>
+                                                            <div className="mt-1">
+                                                                <p className="w-full px-3 py-2 border rounded-md bg-gray-50 border-gray-200">
+                                                                    {branch?.address?.street}
+                                                                </p>
+                                                            </div>
+                                                        </div>
+                                                        <div>
+                                                            <label className="text-sm font-medium text-gray-500">City</label>
+                                                            <div className="mt-1">
+                                                                <p className="w-full px-3 py-2 border rounded-md bg-gray-50 border-gray-200">
+                                                                    {branch?.address?.city}
+                                                                </p>
+                                                            </div>
+                                                        </div>
+                                                        <div>
+                                                            <label className="text-sm font-medium text-gray-500">State</label>
+                                                            <div className="mt-1">
+                                                                <p className="w-full px-3 py-2 border rounded-md bg-gray-50 border-gray-200">
+                                                                    {branch?.address?.state}
+                                                                </p>
+                                                            </div>
+                                                        </div>
+                                                        <div>
+                                                            <label className="text-sm font-medium text-gray-500">Country</label>
+                                                            <div className="mt-1">
+                                                                <p className="w-full px-3 py-2 border rounded-md bg-gray-50 border-gray-200">
+                                                                    {branch?.address?.country}
+                                                                </p>
+                                                            </div>
+                                                        </div>
+                                                        <div>
+                                                            <label className="text-sm font-medium text-gray-500">Zip Code</label>
+                                                            <div className="mt-1">
+                                                                <p className="w-full px-3 py-2 border rounded-md bg-gray-50 border-gray-200">
+                                                                    {branch?.address?.zipCode}
+                                                                </p>
+                                                            </div>
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+                                            ))
+                                        }
                                     </div>
-                                    <div>
-                                        <label className="text-sm font-medium text-gray-500">Company Size</label>
-                                        <div className="mt-1">
-                                            <p className="w-full px-3 py-2 border rounded-md bg-gray-50 border-gray-200">
-                                                {company?.companySize}
-                                            </p>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <label className="text-sm font-medium text-gray-500">Industry</label>
-                                        <div className="mt-1">
-                                            <p className="w-full px-3 py-2 border rounded-md bg-gray-50 border-gray-200">
-                                                {company?.industry}
-                                            </p>
-                                        </div>
-                                    </div>
-                                    <div className="col-span-2">
-                                        <label className="text-sm font-medium text-gray-500">About</label>
-                                        <div className="mt-1">
-                                            <p className="text-sm text-gray-500">{company?.description}</p>
-                                        </div>
-                                    </div>
+                                )}
+                            <div className="mt-6 flex w-full ">
+                                <Button>
+                                    <Link href="/Company/Branch/Register">
+                                        Add Branch
+                                    </Link>
+                                </Button>
+                            </div>
+
+                            <div className="col-span-2">
+                                <label className="text-sm font-medium text-gray-500">About</label>
+                                <div className="mt-1">
+                                    <p className="text-sm text-gray-500">{company?.description}</p>
                                 </div>
                             </div>
+
 
                             {
                                 user?.role === "Owner" && user?.companyId && (

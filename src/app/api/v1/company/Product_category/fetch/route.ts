@@ -19,9 +19,7 @@ export async function GET() {
         }
 
         const category = await ProductCategoryModel.findOne({ companyId: company._id });
-        if (!category) {
-            return NextResponse.json({ success: false, message: "Category not found" }, { status: 404 });
-        }
+
         return NextResponse.json({ success: true, category });
     } catch (error) {
         console.log(error);

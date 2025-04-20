@@ -11,7 +11,7 @@ export async function POST(request: Request) {
 
     try {
         // await connectDB();
-        const userId = await verifyUser();
+        const userId: any = await verifyUser();
 
         const User = await UserModel.findById({ _id: userId })
 
@@ -20,7 +20,7 @@ export async function POST(request: Request) {
         }
         const userCompanyId = User.companyId
 
-        const { name, phone, email, password, address, role } = await request.json();
+        const { name, phone, email, password, address, role, branchId } = await request.json();
 
 
 
@@ -38,6 +38,7 @@ export async function POST(request: Request) {
         // 4. Create staff entry
         const newStaff = await UserModel.create({
             companyId: userCompanyId,
+            branchId,
             name,
             phone,
             email,

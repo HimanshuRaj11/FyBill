@@ -10,9 +10,9 @@ import WebLoader from '@/Components/Other/loader';
 
 export default function ProfilePage() {
     const { User, loading } = useSelector((state: any) => state.User);
-    const user = User?.user;
+    const user = User
     const { Company, loading: companyLoading } = useSelector((state: any) => state.Company);
-    const company = Company?.company;
+    const company = Company
     const [isLoading, setIsLoading] = useState(false);
 
     const companySizes = [
@@ -37,6 +37,7 @@ export default function ProfilePage() {
         'Other',
     ];
     const initialFormData = useMemo(() => ({
+        name: user?.name || '',
         email: user?.email || '',
         phone: user?.phone || '',
         address: {
@@ -176,13 +177,24 @@ export default function ProfilePage() {
 
                             <div className="space-y-3">
                                 <div>
+                                    <label className="text-sm font-medium text-gray-500">Name</label>
+                                    <div className="mt-1">
+                                        <input
+                                            type="text"
+                                            name="name"
+                                            value={formData.name}
+                                            onChange={handleChange}
+                                            className="w-full px-3 py-2 border rounded-md bg-gray-50 border-gray-200"
+                                        />
+                                    </div>
+                                </div>
+                                <div>
                                     <label className="text-sm font-medium text-gray-500">Email</label>
                                     <div className="mt-1">
                                         <input
                                             type="email"
                                             name="email"
                                             value={formData.email}
-                                            disabled={true}
                                             onChange={handleChange}
                                             className="w-full px-3 py-2 border rounded-md bg-gray-50 border-gray-200"
                                         />
@@ -194,7 +206,6 @@ export default function ProfilePage() {
                                     <div className="mt-1">
                                         <input
                                             type="tel"
-                                            disabled={true}
                                             name="phone"
                                             value={formData.phone}
                                             onChange={handleChange}

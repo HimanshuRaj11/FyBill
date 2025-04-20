@@ -19,12 +19,13 @@ export async function POST(request: Request) {
             return NextResponse.json({ message: "User not found" });
         }
 
-        const { email, phone, address } = await request.json();
+        const { email, phone, address, name } = await request.json();
 
         await user.updateOne({
             email,
             phone,
             address,
+            name,
         }).then(() => {
             return NextResponse.json({ message: "User updated successfully", success: true });
         }).catch((err: any) => {

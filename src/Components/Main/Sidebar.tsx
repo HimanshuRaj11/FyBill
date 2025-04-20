@@ -8,7 +8,7 @@ import { Button } from '../ui/button';
 import { useRouter } from 'next/navigation';
 export default function Sidebar() {
     const { User } = useSelector((state: any) => state.User)
-    const user = User?.user
+    const user = User
     const router = useRouter()
 
     if (!user) {

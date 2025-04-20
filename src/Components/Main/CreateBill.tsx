@@ -8,6 +8,8 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { Minus, Plus, Trash2 } from "lucide-react";
 import { Br, Cut, Line, Printer, Text, Row, render } from "react-thermal-printer";
+import { useSelector } from "react-redux";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/Components/ui/select";
 
 interface Product {
     name: string;
@@ -17,11 +19,12 @@ interface Product {
 }
 
 export default function BillingComponent() {
+    const { User } = useSelector((state: any) => state.User)
+    const { Company } = useSelector((state: any) => state.Company)
     const [invoice, setInvoice] = useState<any>(null);
     const [clientName, setClientName] = useState("");
     const [phoneNumber, setPhoneNumber] = useState("");
     const [productName, setProductName] = useState("");
-
     const [products, setProducts] = useState<Product[]>([]);
     const [showInvoice, setShowInvoice] = useState(false);
     const [filteredProducts, setFilteredProducts] = useState<any[]>([]);
@@ -33,6 +36,7 @@ export default function BillingComponent() {
     const [appliedTaxes, setAppliedTaxes] = useState<any[]>([]);
     const [printer, setPrinter] = useState<USBDevice | null>(null);
     const [printerStatus, setPrinterStatus] = useState<"Disconnected" | "Connecting" | "Connected" | "Error">("Disconnected");
+    const [selectedBranch, setSelectedBranch] = useState("");
 
     // Connect to USB printer on component mount
     useEffect(() => {
@@ -81,7 +85,7 @@ export default function BillingComponent() {
     // Tax calculation
     useEffect(() => {
         setAppliedTaxes([]);
-        taxes.forEach((tax) => {
+        taxes?.forEach((tax) => {
             const taxAmount = subTotal * (tax.percentage / 100);
             setAppliedTaxes((prev) => [
                 ...prev,
@@ -156,15 +160,15 @@ export default function BillingComponent() {
     const Receipt = ({ invoice }: { invoice: any }) => (
         <Printer type="star" width={42} characterSet="korea">
             <Text align="center" bold={true}>
-                {invoice.companyName || "Your Company"}
+                {invoice.companyName}
             </Text>
-            <Text align="center">{invoice.companyAddress || "123 Main St"}</Text>
+            <Text align="center">{invoice.companyAddress}</Text>
             <Text align="center">Invoice No: {invoice.invoiceId}</Text>
             <Text align="center">Date: {new Date().toLocaleDateString()}</Text>
             <Line />
             <Text>Bill To:</Text>
-            <Text>{invoice.clientName}</Text>
-            <Text>Phone: {invoice.clientPhone}</Text>
+            <Text>{invoice?.clientName}</Text>
+            <Text>Phone: {invoice?.clientPhone}</Text>
             <Line />
             <Row left="Item" right="Qty  Rate  Total" />
             <Line />
@@ -201,9 +205,6 @@ export default function BillingComponent() {
         try {
             // Render the receipt to Uint8Array
             const data = await render(<Receipt invoice={invoiceToPrint} />);
-            console.log(data);
-
-
             // Send data to USB printer
             const endpointNumber = 1; // Adjust based on your printer’s endpoint (check via device.usbDevice.endpoints)
             await printer.transferOut(endpointNumber, data);
@@ -220,16 +221,13 @@ export default function BillingComponent() {
                 toast.error("Please add at least one product");
                 return;
             }
-            if (clientName === "") {
-                toast.error("Please enter client name");
-                return;
-            }
-            if (phoneNumber === "") {
-                toast.error("Please enter phone number");
-                return;
-            }
+
             if (paymentMode === "") {
                 toast.error("Please select payment mode");
+                return;
+            }
+            if (User?.role === "Owner" && selectedBranch === "") {
+                toast.error("Please select branch");
                 return;
             }
 
@@ -244,6 +242,7 @@ export default function BillingComponent() {
                 paymentMode,
                 appliedTaxes,
                 totalTaxAmount,
+                selectedBranch, // Pass selected branch
             });
 
             if (data.invoice) {
@@ -280,7 +279,7 @@ export default function BillingComponent() {
     const fetchTaxData = async () => {
         try {
             const { data } = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/company/Tax/fetch`);
-            setTaxes(data.tax.taxes);
+            setTaxes(data?.tax?.taxes);
         } catch (error) {
             console.error("Error fetching taxes:", error);
             toast.error("Failed to fetch taxes");
@@ -303,7 +302,27 @@ export default function BillingComponent() {
     return (
         <>
             <div className="flex justify-between">
+
                 <div className="w-[50%] mx-auto p-6 bg-white rounded-2xl shadow-2xl">
+                    {User?.role === "Owner" && (
+                        <div className=" ">
+                            {Company?.branch?.map((branch: any) => (
+                                <div key={branch._id}>
+                                    <label className="block text-sm font-medium mb-1">Branch</label>
+                                    <Select onValueChange={setSelectedBranch}>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Select Branch" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value={branch._id}>{branch.branchName}</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                            ))}
+                        </div>
+                    )
+                    }
+
                     <h1 className="text-2xl font-bold mb-4">Create Bill</h1>
                     <p className="mb-4">Printer Status: {printerStatus}</p>
 
@@ -331,7 +350,7 @@ export default function BillingComponent() {
                     </div>
 
                     {/* List of Products */}
-                    <div className="flex flex-wrap gap-4 overflow-y-auto max-h-[300px]">
+                    <div className="flex flex-wrap gap-4 overflow-y-auto max-h-[280px]">
                         {filteredProducts?.map((product: any, index: any) => (
                             <div
                                 onClick={() => AddProduct(product)}
@@ -363,7 +382,7 @@ export default function BillingComponent() {
                 </div>
 
                 {/* Bill Summary */}
-                <div className="mx-auto p-6 bg-white rounded-2xl shadow-2xl">
+                <div className="mx-auto h-fit p-6 bg-white rounded-2xl shadow-2xl">
                     <div className="flex justify-around">
                         <div>
                             <label className="block text-sm font-medium mb-1">Name</label>
@@ -428,7 +447,7 @@ export default function BillingComponent() {
                             <span className="text-sm font-medium">Sub Total:</span>
                             <span>₹{subTotal.toFixed(2)}</span>
                         </div>
-                        {appliedTaxes.map((tax, index) => (
+                        {appliedTaxes?.map((tax, index) => (
                             <div key={index} className="flex justify-between items-center">
                                 <span className="text-sm font-medium">
                                     {tax.taxName} ({tax.percentage}%):
@@ -439,7 +458,7 @@ export default function BillingComponent() {
                         <div className="flex justify-between items-center border-t pt-4">
                             <span>Total Tax Amount:</span>
                             <span>
-                                ₹{appliedTaxes.reduce((sum, tax) => sum + tax.amount, 0).toFixed(2)}
+                                ₹{appliedTaxes?.reduce((sum, tax) => sum + tax.amount, 0)?.toFixed(2)}
                             </span>
                         </div>
                         <div className="flex justify-between items-center border-t pt-4 font-bold">
@@ -452,8 +471,6 @@ export default function BillingComponent() {
                             onClick={OnContinue}
                             disabled={
                                 products.length === 0 ||
-                                clientName === "" ||
-                                phoneNumber === "" ||
                                 paymentMode === ""
                                 // printerStatus !== "Connected"
                             }

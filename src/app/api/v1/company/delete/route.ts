@@ -6,7 +6,7 @@ import InvoiceModel from "@/Model/Invoice.model";
 import ProductCategoryModel from "@/Model/Category.model";
 import ProductModel from "@/Model/Product.model";
 import TaxModel from "@/Model/Tax.model";
-
+import BranchModel from "@/Model/branch.model";
 export async function DELETE(request: Request) {
     try {
         const user_id = await verifyUser()
@@ -46,6 +46,9 @@ export async function DELETE(request: Request) {
             companyId: company._id
         });
         await TaxModel.deleteMany({
+            companyId: company._id
+        });
+        await BranchModel.deleteMany({
             companyId: company._id
         });
         await CompanyModel.findByIdAndDelete({ _id: company?._id });

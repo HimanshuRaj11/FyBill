@@ -22,7 +22,7 @@ interface StaffMember {
 
 export default function Staff() {
     const { User } = useSelector((state: any) => state.User);
-    const user = User?.user
+    const user = User
 
 
     const [showAddStaffModal, setShowAddStaffModal] = useState(false)
