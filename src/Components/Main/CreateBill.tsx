@@ -203,6 +203,7 @@ export default function BillingComponent() {
         const endpoint = device.configurations?.[0]?.interfaces[0]?.alternates[0]?.endpoints.find(
             (ep: any) => ep.direction === "out"
         );
+        console.log("Endpoint:", endpoint);
         const endpointNumber = endpoint?.endpointNumber || 1;
         console.log("Using endpoint number:", endpointNumber);
         try {
