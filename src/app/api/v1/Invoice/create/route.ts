@@ -60,7 +60,10 @@ export async function POST(request: Request) {
         })
         if (User.branchId || selectedBranch) {
             invoice.branchId = User.branchId || selectedBranch;
+            const branch = await BranchModel.findById({ _id: User.branchId || selectedBranch })
+            invoice.branchName = branch?.branchName || "";
         }
+        await invoice.save();
         return Response.json({ message: "Invoice created successfully", invoice }, { status: 200 });
 
     } catch (error) {

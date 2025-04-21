@@ -20,6 +20,7 @@ export interface IInvoice extends Document {
     clientPhone?: string;
     companyName?: string;
     companyAddress?: string;
+    branchName?: string;
     issueDate: Date;
     products: Product[];
     subTotal: number;
@@ -57,6 +58,7 @@ const InvoiceSchema: Schema = new Schema<IInvoice>(
         clientPhone: { type: String, default: "" },
         companyName: { type: String, default: "" },
         companyAddress: { type: String, default: "" },
+        branchName: { type: String, default: "" },
 
         issueDate: { type: Date, default: new Date() },
         products: { type: [ProductSchema], required: true },

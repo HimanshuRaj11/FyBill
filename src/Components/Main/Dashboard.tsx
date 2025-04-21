@@ -11,7 +11,6 @@ import DashboardTopCards from '../Other/DashboardTopCards'
 
 export default function Dashboard() {
     const { Company } = useSelector((state: any) => state.Company)
-    const company = Company
     const [isLoading, setIsLoading] = useState(false)
 
     const [searchQuery, setSearchQuery] = useState('')
@@ -27,6 +26,15 @@ export default function Dashboard() {
             setIsLoading(false)
         } catch (error) {
             setIsLoading(false)
+        }
+    }
+
+    const filterInvoice = (branchId: string) => {
+        if (branchId === "") {
+            FetchInvoice()
+        } else {
+            const filteredInvoice = Invoice.filter((invoice: any) => invoice.branchId._id === branchId)
+            setInvoice(filteredInvoice)
         }
     }
 
@@ -63,7 +71,21 @@ export default function Dashboard() {
                 </div>
             </div>
 
+            <div className="flex flex-row justify-start mb-2.5 gap-2">
+                <div onClick={() => filterInvoice("")} className='flex justify-center items-center p-2 rounded-lg bg-gray-100 cursor-pointer hover:shadow-md transition-colors'>
+                    <span className="text-md text-gray-900 font-semibold min-w-20 text-center">All</span>
+                </div>
+                {
+                    Company?.branch?.length > 0 && (
+                        Company?.branch?.map((branch: any) => (
+                            <div onClick={() => filterInvoice(branch._id)} key={branch._id} className='flex justify-center items-center p-2 rounded-lg bg-gray-100 cursor-pointer hover:shadow-md transition-colors'>
+                                <span className="text-md text-gray-900 font-semibold">{branch?.branchName}</span>
+                            </div>
+                        ))
+                    )
+                }
 
+            </div>
             {/* Search and Filter */}
             <div className="flex flex-col sm:flex-row gap-3 mb-6">
                 <div className="relative flex-grow">
@@ -154,6 +176,11 @@ export default function Dashboard() {
                                 <tr>
                                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Invoice</th>
                                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer</th>
+                                    {
+                                        Company?.branch?.length > 0 && (
+                                            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Branch</th>
+                                        )
+                                    }
                                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
                                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Mode of Payment</th>
                                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
@@ -169,6 +196,11 @@ export default function Dashboard() {
                                             </Link>
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500"> {invoice.clientName}</td>
+                                        {
+                                            Company?.branch?.length > 0 && (
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{invoice?.branchId?.branchName}</td>
+                                            )
+                                        }
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{invoice.currency}{invoice.grandTotal}</td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 ">{invoice.paymentMode} </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{moment(invoice.createdAt).format('MMM DD, YYYY')}</td>

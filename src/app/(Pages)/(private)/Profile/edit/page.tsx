@@ -14,6 +14,7 @@ export default function ProfilePage() {
     const { Company, loading: companyLoading } = useSelector((state: any) => state.Company);
     const company = Company
     const [isLoading, setIsLoading] = useState(false);
+    const [branches, setBranches] = useState([])
 
     const companySizes = [
         'select company size',
@@ -129,6 +130,15 @@ export default function ProfilePage() {
         }
     };
 
+    useEffect(() => {
+        const fetchBranches = async () => {
+            const response = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/company/branch/fetch`)
+            if (response.data.success) {
+                setBranches(response.data.branches)
+            }
+        }
+        fetchBranches()
+    }, [])
 
 
     if (loading || companyLoading || isLoading) {
@@ -136,7 +146,7 @@ export default function ProfilePage() {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8 rounded-md">
+        <div className="min-h-screen ">
             <div className="max-w-3xl mx-auto">
                 {/* Profile Header */}
                 <div className="bg-white rounded-lg shadow-md overflow-hidden">
@@ -291,6 +301,7 @@ export default function ProfilePage() {
                                 </div>
                             </div>
                         </div>
+
                     </div>
                 </div>
                 {
@@ -482,6 +493,64 @@ export default function ProfilePage() {
                                 )
                             }
 
+                            {
+                                branches?.length > 0 && (
+                                    <div className="mt-6">
+                                        <h1 className='text-xl font-semibold text-gray-900'>Branch Details</h1>
+                                        {
+                                            branches.map((branch: any) => (
+                                                <div className="mt-4 border rounded-lg p-4" key={branch._id}>
+                                                    <h1 className='text-md font-medium text-gray-900'>Branch Name:
+                                                        <span className='text-sm ml-2 font-medium text-gray-500'>{branch?.branchName}</span>
+                                                    </h1>
+                                                    <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-4">
+                                                        <div>
+                                                            <label className="text-sm font-medium text-gray-500">Street</label>
+                                                            <div className="mt-1">
+                                                                <p className="w-full px-3 py-2 border rounded-md bg-gray-50 border-gray-200">
+                                                                    {branch?.address?.street}
+                                                                </p>
+                                                            </div>
+                                                        </div>
+                                                        <div>
+                                                            <label className="text-sm font-medium text-gray-500">City</label>
+                                                            <div className="mt-1">
+                                                                <p className="w-full px-3 py-2 border rounded-md bg-gray-50 border-gray-200">
+                                                                    {branch?.address?.city}
+                                                                </p>
+                                                            </div>
+                                                        </div>
+                                                        <div>
+                                                            <label className="text-sm font-medium text-gray-500">State</label>
+                                                            <div className="mt-1">
+                                                                <p className="w-full px-3 py-2 border rounded-md bg-gray-50 border-gray-200">
+                                                                    {branch?.address?.state}
+                                                                </p>
+                                                            </div>
+                                                        </div>
+                                                        <div>
+                                                            <label className="text-sm font-medium text-gray-500">Country</label>
+                                                            <div className="mt-1">
+                                                                <p className="w-full px-3 py-2 border rounded-md bg-gray-50 border-gray-200">
+                                                                    {branch?.address?.country}
+                                                                </p>
+                                                            </div>
+                                                        </div>
+                                                        <div>
+                                                            <label className="text-sm font-medium text-gray-500">Zip Code</label>
+                                                            <div className="mt-1">
+                                                                <p className="w-full px-3 py-2 border rounded-md bg-gray-50 border-gray-200">
+                                                                    {branch?.address?.zipCode}
+                                                                </p>
+                                                            </div>
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+                                            ))
+                                        }
+                                    </div>
+                                )}
                         </div>
                     )
                 }
