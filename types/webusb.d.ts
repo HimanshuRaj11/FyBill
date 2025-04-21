@@ -9,6 +9,7 @@ interface USB {
 
 interface USBDevice {
     open(): Promise<void>;
+    configurations: USBConfiguration[];
     close(): Promise<void>;
     selectConfiguration(configurationValue: number): Promise<void>;
     claimInterface(interfaceNumber: number): Promise<void>;
@@ -17,6 +18,12 @@ interface USBDevice {
     productName?: string;
     vendorId: number;
     productId: number;
+    endpointNumber: number;
+    direction: "in" | "out";
+    type: string;
+    endpoints: USBEndpoint[];
+    packetSize: number;
+    alternates: USBAlternateInterface[];
 }
 
 interface USBDeviceRequestOptions {
@@ -27,3 +34,4 @@ interface USBOutTransferResult {
     status: string;
     bytesWritten: number;
 }
+

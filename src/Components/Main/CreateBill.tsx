@@ -50,13 +50,13 @@ export default function BillingComponent() {
                     setPrinterStatus("Connected");
                     return;
                 }
-
                 const device = await navigator.usb.requestDevice({
-                    filters: [{ vendorId: 0x0519 }], // Epson vendor ID; adjust if needed (e.g., Star: 0x0519)
+                    filters: [{ vendorId: 0x0519 }],
                 });
+
                 await device.open();
                 await device.selectConfiguration(1);
-                await device.claimInterface(0); // Adjust interface based on printer
+                await device.claimInterface(0);
                 setPrinter(device);
                 setPrinterStatus("Connected");
                 toast.success("Printer connected");
@@ -156,12 +156,10 @@ export default function BillingComponent() {
         }
     };
 
-    // Define the receipt as a React component
+
     const Receipt = ({ invoice }: { invoice: any }) => (
         <Printer type="star" width={42} characterSet="korea">
-            <Text align="center" bold={true}>
-                {invoice.companyName}
-            </Text>
+            <Text align="center" bold={true}> {invoice.companyName} </Text>
             <Text align="center">{invoice.companyAddress}</Text>
             <Text align="center">Invoice No: {invoice.invoiceId}</Text>
             <Text align="center">Date: {new Date().toLocaleDateString()}</Text>
@@ -201,12 +199,23 @@ export default function BillingComponent() {
             toast.error("Printer not connected");
             return;
         }
-
+        const device = printer as any;
+        const endpoint = device.configurations?.[0]?.interfaces[0]?.alternates[0]?.endpoints.find(
+            (ep: any) => ep.direction === "out"
+        );
+        const endpointNumber = endpoint?.endpointNumber || 1;
+        console.log("Using endpoint number:", endpointNumber);
         try {
+            console.log("Printer details:", {
+                opened: printer.open,
+                vendorId: printer.vendorId,
+                productId: printer.productId,
+                configurations: (printer as any).configurations,
+            });
             // Render the receipt to Uint8Array
             const data = await render(<Receipt invoice={invoiceToPrint} />);
             // Send data to USB printer
-            const endpointNumber = 1; // Adjust based on your printer’s endpoint (check via device.usbDevice.endpoints)
+            const endpointNumber = 2; // Adjust based on your printer’s endpoint (check via device.usbDevice.endpoints)
             await printer.transferOut(endpointNumber, data);
             toast.success("Bill printed successfully");
         } catch (err) {

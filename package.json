@@ -39,6 +39,7 @@
     "moment": "^2.30.1",
     "mongoose": "^8.13.2",
     "next": "15.2.4",
+    "node-thermal-printer": "^4.4.5",
     "qz-tray": "^2.2.4",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",

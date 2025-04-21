@@ -42,7 +42,7 @@ export default function AddStaff({ setShowAddStaffModal }: { setShowAddStaffModa
     })
 
     const { User } = useSelector((state: any) => state.User);
-    const user = User?.user
+    const user = User
     const router = useRouter()
 
     const fetchBranch = async () => {
