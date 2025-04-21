@@ -51,7 +51,7 @@ export default function BillingComponent() {
                     return;
                 }
                 const device = await navigator.usb.requestDevice({
-                    filters: [{ vendorId: 0x0519 }],
+                    filters: [{ vendorId: 1305 }],
                 });
 
                 await device.open();
@@ -215,7 +215,7 @@ export default function BillingComponent() {
             // Render the receipt to Uint8Array
             const data = await render(<Receipt invoice={invoiceToPrint} />);
             // Send data to USB printer
-            const endpointNumber = 2; // Adjust based on your printer’s endpoint (check via device.usbDevice.endpoints)
+            const endpointNumber = 1; // Adjust based on your printer’s endpoint (check via device.usbDevice.endpoints)
             await printer.transferOut(endpointNumber, data);
             toast.success("Bill printed successfully");
         } catch (err) {
