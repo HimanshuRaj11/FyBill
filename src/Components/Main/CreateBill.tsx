@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Dialog, DialogContent } from "../ui/dialog";
@@ -158,15 +158,17 @@ export default function BillingComponent() {
 
 
     const Receipt = ({ invoice }: { invoice: any }) => (
-        <Printer type="star" width={42} characterSet="korea">
-            <Text align="center" bold={true}> {invoice.companyName} </Text>
+        <Printer type="epson" width={42} characterSet="korea">
+            <Text align="center" bold={true}>
+                {invoice.companyName}
+            </Text>
             <Text align="center">{invoice.companyAddress}</Text>
             <Text align="center">Invoice No: {invoice.invoiceId}</Text>
             <Text align="center">Date: {new Date().toLocaleDateString()}</Text>
             <Line />
             <Text>Bill To:</Text>
-            <Text>{invoice?.clientName}</Text>
-            <Text>Phone: {invoice?.clientPhone}</Text>
+            <Text>{invoice.clientName}</Text>
+            <Text>Phone: {invoice.clientPhone}</Text>
             <Line />
             <Row left="Item" right="Qty  Rate  Total" />
             <Line />
@@ -309,6 +311,19 @@ export default function BillingComponent() {
         setFilteredProducts(filtered);
     };
 
+    const invoiceRef = useRef<HTMLDivElement>(null);
+    const handlePrintDocument = () => {
+        if (invoiceRef.current) {
+            // setIsPrinting(true);
+            const printContents = invoiceRef.current.innerHTML;
+            const originalContents = document.body.innerHTML;
+            document.body.innerHTML = printContents;
+            window.print();
+            document.body.innerHTML = originalContents;
+            window.location.reload();
+            // setIsPrinting(false);
+        }
+    };
     return (
         <>
             <div className="flex justify-between">
@@ -492,10 +507,11 @@ export default function BillingComponent() {
                 </div>
             </div>
             <Dialog open={showInvoice} onOpenChange={setShowInvoice}>
-                <DialogContent className="max-w-7xl w-full max-h-[90vh] overflow-auto">
+                <DialogContent ref={invoiceRef} className="max-w-7xl w-full max-h-[90vh] overflow-auto">
                     <Receipt invoice={invoice} />
                 </DialogContent>
             </Dialog>
+            <Button onClick={handlePrintDocument}>Print</Button>
         </>
     );
 }
