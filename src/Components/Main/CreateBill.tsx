@@ -157,40 +157,47 @@ export default function BillingComponent() {
     };
 
 
+    // const Receipt = ({ invoice }: { invoice: any }) => (
+    //     <Printer type="epson" width={42} characterSet="korea">
+    //         <Text align="center" bold={true}>
+    //             {invoice.companyName}
+    //         </Text>
+    //         <Text align="center">{invoice.companyAddress}</Text>
+    //         <Text align="center">Invoice No: {invoice.invoiceId}</Text>
+    //         <Text align="center">Date: {new Date().toLocaleDateString()}</Text>
+    //         <Line />
+    //         <Text>Bill To:</Text>
+    //         <Text>{invoice.clientName}</Text>
+    //         <Text>Phone: {invoice.clientPhone}</Text>
+    //         <Line />
+    //         <Row left="Item" right="Qty  Rate  Total" />
+    //         <Line />
+    //         {invoice.products.map((item: any, index: number) => (
+    //             <Row
+    //                 key={index}
+    //                 left={item.name}
+    //                 right={`${item.quantity}  ${item.rate.toFixed(2)}  ${(item.quantity * item.rate).toFixed(2)}`}
+    //             />
+    //         ))}
+    //         <Line />
+    //         <Row left="Subtotal:" right={invoice.subTotal.toFixed(2)} />
+    //         {invoice.appliedTaxes.map((tax: any, index: number) => (
+    //             <Row key={index} left={`${tax.taxName} (${tax.percentage}%)`} right={tax.amount.toFixed(2)} />
+    //         ))}
+    //         <Row left="Total Tax:" right={invoice.appliedTaxes.reduce((sum: number, tax: any) => sum + tax.amount, 0).toFixed(2)} />
+    //         <Line />
+    //         <Row left="Grand Total:" right={invoice.grandTotal.toFixed(2)} />
+    //         <Row left="Payment" right={invoice.paymentMode} />
+    //         <Line />
+    //         <Text align="center">Thank You!</Text>
+    //         <Br />
+    //         <Cut />
+    //     </Printer>
+    // );
     const Receipt = ({ invoice }: { invoice: any }) => (
-        <Printer type="epson" width={42} characterSet="korea">
-            <Text align="center" bold={true}>
-                {invoice.companyName}
-            </Text>
-            <Text align="center">{invoice.companyAddress}</Text>
-            <Text align="center">Invoice No: {invoice.invoiceId}</Text>
-            <Text align="center">Date: {new Date().toLocaleDateString()}</Text>
-            <Line />
-            <Text>Bill To:</Text>
-            <Text>{invoice.clientName}</Text>
-            <Text>Phone: {invoice.clientPhone}</Text>
-            <Line />
-            <Row left="Item" right="Qty  Rate  Total" />
-            <Line />
-            {invoice.products.map((item: any, index: number) => (
-                <Row
-                    key={index}
-                    left={item.name}
-                    right={`${item.quantity}  ${item.rate.toFixed(2)}  ${(item.quantity * item.rate).toFixed(2)}`}
-                />
-            ))}
-            <Line />
-            <Row left="Subtotal:" right={invoice.subTotal.toFixed(2)} />
-            {invoice.appliedTaxes.map((tax: any, index: number) => (
-                <Row key={index} left={`${tax.taxName} (${tax.percentage}%)`} right={tax.amount.toFixed(2)} />
-            ))}
-            <Row left="Total Tax:" right={invoice.appliedTaxes.reduce((sum: number, tax: any) => sum + tax.amount, 0).toFixed(2)} />
-            <Line />
-            <Row left="Grand Total:" right={invoice.grandTotal.toFixed(2)} />
-            <Row left="Payment" right={invoice.paymentMode} />
-            <Line />
-            <Text align="center">Thank You!</Text>
-            <Br />
+        <Printer type="epson" width={42}>
+            <Text>Hello World</Text>
+            <Text>Invoice No: {invoice.invoiceId}</Text>
             <Cut />
         </Printer>
     );
