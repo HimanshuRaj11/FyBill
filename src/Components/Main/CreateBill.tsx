@@ -10,6 +10,7 @@ import { Minus, Plus, Trash2 } from "lucide-react";
 import { Br, Cut, Line, Printer, Text, Row, render } from "react-thermal-printer";
 import { useSelector } from "react-redux";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/Components/ui/select";
+import USBPrinter from "../Other/PrintBill";
 
 interface Product {
     name: string;
@@ -537,6 +538,7 @@ export default function BillingComponent() {
                     </div>
                 </div>
             </div>
+            <USBPrinter invoice={invoice} />
             <Dialog open={showInvoice} onOpenChange={setShowInvoice}>
                 <DialogContent ref={invoiceRef} className="max-w-7xl w-full max-h-[90vh] overflow-auto">
                     <Receipt invoice={invoice} />
