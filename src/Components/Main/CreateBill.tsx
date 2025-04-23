@@ -207,6 +207,8 @@ export default function BillingComponent() {
                 await writer.write(data);
                 writer.releaseLock();
             }
+            console.log('printer2');
+
         } catch (error) {
             console.log(error);
 
@@ -241,6 +243,7 @@ export default function BillingComponent() {
             const endpointNumber = 1; // Adjust based on your printer’s endpoint (check via device.usbDevice.endpoints)
             await printer.transferOut(endpointNumber, data);
             toast.success("Bill printed successfully");
+            console.log('printer1');
         } catch (err) {
             console.error("Printing failed:", err);
             toast.error("Failed to print bill. Check printer connection.");
