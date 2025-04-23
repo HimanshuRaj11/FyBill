@@ -160,7 +160,7 @@ export default function BillingComponent() {
 
 
     const Receipt = ({ invoice }: { invoice: any }) => (
-        <Printer type="star" width={42} characterSet="slovenia">
+        <Printer type="star" width={42} characterSet="pc437_usa">
             <Text align="center" bold={true}>
                 {invoice.companyName}
             </Text>
@@ -217,10 +217,10 @@ export default function BillingComponent() {
                 productId: printer.productId,
                 configurations: (printer as any).configurations,
             });
-            // Render the receipt to Uint8Array
+
             const data = await render(<Receipt invoice={invoiceToPrint} />);
-            // Send data to USB printer
-            const endpointNumber = 1; // Adjust based on your printer’s endpoint (check via device.usbDevice.endpoints)
+
+            const endpointNumber = 1;
             await printer.transferOut(endpointNumber, data);
             toast.success("Bill printed successfully");
             console.log('printer1');
@@ -268,7 +268,6 @@ export default function BillingComponent() {
                 setProducts([]);
                 setSubTotal(0);
                 setGrandTotal(0);
-                setPaymentMode("");
                 await handlePrint(data.invoice);
             }
         } catch (error) {
