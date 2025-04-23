@@ -213,7 +213,7 @@ export default function BillingComponent() {
         try {
             console.log("Printer details:", {
                 opened: printer.open,
-                vendorId: printer.vendorId,
+                vendorId: 0x0519,
                 productId: printer.productId,
                 configurations: (printer as any).configurations,
             });
