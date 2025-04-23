@@ -195,6 +195,26 @@ export default function BillingComponent() {
         </Printer>
     );
 
+    const handlePrint2 = async (invoiceToPrint: any) => {
+        try {
+            const data = await render(<Receipt invoice={invoiceToPrint} />);
+
+            const port = await window.navigator.serial.requestPort();
+            await port.open({ baudRate: 9600 });
+
+            const writer = port.writable?.getWriter();
+            if (writer != null) {
+                await writer.write(data);
+                writer.releaseLock();
+            }
+        } catch (error) {
+            console.log(error);
+
+            return error
+        }
+
+
+    }
     const handlePrint = async (invoiceToPrint: any) => {
 
         if (printerStatus !== "Connected" || !printer) {
@@ -267,6 +287,7 @@ export default function BillingComponent() {
                 setGrandTotal(0);
                 setPaymentMode("");
                 await handlePrint(data.invoice);
+                await handlePrint2(data.invoice);
             }
         } catch (error) {
             console.error("Error creating invoice:", error);

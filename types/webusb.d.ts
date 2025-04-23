@@ -35,3 +35,42 @@ interface USBOutTransferResult {
     bytesWritten: number;
 }
 
+interface Navigator {
+    serial: Serial;
+}
+
+interface Serial {
+    requestPort(options?: SerialPortRequestOptions): Promise<SerialPort>;
+    getPorts(): Promise<SerialPort[]>;
+}
+
+interface SerialPort {
+    open(options: SerialOptions): Promise<void>;
+    close(): Promise<void>;
+    readable: ReadableStream | null;
+    writable: WritableStream | null;
+    getInfo(): SerialPortInfo;
+}
+
+interface SerialPortInfo {
+    usbVendorId?: number;
+    usbProductId?: number;
+}
+
+interface SerialOptions {
+    baudRate: number;
+    dataBits?: number;
+    stopBits?: number;
+    parity?: 'none' | 'even' | 'odd';
+    bufferSize?: number;
+    flowControl?: 'none' | 'hardware';
+}
+
+interface SerialPortRequestOptions {
+    filters?: SerialPortFilter[];
+}
+
+interface SerialPortFilter {
+    usbVendorId?: number;
+    usbProductId?: number;
+}
