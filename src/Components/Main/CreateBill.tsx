@@ -11,6 +11,7 @@ import { Br, Cut, Line, Printer, Text, Row, render } from "react-thermal-printer
 import { useSelector } from "react-redux";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/Components/ui/select";
 import USBPrinter from "../Other/PrintBill";
+import BillReceipt from "./BillReceipt";
 
 interface Product {
     name: string;
@@ -158,73 +159,45 @@ export default function BillingComponent() {
     };
 
 
-    // const Receipt = ({ invoice }: { invoice: any }) => (
-    //     <Printer type="star" width={42} characterSet="korea">
-    //         <Text align="center" bold={true}>
-    //             {invoice.companyName}
-    //         </Text>
-    //         <Text align="center">{invoice.companyAddress}</Text>
-    //         <Text align="center">Invoice No: {invoice.invoiceId}</Text>
-    //         <Text align="center">Date: {new Date().toLocaleDateString()}</Text>
-    //         <Line />
-    //         <Text>Bill To:</Text>
-    //         <Text>{invoice.clientName}</Text>
-    //         <Text>Phone: {invoice.clientPhone}</Text>
-    //         <Line />
-    //         <Row left="Item" right="Qty  Rate  Total" />
-    //         <Line />
-    //         {invoice.products.map((item: any, index: number) => (
-    //             <Row
-    //                 key={index}
-    //                 left={item.name}
-    //                 right={`${item.quantity}  ${item.rate.toFixed(2)}  ${(item.quantity * item.rate).toFixed(2)}`}
-    //             />
-    //         ))}
-    //         <Line />
-    //         <Row left="Subtotal:" right={invoice.subTotal.toFixed(2)} />
-    //         {invoice.appliedTaxes.map((tax: any, index: number) => (
-    //             <Row key={index} left={`${tax.taxName} (${tax.percentage}%)`} right={tax.amount.toFixed(2)} />
-    //         ))}
-    //         <Row left="Total Tax:" right={invoice.appliedTaxes.reduce((sum: number, tax: any) => sum + tax.amount, 0).toFixed(2)} />
-    //         <Line />
-    //         <Row left="Grand Total:" right={invoice.grandTotal.toFixed(2)} />
-    //         <Row left="Payment" right={invoice.paymentMode} />
-    //         <Line />
-    //         <Text align="center">Thank You!</Text>
-    //         <Br />
-    //         <Cut />
-    //     </Printer>
-    // );
     const Receipt = ({ invoice }: { invoice: any }) => (
-        <Printer type="star" width={42}>
-            <Text>Hello World</Text>
-            <Text>Invoice No: {invoice.invoiceId}</Text>
+        <Printer type="star" width={42} characterSet="korea">
+            <Text align="center" bold={true}>
+                {invoice.companyName}
+            </Text>
+            <Text align="center">{invoice.companyAddress}</Text>
+            <Text align="center">Invoice No: {invoice.invoiceId}</Text>
+            <Text align="center">Date: {new Date().toLocaleDateString()}</Text>
+            <Line />
+            <Text>Bill To:</Text>
+            <Text>{invoice.clientName}</Text>
+            <Text>Phone: {invoice.clientPhone}</Text>
+            <Line />
+            <Row left="Item" right="Qty  Rate  Total" />
+            <Line />
+            {invoice.products.map((item: any, index: number) => (
+                <Row
+                    key={index}
+                    left={item.name}
+                    right={`${item.quantity}  ${item.rate.toFixed(2)}  ${(item.quantity * item.rate).toFixed(2)}`}
+                />
+            ))}
+            <Line />
+            <Row left="Subtotal:" right={invoice.subTotal.toFixed(2)} />
+            {invoice.appliedTaxes.map((tax: any, index: number) => (
+                <Row key={index} left={`${tax.taxName} (${tax.percentage}%)`} right={tax.amount.toFixed(2)} />
+            ))}
+            <Row left="Total Tax:" right={invoice.appliedTaxes.reduce((sum: number, tax: any) => sum + tax.amount, 0).toFixed(2)} />
+            <Line />
+            <Row left="Grand Total:" right={invoice.grandTotal.toFixed(2)} />
+            <Row left="Payment" right={invoice.paymentMode} />
+            <Line />
+            <Text align="center">Thank You!</Text>
+            <Br />
             <Cut />
         </Printer>
     );
 
-    const handlePrint2 = async (invoiceToPrint: any) => {
-        try {
-            const data = await render(<Receipt invoice={invoiceToPrint} />);
 
-            const port = await window.navigator.serial.requestPort();
-            await port.open({ baudRate: 9600 });
-
-            const writer = port.writable?.getWriter();
-            if (writer != null) {
-                await writer.write(data);
-                writer.releaseLock();
-            }
-            console.log('printer2');
-
-        } catch (error) {
-            console.log(error);
-
-            return error
-        }
-
-
-    }
     const handlePrint = async (invoiceToPrint: any) => {
 
         if (printerStatus !== "Connected" || !printer) {
@@ -235,7 +208,6 @@ export default function BillingComponent() {
         const endpoint = device.configurations?.[0]?.interfaces[0]?.alternates[0]?.endpoints.find(
             (ep: any) => ep.direction === "out"
         );
-        console.log("Endpoint:", endpoint);
         const endpointNumber = endpoint?.endpointNumber || 1;
         console.log("Using endpoint number:", endpointNumber);
         try {
@@ -298,7 +270,6 @@ export default function BillingComponent() {
                 setGrandTotal(0);
                 setPaymentMode("");
                 await handlePrint(data.invoice);
-                await handlePrint2(data.invoice);
             }
         } catch (error) {
             console.error("Error creating invoice:", error);
@@ -346,16 +317,23 @@ export default function BillingComponent() {
     const invoiceRef = useRef<HTMLDivElement>(null);
     const handlePrintDocument = () => {
         if (invoiceRef.current) {
-            // setIsPrinting(true);
             const printContents = invoiceRef.current.innerHTML;
             const originalContents = document.body.innerHTML;
-            document.body.innerHTML = printContents;
-            window.print();
-            document.body.innerHTML = originalContents;
-            window.location.reload();
-            // setIsPrinting(false);
+
+            const printWindow = window.open('', '_blank', 'width=600,height=400');
+
+            if (printWindow) { // Check if printWindow is not null
+                printWindow.document.write(` ${printContents}
+`);
+                printWindow.document.close();
+                printWindow.print();
+                printWindow.close();
+            } else {
+                console.error('Failed to open print window');
+            }
         }
     };
+
     return (
         <>
             <div className="flex justify-between">
@@ -538,13 +516,14 @@ export default function BillingComponent() {
                     </div>
                 </div>
             </div>
-            <USBPrinter invoice={invoice} />
             <Dialog open={showInvoice} onOpenChange={setShowInvoice}>
-                <DialogContent ref={invoiceRef} className="max-w-7xl w-full max-h-[90vh] overflow-auto">
-                    <Receipt invoice={invoice} />
+                <DialogContent className="max-w-7xl w-full max-h-[90vh] overflow-auto">
+                    <div ref={invoiceRef} className="">
+                        <BillReceipt invoice={invoice} />
+                    </div>
+                    <Button onClick={handlePrintDocument}>Print</Button>
                 </DialogContent>
             </Dialog>
-            <Button onClick={handlePrintDocument}>Print</Button>
         </>
     );
 }
