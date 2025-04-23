@@ -160,7 +160,7 @@ export default function BillingComponent() {
 
 
     const Receipt = ({ invoice }: { invoice: any }) => (
-        <Printer type="star" width={42} characterSet="korea">
+        <Printer type="star" width={42} characterSet="slovenia">
             <Text align="center" bold={true}>
                 {invoice.companyName}
             </Text>
