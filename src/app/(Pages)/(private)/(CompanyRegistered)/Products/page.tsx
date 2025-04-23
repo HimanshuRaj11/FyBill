@@ -128,10 +128,12 @@ export default function ProductsPage() {
 
                                 </div>
                                 <div className="flex gap-2 mt-4">
-                                    <Button variant="default" className="w-1/2 flex items-center justify-center gap-2">
-                                        <FiEdit2 className="w-4 h-4" />
-                                        Edit
-                                    </Button>
+                                    <Link href={`/Products/edit/${product._id}`}>
+                                        <Button variant="default" className="w-1/2 flex items-center justify-center gap-2">
+                                            <FiEdit2 className="w-4 h-4" />
+                                            Edit
+                                        </Button>
+                                    </Link>
                                     <Button variant="destructive" className="w-1/2 flex items-center justify-center gap-2" onClick={() => deleteProduct(product._id)}>
                                         <FiTrash2 className="w-4 h-4" />
                                         Delete
