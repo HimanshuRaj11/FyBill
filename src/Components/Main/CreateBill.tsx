@@ -296,7 +296,7 @@ export default function BillingComponent() {
                 setSubTotal(0);
                 setGrandTotal(0);
                 setPaymentMode("");
-                // await handlePrint(data.invoice);
+                await handlePrint(data.invoice);
                 await handlePrint2(data.invoice);
             }
         } catch (error) {
