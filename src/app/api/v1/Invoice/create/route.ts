@@ -4,6 +4,7 @@ import UserModel from "@/Model/User.model";
 import { generateInvoiceId } from "@/lib/generateInvoiceId";
 import CompanyModel from "@/Model/Company.model";
 import BranchModel from "@/Model/branch.model";
+import handleServerPrint from "../print/route";
 export async function POST(request: Request) {
 
     try {
@@ -64,6 +65,7 @@ export async function POST(request: Request) {
             invoice.branchName = branch?.branchName || "";
         }
         await invoice.save();
+        handleServerPrint(request, invoice)
         return Response.json({ message: "Invoice created successfully", invoice }, { status: 200 });
 
     } catch (error) {

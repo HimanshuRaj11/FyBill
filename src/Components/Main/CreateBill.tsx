@@ -290,16 +290,16 @@ export default function BillingComponent() {
         }
     };
 
-    const handleServerPrint = async () => {
-        try {
-            const res = await axios.post(`${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/invoice/print`, { invoice })
-            console.log(res);
+    // const handleServerPrint = async () => {
+    //     try {
+    //         const res = await axios.post(`${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/invoice/print`, { invoice })
+    //         console.log(res);
 
-        } catch (error) {
-            console.log(error);
+    //     } catch (error) {
+    //         console.log(error);
 
-        }
-    }
+    //     }
+    // }
     const OnContinue = async () => {
         try {
             if (products.length === 0) {
@@ -339,7 +339,7 @@ export default function BillingComponent() {
                 setSubTotal(0);
                 setGrandTotal(0);
                 await handlePrint(data.invoice);
-                handleServerPrint()
+                // handleServerPrint()
             }
         } catch (error) {
             console.error("Error creating invoice:", error);

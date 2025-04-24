@@ -1,9 +1,9 @@
 // pages/api/print.js
 import { ThermalPrinter, PrinterTypes } from "node-thermal-printer";
 
-export default async function POST(req: Request) {
+export default async function handleServerPrint(req: Request, invoice: any) {
     try {
-        const { invoice } = await req.json();
+        // const { invoice } = await req.json();
         const printer = new ThermalPrinter({
             type: PrinterTypes.STAR,
             interface: "usb://0x0519:0x0001", // Replace with your printer’s USB interface
