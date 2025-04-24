@@ -106,42 +106,48 @@ export default function ProductsPage() {
             </div>
 
             {/* Products Grid */}
-            <div className="max-w-7xl mx-auto">
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                    {filteredProducts.map((product) => (
-                        <div
-                            key={product._id}
-                            className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300"
-                        >
+            <div className="w-full mx-auto">
+                <div className="">
+                    <table className="min-w-full bg-white rounded-lg shadow-md">
+                        <thead>
+                            <tr className=''>
+                                <th className="p-4 text-left">Product Name</th>
+                                <th className="p-4 text-left">Price</th>
+                                <th className="p-4 text-left">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {filteredProducts.map((product) => (
+                                <tr key={product._id} className="hover:bg-gray-100 border-b-2">
+                                    <td className="px-4">
+                                        <h3 className="text-lg font-semibold text-gray-800 line-clamp-2 mb-2">
+                                            {product?.name}
+                                        </h3>
+                                    </td>
 
-                            <div className="p-4">
-                                <h3 className="text-lg font-semibold text-gray-800 line-clamp-2 mb-2">
-                                    {product?.name}
-                                </h3>
-                                <p className="text-gray-600 text-sm line-clamp-3 mb-4 h-12 overflow-auto">
-                                    {product.description}
-                                </p>
-                                <div className="flex items-center justify-between">
-                                    <span className="text-xl font-bold text-blue-600">
-                                        {company?.currency.symbol} {product.price.toFixed(2)}
-                                    </span>
-
-                                </div>
-                                <div className="flex gap-2 mt-4">
-                                    <Link href={`/Products/edit/${product._id}`}>
-                                        <Button variant="default" className="w-1/2 flex items-center justify-center gap-2">
-                                            <FiEdit2 className="w-4 h-4" />
-                                            Edit
-                                        </Button>
-                                    </Link>
-                                    <Button variant="destructive" className="w-1/2 flex items-center justify-center gap-2" onClick={() => deleteProduct(product._id)}>
-                                        <FiTrash2 className="w-4 h-4" />
-                                        Delete
-                                    </Button>
-                                </div>
-                            </div>
-                        </div>
-                    ))}
+                                    <td className="px-4">
+                                        <span className="text-xl font-bold text-blue-600">
+                                            {company?.currency.symbol} {product.price.toFixed(2)}
+                                        </span>
+                                    </td>
+                                    <td className="px-4">
+                                        <div className="flex gap-2">
+                                            <Button variant="default" className="flex items-center justify-center gap-2">
+                                                <Link className='w-full flex items-center justify-center gap-2' href={`/Products/edit/${product._id}`}>
+                                                    <FiEdit2 className="w-4 h-4" />
+                                                    Edit
+                                                </Link>
+                                            </Button>
+                                            <Button variant="destructive" className="flex items-center justify-center gap-2" onClick={() => deleteProduct(product._id)}>
+                                                <FiTrash2 className="w-4 h-4" />
+                                                Delete
+                                            </Button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>

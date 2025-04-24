@@ -2,16 +2,16 @@
 import { useEffect, useRef, useState } from "react";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
-import { Dialog, DialogContent } from "../ui/dialog";
-import InvoiceDisplay from "./InvoiceDisplay";
+import { Dialog, DialogContent, DialogDescription } from "../ui/dialog";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { Minus, Plus, Trash2 } from "lucide-react";
+import { Edit, Minus, Plus, Trash2 } from "lucide-react";
 import { Br, Cut, Line, Printer, Text, Row, render } from "react-thermal-printer";
 import { useSelector } from "react-redux";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/Components/ui/select";
-import USBPrinter from "../Other/PrintBill";
 import BillReceipt from "./BillReceipt";
+import BillProductEdit from "../Other/BillProductEdit";
+import { DialogTitle } from "@radix-ui/react-dialog";
 
 interface Product {
     name: string;
@@ -39,6 +39,8 @@ export default function BillingComponent() {
     const [printer, setPrinter] = useState<USBDevice | null>(null);
     const [printerStatus, setPrinterStatus] = useState<"Disconnected" | "Connecting" | "Connected" | "Error">("Disconnected");
     const [selectedBranch, setSelectedBranch] = useState("");
+    const [editProductPopUp, setEditProductPopUp] = useState(false)
+    const [editProduct, setEditProduct] = useState({})
 
     // Connect to USB printer on component mount
     useEffect(() => {
@@ -133,6 +135,11 @@ export default function BillingComponent() {
     const handleDelete = (index: number) => {
         setProducts(products.filter((_, i) => i !== index));
     };
+    const handleProductEdit = (product: any, index: number) => {
+        setEditProductPopUp(true)
+        setEditProduct({ product, index });
+    }
+
 
     const handleQuantityChange = (product: Product, value: number) => {
         if (value === 1) {
@@ -169,8 +176,8 @@ export default function BillingComponent() {
             <Text align="center">Date: {new Date().toLocaleDateString()}</Text>
             <Line />
             <Text>Bill To:</Text>
-            <Text>{invoice.clientName}</Text>
-            <Text>Phone: {invoice.clientPhone}</Text>
+            <Text>{invoice?.clientName || ""}</Text>
+            <Text>Phone: {invoice?.clientPhone || ""}</Text>
             <Line />
             <Row left="Item" right="Qty  Rate  Total" />
             <Line />
@@ -183,10 +190,10 @@ export default function BillingComponent() {
             ))}
             <Line />
             <Row left="Subtotal:" right={invoice.subTotal.toFixed(2)} />
-            {invoice.appliedTaxes.map((tax: any, index: number) => (
+            {invoice?.appliedTaxes?.map((tax: any, index: number) => (
                 <Row key={index} left={`${tax.taxName} (${tax.percentage}%)`} right={tax.amount.toFixed(2)} />
             ))}
-            <Row left="Total Tax:" right={invoice.appliedTaxes.reduce((sum: number, tax: any) => sum + tax.amount, 0).toFixed(2)} />
+            <Row left="Total Tax:" right={invoice?.appliedTaxes?.reduce((sum: number, tax: any) => sum + tax.amount, 0).toFixed(2)} />
             <Line />
             <Row left="Grand Total:" right={invoice.grandTotal.toFixed(2)} />
             <Row left="Payment" right={invoice.paymentMode} />
@@ -201,6 +208,7 @@ export default function BillingComponent() {
     const handlePrint = async (invoiceToPrint: any) => {
 
         if (printerStatus !== "Connected" || !printer) {
+
             toast.error("Printer not connected");
             return;
         }
@@ -223,7 +231,6 @@ export default function BillingComponent() {
             const endpointNumber = 1;
             await printer.transferOut(endpointNumber, data);
             toast.success("Bill printed successfully");
-            console.log('printer1');
         } catch (err) {
             console.error("Printing failed:", err);
             toast.error("Failed to print bill. Check printer connection.");
@@ -335,7 +342,7 @@ export default function BillingComponent() {
 
     return (
         <>
-            <div className="flex justify-between">
+            <div className="flex justify-between flex-col sm:flex-row gap-2">
 
                 <div className="w-[50%] mx-auto p-6 bg-white rounded-2xl shadow-2xl">
                     {User?.role === "Owner" && (
@@ -416,7 +423,7 @@ export default function BillingComponent() {
                 </div>
 
                 {/* Bill Summary */}
-                <div className="mx-auto h-fit p-6 bg-white rounded-2xl shadow-2xl">
+                <div className="mx-auto h-fit p-6 w-[50%] sm:w-auto bg-white rounded-2xl shadow-2xl">
                     <div className="flex justify-around">
                         <div>
                             <label className="block text-sm font-medium mb-1">Name</label>
@@ -471,8 +478,25 @@ export default function BillingComponent() {
                                         >
                                             <Trash2 />
                                         </Button>
+                                        <Button
+                                            size="sm"
+                                            className="cursor-pointer"
+                                            variant="secondary"
+                                            onClick={() => handleProductEdit(product, index)}
+                                        >
+                                            <Edit />
+                                        </Button>
                                     </td>
+                                    <Dialog open={editProductPopUp} onOpenChange={setEditProductPopUp}>
+                                        <DialogContent className="max-w-7xl w-full max-h-[90vh] overflow-auto">
+                                            <DialogTitle>Edit Product</DialogTitle>
+                                            <div className="">
+                                                <BillProductEdit setEditProductPopUp={setEditProductPopUp} editProduct={editProduct} setProducts={setProducts} />
+                                            </div>
+                                        </DialogContent>
+                                    </Dialog>
                                 </tr>
+
                             ))}
                         </tbody>
                     </table>
@@ -517,12 +541,14 @@ export default function BillingComponent() {
             </div>
             <Dialog open={showInvoice} onOpenChange={setShowInvoice}>
                 <DialogContent className="max-w-7xl w-full max-h-[90vh] overflow-auto">
+                    <DialogTitle>Invoice</DialogTitle>
                     <div ref={invoiceRef} className="">
                         <BillReceipt invoice={invoice} />
                     </div>
                     <Button onClick={handlePrintDocument}>Print</Button>
                 </DialogContent>
             </Dialog>
+
         </>
     );
 }
