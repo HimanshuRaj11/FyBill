@@ -5,7 +5,7 @@ import { Input } from "../ui/input";
 import { Dialog, DialogContent, DialogDescription } from "../ui/dialog";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { Edit, Minus, Plus, Trash2 } from "lucide-react";
+import { Barcode, Edit, Minus, Plus, Trash2 } from "lucide-react";
 import { Br, Cut, Line, Printer, Text, Row, render } from "react-thermal-printer";
 import { useSelector } from "react-redux";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/Components/ui/select";
@@ -167,41 +167,47 @@ export default function BillingComponent() {
 
     const Receipt = ({ invoice }: { invoice: any }) => (
 
-        <Printer type="star" width={42} characterSet="pc437_usa">
-            <Text align="center" bold={true}>
-                {invoice.companyName}
-            </Text>
-            <Text align="center">{invoice.companyAddress}</Text>
-            <Text align="center">Invoice No: {invoice.invoiceId}</Text>
-            <Text align="center">Date: {new Date().toLocaleDateString()}</Text>
-            <Line />
+        <Printer type="star" characterSet="pc437_usa" width={42}>
             <Text>Bill To:</Text>
-            <Text>{invoice?.clientName || ""}</Text>
-            <Text>Phone: {invoice?.clientPhone || ""}</Text>
-            <Line />
-            <Row left="Item" right="Qty  Rate  Total" />
-            <Line />
-            {invoice.products.map((item: any, index: number) => (
-                <Row
-                    key={index}
-                    left={item.name}
-                    right={`${item.quantity}  ${item.rate.toFixed(2)}  ${(item.quantity * item.rate).toFixed(2)}`}
-                />
-            ))}
-            <Line />
-            <Row left="Subtotal:" right={invoice.subTotal.toFixed(2)} />
-            {invoice?.appliedTaxes?.map((tax: any, index: number) => (
-                <Row key={index} left={`${tax.taxName} (${tax.percentage}%)`} right={tax.amount.toFixed(2)} />
-            ))}
-            <Row left="Total Tax:" right={invoice?.appliedTaxes?.reduce((sum: number, tax: any) => sum + tax.amount, 0).toFixed(2)} />
-            <Line />
-            <Row left="Grand Total:" right={invoice.grandTotal.toFixed(2)} />
-            <Row left="Payment" right={invoice.paymentMode} />
-            <Line />
-            <Text align="center">Thank You!</Text>
             <Br />
+            <Barcode type="CODE39" />
             <Cut />
         </Printer>
+        // <Printer type="star" width={42} characterSet="pc437_usa">
+        //     <Text align="center" bold={true}>
+        //         {invoice.companyName}
+        //     </Text>
+        //     <Text align="center">{invoice.companyAddress}</Text>
+        //     <Text align="center">Invoice No: {invoice.invoiceId}</Text>
+        //     <Text align="center">Date: {new Date().toLocaleDateString()}</Text>
+        //     <Line />
+        //     <Text>Bill To:</Text>
+        //     <Text>{invoice?.clientName || ""}</Text>
+        //     <Text>Phone: {invoice?.clientPhone || ""}</Text>
+        //     <Line />
+        //     <Row left="Item" right="Qty  Rate  Total" />
+        //     <Line />
+        //     {invoice.products.map((item: any, index: number) => (
+        //         <Row
+        //             key={index}
+        //             left={item.name}
+        //             right={`${item.quantity}  ${item.rate.toFixed(2)}  ${(item.quantity * item.rate).toFixed(2)}`}
+        //         />
+        //     ))}
+        //     <Line />
+        //     <Row left="Subtotal:" right={invoice.subTotal.toFixed(2)} />
+        //     {invoice?.appliedTaxes?.map((tax: any, index: number) => (
+        //         <Row key={index} left={`${tax.taxName} (${tax.percentage}%)`} right={tax.amount.toFixed(2)} />
+        //     ))}
+        //     <Row left="Total Tax:" right={invoice?.appliedTaxes?.reduce((sum: number, tax: any) => sum + tax.amount, 0).toFixed(2)} />
+        //     <Line />
+        //     <Row left="Grand Total:" right={invoice.grandTotal.toFixed(2)} />
+        //     <Row left="Payment" right={invoice.paymentMode} />
+        //     <Line />
+        //     <Text align="center">Thank You!</Text>
+        //     <Br />
+        //     <Cut />
+        // </Printer>
     );
 
 
