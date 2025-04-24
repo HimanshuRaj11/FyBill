@@ -264,18 +264,7 @@ export default function BillingComponent() {
             (ep: any) => ep.direction === "out"
         );
         const endpointNumber = endpoint?.endpointNumber || 1;
-        console.log("Using endpoint number:", endpointNumber);
         try {
-            console.log("Printer details:", {
-                opened: printer.open,
-                vendorId: 0x0519,
-                productId: printer.productId,
-                configurations: (printer as any).configurations,
-            });
-
-            console.log("inocice");
-
-
             const data = await render(<Receipt invoice={invoiceToPrint} />);
             console.log(data, ':data');
 
@@ -285,20 +274,10 @@ export default function BillingComponent() {
             toast.success("Bill printed successfully");
         } catch (err) {
             console.error("Printing failed:", err);
-            toast.error("Failed to print bill. Check printer connection.");
+            toast.error("Failed to print bill.");
         }
     };
 
-    // const handleServerPrint = async () => {
-    //     try {
-    //         const res = await axios.post(`${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/invoice/print`, { invoice })
-    //         console.log(res);
-
-    //     } catch (error) {
-    //         console.log(error);
-
-    //     }
-    // }
     const OnContinue = async () => {
         try {
             if (products.length === 0) {
