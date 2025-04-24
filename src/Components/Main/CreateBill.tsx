@@ -165,8 +165,8 @@ export default function BillingComponent() {
         }
     };
     const Receipt = ({ invoice }: { invoice: any }) => (
-        <Printer type="star" width={42}>
-            <Text bold={true}>{centerText(invoice.companyName, 42)}</Text>
+        <Printer type="epson" width={42}> {/* Try "epson" first */}
+            <Text>{centerText(invoice.companyName, 42)}</Text>
             <Text>{centerText(invoice.companyAddress, 42)}</Text>
             <Text>Invoice No: {invoice.invoiceId}</Text>
             <Text>Date: {new Date().toLocaleDateString()}</Text>
@@ -203,7 +203,6 @@ export default function BillingComponent() {
         </Printer>
     );
 
-    // Helper function to center text
     const centerText = (text: string, width: number) => {
         const padding = Math.max(0, Math.floor((width - text.length) / 2));
         return " ".repeat(padding) + text;
