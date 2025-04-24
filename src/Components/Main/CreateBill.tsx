@@ -234,6 +234,7 @@ export default function BillingComponent() {
 
             const endpointNumber = 1;
             await printer.transferOut(endpointNumber, data);
+
             toast.success("Bill printed successfully");
         } catch (err) {
             console.error("Printing failed:", err);
