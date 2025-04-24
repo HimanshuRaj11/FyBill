@@ -165,7 +165,7 @@ export default function BillingComponent() {
         }
     };
     const Receipt = ({ invoice }: { invoice: any }) => (
-        <Printer type="epson" width={42}> {/* Try "epson" first */}
+        <Printer type="star" width={42} >
             <Text>{centerText(invoice.companyName, 42)}</Text>
             <Text>{centerText(invoice.companyAddress, 42)}</Text>
             <Text>Invoice No: {invoice.invoiceId}</Text>
