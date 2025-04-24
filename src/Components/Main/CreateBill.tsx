@@ -2,14 +2,13 @@
 import { useEffect, useRef, useState } from "react";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
-import { Dialog, DialogContent, DialogDescription } from "../ui/dialog";
+import { Dialog, DialogContent } from "../ui/dialog";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { Barcode, Edit, Minus, Plus, Trash2 } from "lucide-react";
+import { Edit, Minus, Plus, Trash2 } from "lucide-react";
 import { Br, Cut, Line, Printer, Text, Row, render } from "react-thermal-printer";
 import { useSelector } from "react-redux";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/Components/ui/select";
-import BillReceipt from "./BillReceipt";
 import BillProductEdit from "../Other/BillProductEdit";
 import { DialogTitle } from "@radix-ui/react-dialog";
 
@@ -55,7 +54,7 @@ export default function BillingComponent() {
                     return;
                 }
                 const device = await navigator.usb.requestDevice({
-                    filters: [{ vendorId: 1305 }],
+                    filters: [{ vendorId: 0x0519 }]
                 });
 
                 await device.open();
@@ -603,15 +602,6 @@ export default function BillingComponent() {
                     </div>
                 </div>
             </div>
-            <Dialog open={showInvoice} onOpenChange={setShowInvoice}>
-                <DialogContent className="max-w-7xl w-full max-h-[90vh] overflow-auto">
-                    <DialogTitle>Invoice</DialogTitle>
-                    <div ref={invoiceRef} className="">
-                        <BillReceipt invoice={invoice} />
-                    </div>
-                    <Button onClick={handlePrintDocument}>Print</Button>
-                </DialogContent>
-            </Dialog>
 
         </>
     );
