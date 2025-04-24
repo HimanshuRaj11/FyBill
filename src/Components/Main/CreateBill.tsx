@@ -166,6 +166,7 @@ export default function BillingComponent() {
     };
 
     const Receipt = ({ invoice }: { invoice: any }) => (
+
         <Printer type="star" width={42} characterSet="pc437_usa">
             <Text align="center" bold={true}>
                 {invoice.companyName}
@@ -225,7 +226,11 @@ export default function BillingComponent() {
                 configurations: (printer as any).configurations,
             });
 
+            console.log("inocice");
+
+
             const data = await render(<Receipt invoice={invoiceToPrint} />);
+            console.log(data, ':data');
 
             const endpointNumber = 1;
             await printer.transferOut(endpointNumber, data);
