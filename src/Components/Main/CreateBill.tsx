@@ -165,7 +165,6 @@ export default function BillingComponent() {
         }
     };
 
-
     const Receipt = ({ invoice }: { invoice: any }) => (
         <Printer type="star" width={42} characterSet="pc437_usa">
             <Text align="center" bold={true}>

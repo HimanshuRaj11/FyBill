@@ -20,8 +20,6 @@ export default function BillProductEdit({ setEditProductPopUp, editProduct, setP
         setName(product.name)
         setRate(product.rate)
         setQuantity(product.quantity)
-
-        // Handle form submission logic here
     };
 
     return (
