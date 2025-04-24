@@ -165,36 +165,36 @@ export default function BillingComponent() {
     };
     const Receipt = ({ invoice }: { invoice: any }) => (
         <Printer type="star" width={42} >
-            <Text>{centerText(invoice.companyName, 42)}</Text>
-            <Text>{centerText(invoice.companyAddress, 42)}</Text>
-            <Text>Invoice No: {invoice.invoiceId}</Text>
+            <Text>{centerText(invoice.companyName || '', 42)}</Text>
+            <Text>{centerText(invoice.companyAddress || '', 42)}</Text>
+            <Text>Invoice No: {invoice.invoiceId || ''}</Text>
             <Text>Date: {new Date().toLocaleDateString()}</Text>
             <Line />
             <Text>Bill To:</Text>
-            <Text>{invoice.clientName}</Text>
-            <Text>Phone: {invoice.clientPhone}</Text>
+            <Text>{invoice.clientName || ''}</Text>
+            <Text>Phone: {invoice.clientPhone || ''}</Text>
             <Line />
             <Row left="Item" right="Qty  Rate  Total" />
             <Line />
-            {invoice.products.map((item: any, index: number) => (
+            {invoice.products && invoice.products.map((item: any, index: number) => (
                 <Row
                     key={index}
-                    left={item.name}
-                    right={`${item.quantity}  ${item.rate.toFixed(2)}  ${(item.quantity * item.rate).toFixed(2)}`}
+                    left={item.name || ''}
+                    right={`${item.quantity || 0}  ${(item.rate || 0).toFixed(2)}  ${((item.quantity || 0) * (item.rate || 0)).toFixed(2)}`}
                 />
             ))}
             <Line />
-            <Row left="Subtotal:" right={invoice.subTotal.toFixed(2)} />
-            {invoice.appliedTaxes.map((tax: any, index: number) => (
-                <Row key={index} left={`${tax.taxName} (${tax.percentage}%)`} right={tax.amount.toFixed(2)} />
+            <Row left="Subtotal:" right={(invoice.subTotal || 0).toFixed(2)} />
+            {invoice.appliedTaxes && invoice.appliedTaxes.map((tax: any, index: number) => (
+                <Row key={index} left={`${tax.taxName || ''} (${tax.percentage || 0}%)`} right={(tax.amount || 0).toFixed(2)} />
             ))}
             <Row
                 left="Total Tax:"
-                right={invoice.appliedTaxes.reduce((sum: number, tax: any) => sum + tax.amount, 0).toFixed(2)}
+                right={(invoice.appliedTaxes ? invoice.appliedTaxes.reduce((sum: number, tax: any) => sum + (tax.amount || 0), 0) : 0).toFixed(2)}
             />
             <Line />
-            <Row left="Grand Total:" right={invoice.grandTotal.toFixed(2)} />
-            <Row left="Payment" right={invoice.paymentMode} />
+            <Row left="Grand Total:" right={(invoice.grandTotal || 0).toFixed(2)} />
+            <Row left="Payment" right={invoice.paymentMode || ''} />
             <Line />
             <Text>{centerText("Thank You!", 42)}</Text>
             <Br />
@@ -203,6 +203,7 @@ export default function BillingComponent() {
     );
 
     const centerText = (text: string, width: number) => {
+        if (!text) return '';
         const padding = Math.max(0, Math.floor((width - text.length) / 2));
         return " ".repeat(padding) + text;
     };
@@ -253,17 +254,11 @@ export default function BillingComponent() {
 
 
     const handlePrint = async (invoiceToPrint: any) => {
-
         if (printerStatus !== "Connected" || !printer) {
-
             toast.error("Printer not connected");
             return;
         }
-        const device = printer as any;
-        const endpoint = device.configurations?.[0]?.interfaces[0]?.alternates[0]?.endpoints.find(
-            (ep: any) => ep.direction === "out"
-        );
-        const endpointNumber = endpoint?.endpointNumber || 1;
+
         try {
             const data = await render(<Receipt invoice={invoiceToPrint} />);
             console.log(data, ':data');
@@ -274,7 +269,7 @@ export default function BillingComponent() {
             toast.success("Bill printed successfully");
         } catch (err) {
             console.error("Printing failed:", err);
-            toast.error("Failed to print bill.");
+            toast.error("Failed to print bill: " + (err instanceof Error ? err.message : String(err)));
         }
     };
 
