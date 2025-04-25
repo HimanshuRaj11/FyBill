@@ -4,7 +4,9 @@ import UserModel from "@/Model/User.model";
 import { generateInvoiceId } from "@/lib/generateInvoiceId";
 import CompanyModel from "@/Model/Company.model";
 import BranchModel from "@/Model/branch.model";
-import { ThermalPrinter, PrinterTypes } from "node-thermal-printer";
+import escpos from 'escpos';
+import USBAdapter from 'escpos-usb';
+
 export async function POST(request: Request) {
 
     try {
@@ -65,7 +67,29 @@ export async function POST(request: Request) {
             invoice.branchName = branch?.branchName || "";
         }
         await invoice.save();
+        // Initialize USB adapter
+        const adapter = new USBAdapter();
+        const printer = new escpos.Printer(adapter);
 
+        // Open printer connection
+        await new Promise<void>((resolve, reject) => {
+            adapter.open((error) => {
+                if (error) return reject(error);
+                resolve();
+            });
+        });
+
+        // Print content
+        printer
+            .font('A')
+            .align('CT')
+            .style('BOLD')
+            .size(1, 1)
+            .text('Hello, ESC/POS!')
+            .text('Printing from Next.js with TypeScript')
+            .newLine()
+            .cut()
+            .close();
 
         return Response.json({ message: "Invoice created successfully", invoice }, { status: 200 });
 
