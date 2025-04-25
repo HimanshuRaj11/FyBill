@@ -367,8 +367,7 @@ export default function BillingComponent() {
             const printWindow = window.open('', '_blank', 'width=600,height=400');
 
             if (printWindow) { // Check if printWindow is not null
-                printWindow.document.write(` ${printContents}
-`);
+                printWindow.document.write(` ${printContents}`);
                 printWindow.document.close();
                 printWindow.print();
                 printWindow.close();
@@ -579,7 +578,7 @@ export default function BillingComponent() {
                 </div>
             </div>
 
-            <PrintBill />
+            <PrintBill Invoice={invoice} />
 
         </>
     );
