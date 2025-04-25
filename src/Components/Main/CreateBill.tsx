@@ -11,6 +11,7 @@ import { useSelector } from "react-redux";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/Components/ui/select";
 import BillProductEdit from "../Other/BillProductEdit";
 import { DialogTitle } from "@radix-ui/react-dialog";
+import PrintBill from "../Other/PrintBill";
 
 interface Product {
     name: string;
@@ -573,9 +574,12 @@ export default function BillingComponent() {
                         >
                             Continue
                         </Button>
+
                     </div>
                 </div>
             </div>
+
+            <PrintBill />
 
         </>
     );
