@@ -55,8 +55,9 @@ export default function BillingComponent() {
                     return;
                 }
                 const device = await navigator.usb.requestDevice({
-                    filters: [{ vendorId: 0x0519 }]
+                    filters: []
                 });
+                console.log(device);
 
                 await device.open();
                 await device.selectConfiguration(1);
