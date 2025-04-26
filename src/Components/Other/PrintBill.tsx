@@ -10,12 +10,6 @@ const PrintReceiptUSB = async (data: Uint8Array) => {
             ]
         });
         console.log(device.vendorId, device.productId);
-        navigator.usb.requestDevice({ filters: [] })
-            .then(device => console.log(device))
-            .catch(error => console.error(error));
-
-
-
         await device.open();
         if (device.configuration === null) {
             await device.selectConfiguration(1);
