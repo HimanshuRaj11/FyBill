@@ -21,15 +21,16 @@ const PrintBill = ({ Invoice }: { Invoice: any }) => {
         const renderReceipt = async () => {
             try {
                 const data = await render(
-                    <Printer type="epson">
+                    <Printer type="star">
                         <Text align="center" bold >
                             Receipt
                         </Text>
-                        <Text>Order ID: {Invoice._id}</Text>
+                        <Text>Order ID:</Text>
                         {/* Add more receipt details here */}
                     </Printer>
                 );
                 await PrintReceipt(data);
+                setPrinterStatus(false)
 
             } catch (error) {
                 console.log(error);
