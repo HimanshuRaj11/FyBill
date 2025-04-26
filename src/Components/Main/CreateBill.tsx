@@ -577,8 +577,9 @@ export default function BillingComponent() {
                     </div>
                 </div>
             </div>
-
-            <PrintBill Invoice={invoice} />
+            {
+                invoice && <PrintBill Invoice={invoice} />
+            }
 
         </>
     );
