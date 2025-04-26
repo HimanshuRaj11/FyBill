@@ -10,6 +10,7 @@ interface USB {
 interface USBDevice {
     open(): Promise<void>;
     configurations: USBConfiguration[];
+    configuration: USBConfiguration[];
     close(): Promise<void>;
     selectConfiguration(configurationValue: number): Promise<void>;
     claimInterface(interfaceNumber: number): Promise<void>;

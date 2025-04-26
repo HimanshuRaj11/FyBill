@@ -4,9 +4,14 @@ import { useEffect, useState } from 'react';
 
 const PrintReceiptUSB = async (data: Uint8Array) => {
     try {
+        navigator.usb.requestDevice({ filters: [] })
+            .then(device => console.log(device))
+            .catch(error => console.error(error));
+
         const device = await navigator.usb.requestDevice({
             filters: [{ vendorId: 0x0519 }] // <-- You need to find your printer's USB Vendor ID
         });
+
 
         await device.open();
         if (device.configuration === null) {
