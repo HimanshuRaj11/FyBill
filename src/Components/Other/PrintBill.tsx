@@ -4,7 +4,11 @@ import { useEffect, useState } from 'react';
 
 const PrintReceiptUSB = async (data: Uint8Array) => {
     try {
-        const device = await navigator.usb.requestDevice({ filters: [] });
+        const device = await navigator.usb.requestDevice({
+            filters: [
+                { vendorId: 1305 }
+            ]
+        });
         console.log(device.vendorId, device.productId);
         navigator.usb.requestDevice({ filters: [] })
             .then(device => console.log(device))
