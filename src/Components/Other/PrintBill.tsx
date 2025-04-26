@@ -2,47 +2,59 @@
 import { render, Printer, Text } from 'react-thermal-printer';
 import { useEffect, useState } from 'react';
 
-const PrintReceipt = async (data: Uint8Array) => {
+const PrintReceiptUSB = async (data: Uint8Array) => {
+    try {
+        const device = await navigator.usb.requestDevice({
+            filters: [{ vendorId: 0x0519 }] // <-- You need to find your printer's USB Vendor ID
+        });
 
-    const port = await navigator.serial.requestPort();
-    await port.open({ baudRate: 9600 }); // Adjust baudRate if needed
-    const writer = port.writable?.getWriter();
+        await device.open();
+        if (device.configuration === null) {
+            await device.selectConfiguration(1);
+        }
+        await device.claimInterface(0); // usually 0, but depends on printer
+        await device.transferOut(1, data); // endpoint number could vary
 
-    if (writer) {
-        await writer.write(data);
-        writer.releaseLock();
-        await port.close();
+        await device.close();
+    } catch (error) {
+        console.error("USB print error:", error);
+        throw error;
     }
 };
 
 const PrintBill = ({ Invoice }: { Invoice: any }) => {
-    const [PrintStatus, setPrinterStatus] = useState(true)
+    const [printStatus, setPrintStatus] = useState<'printing' | 'done' | 'error'>('printing');
+
     useEffect(() => {
         const renderReceipt = async () => {
             try {
                 const data = await render(
-                    <Printer type="star">
-                        <Text align="center" bold >
+                    <Printer type="star"> {/* if your printer supports STAR commands */}
+                        <Text align="center" bold>
                             Receipt
                         </Text>
-                        <Text>Order ID:</Text>
-                        {/* Add more receipt details here */}
+                        <Text>Order ID: {Invoice?.orderId}</Text>
+                        {/* Add more invoice details here */}
                     </Printer>
                 );
-                await PrintReceipt(data);
-                setPrinterStatus(false)
 
+                await PrintReceiptUSB(data);
+                setPrintStatus('done');
             } catch (error) {
-                console.log(error);
-
+                setPrintStatus('error');
             }
-
         };
 
         renderReceipt();
     }, [Invoice]);
 
-    return <div>{PrintStatus ? " Printing" : ""}</div>;
+    return (
+        <div>
+            {printStatus === 'printing' && "Printing..."}
+            {printStatus === 'done' && "Print Done!"}
+            {printStatus === 'error' && "Failed to Print!"}
+        </div>
+    );
 };
 
 export default PrintBill;
