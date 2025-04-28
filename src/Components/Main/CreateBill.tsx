@@ -5,13 +5,12 @@ import { Input } from "../ui/input";
 import { Dialog, DialogContent } from "../ui/dialog";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { Edit, Minus, Plus, Trash2 } from "lucide-react";
-import { Br, Cut, Line, Printer, Text, Row, render } from "react-thermal-printer";
+import { Edit, Minus, Plus, PlusCircle, Trash2 } from "lucide-react";
 import { useSelector } from "react-redux";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/Components/ui/select";
 import BillProductEdit from "../Other/BillProductEdit";
 import { DialogTitle } from "@radix-ui/react-dialog";
-import PrintBill from "../Other/PrintBill";
+import PrintInvoiceFormate from "./PrintInvoiceFormate";
 
 interface Product {
     name: string;
@@ -19,7 +18,12 @@ interface Product {
     quantity: number;
     amount: number;
 }
-
+const ComplementProduct = {
+    name: "Complement",
+    rate: 0,
+    amount: 0,
+    quantity: 1,
+}
 export default function BillingComponent() {
     const { User } = useSelector((state: any) => state.User)
     const { Company } = useSelector((state: any) => state.Company)
@@ -36,56 +40,11 @@ export default function BillingComponent() {
     const [grandTotal, setGrandTotal] = useState<number>(0);
     const [paymentMode, setPaymentMode] = useState<string>("");
     const [appliedTaxes, setAppliedTaxes] = useState<any[]>([]);
-    const [printer, setPrinter] = useState<USBDevice | null>(null);
-    const [printerStatus, setPrinterStatus] = useState<"Disconnected" | "Connecting" | "Connected" | "Error">("Disconnected");
     const [selectedBranch, setSelectedBranch] = useState("");
     const [editProductPopUp, setEditProductPopUp] = useState(false)
     const [editProduct, setEditProduct] = useState({})
 
-    // Connect to USB printer on component mount
-    useEffect(() => {
-        const connectPrinter = async () => {
-            try {
-                setPrinterStatus("Connecting");
-                const devices = await navigator.usb.getDevices();
-                const existingDevice = devices.find((device: any) => device.productName?.toLowerCase().includes("star")); // Adjust for your printer
-                if (existingDevice) {
-                    setPrinter(existingDevice);
-                    setPrinterStatus("Connected");
-                    return;
-                }
-                const device = await navigator.usb.requestDevice({
-                    filters: []
-                });
-                console.log(device);
 
-                await device.open();
-                await device.selectConfiguration(1);
-                await device.claimInterface(0);
-                setPrinter(device);
-                setPrinterStatus("Connected");
-                toast.success("Printer connected");
-            } catch (err) {
-                console.error("USB connection failed:", err);
-                setPrinterStatus("Error");
-                toast.error("Failed to connect to printer");
-            }
-        };
-
-        if (navigator.usb) {
-            connectPrinter();
-        } else {
-            setPrinterStatus("Error");
-            toast.error("WebUSB not supported in this browser");
-        }
-
-        // Cleanup on unmount
-        return () => {
-            if (printer) {
-                printer.close().catch((err: any) => console.error("Error closing printer:", err));
-            }
-        };
-    }, [printer]);
 
     // Tax calculation
     useEffect(() => {
@@ -165,162 +124,9 @@ export default function BillingComponent() {
             }
         }
     };
-    const Receipt = ({ invoice }: { invoice: any }) => (
-        <Printer type="star" width={42} >
-            <Text>{centerText(invoice.companyName || '', 42)}</Text>
-            <Text>{centerText(invoice.companyAddress || '', 42)}</Text>
-            <Text>Invoice No: {invoice.invoiceId || ''}</Text>
-            <Text>Date: {new Date().toLocaleDateString()}</Text>
-            <Line />
-            <Text>Bill To:</Text>
-            <Text>{invoice.clientName || ''}</Text>
-            <Text>Phone: {invoice.clientPhone || ''}</Text>
-            <Line />
-            <Row left="Item" right="Qty  Rate  Total" />
-            <Line />
-            {invoice.products && invoice.products.map((item: any, index: number) => (
-                <Row
-                    key={index}
-                    left={item.name || ''}
-                    right={`${item.quantity || 0}  ${(item.rate || 0).toFixed(2)}  ${((item.quantity || 0) * (item.rate || 0)).toFixed(2)}`}
-                />
-            ))}
-            <Line />
-            <Row left="Subtotal:" right={(invoice.subTotal || 0).toFixed(2)} />
-            {invoice.appliedTaxes && invoice.appliedTaxes.map((tax: any, index: number) => (
-                <Row key={index} left={`${tax.taxName || ''} (${tax.percentage || 0}%)`} right={(tax.amount || 0).toFixed(2)} />
-            ))}
-            <Row
-                left="Total Tax:"
-                right={(invoice.appliedTaxes ? invoice.appliedTaxes.reduce((sum: number, tax: any) => sum + (tax.amount || 0), 0) : 0).toFixed(2)}
-            />
-            <Line />
-            <Row left="Grand Total:" right={(invoice.grandTotal || 0).toFixed(2)} />
-            <Row left="Payment" right={invoice.paymentMode || ''} />
-            <Line />
-            <Text>{centerText("Thank You!", 42)}</Text>
-            <Br />
-            <Cut />
-        </Printer>
-    );
-
-    const centerText = (text: string, width: number) => {
-        if (!text) return '';
-        const padding = Math.max(0, Math.floor((width - text.length) / 2));
-        return " ".repeat(padding) + text;
-    };
-    // const Receipt = ({ invoice }: { invoice: any }) => (
-
-    //     <Printer type="star" characterSet="pc437_usa" width={42}>
-    //         <Text>Bill To:</Text>
-    //         <Br />
-    //         <Barcode type="CODE39" />
-    //         <Cut />
-    //     </Printer>
-    //     // <Printer type="star" width={42} characterSet="pc437_usa">
-    //     //     <Text align="center" bold={true}>
-    //     //         {invoice.companyName}
-    //     //     </Text>
-    //     //     <Text align="center">{invoice.companyAddress}</Text>
-    //     //     <Text align="center">Invoice No: {invoice.invoiceId}</Text>
-    //     //     <Text align="center">Date: {new Date().toLocaleDateString()}</Text>
-    //     //     <Line />
-    //     //     <Text>Bill To:</Text>
-    //     //     <Text>{invoice?.clientName || ""}</Text>
-    //     //     <Text>Phone: {invoice?.clientPhone || ""}</Text>
-    //     //     <Line />
-    //     //     <Row left="Item" right="Qty  Rate  Total" />
-    //     //     <Line />
-    //     //     {invoice.products.map((item: any, index: number) => (
-    //     //         <Row
-    //     //             key={index}
-    //     //             left={item.name}
-    //     //             right={`${item.quantity}  ${item.rate.toFixed(2)}  ${(item.quantity * item.rate).toFixed(2)}`}
-    //     //         />
-    //     //     ))}
-    //     //     <Line />
-    //     //     <Row left="Subtotal:" right={invoice.subTotal.toFixed(2)} />
-    //     //     {invoice?.appliedTaxes?.map((tax: any, index: number) => (
-    //     //         <Row key={index} left={`${tax.taxName} (${tax.percentage}%)`} right={tax.amount.toFixed(2)} />
-    //     //     ))}
-    //     //     <Row left="Total Tax:" right={invoice?.appliedTaxes?.reduce((sum: number, tax: any) => sum + tax.amount, 0).toFixed(2)} />
-    //     //     <Line />
-    //     //     <Row left="Grand Total:" right={invoice.grandTotal.toFixed(2)} />
-    //     //     <Row left="Payment" right={invoice.paymentMode} />
-    //     //     <Line />
-    //     //     <Text align="center">Thank You!</Text>
-    //     //     <Br />
-    //     //     <Cut />
-    //     // </Printer>
-    // );
 
 
-    const handlePrint = async (invoiceToPrint: any) => {
-        if (printerStatus !== "Connected" || !printer) {
-            toast.error("Printer not connected");
-            return;
-        }
 
-        try {
-            const data = await render(<Receipt invoice={invoiceToPrint} />);
-            console.log(data, ':data');
-
-            const endpointNumber = 1;
-            await printer.transferOut(endpointNumber, data);
-
-            toast.success("Bill printed successfully");
-        } catch (err) {
-            console.error("Printing failed:", err);
-            toast.error("Failed to print bill: " + (err instanceof Error ? err.message : String(err)));
-        }
-    };
-
-    const OnContinue = async () => {
-        try {
-            if (products.length === 0) {
-                toast.error("Please add at least one product");
-                return;
-            }
-
-            if (paymentMode === "") {
-                toast.error("Please select payment mode");
-                return;
-            }
-            if (User?.role === "Owner" && selectedBranch === "") {
-                toast.error("Please select branch");
-                return;
-            }
-
-            const totalTaxAmount = appliedTaxes.reduce((sum, tax) => sum + tax.amount, 0);
-
-            const { data } = await axios.post(`${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/Invoice/create`, {
-                clientName,
-                phoneNumber,
-                products,
-                subTotal,
-                grandTotal,
-                paymentMode,
-                appliedTaxes,
-                totalTaxAmount,
-                selectedBranch, // Pass selected branch
-            });
-
-            if (data.invoice) {
-                setInvoice(data.invoice);
-                setShowInvoice(true);
-                setClientName("");
-                setPhoneNumber("");
-                setProducts([]);
-                setSubTotal(0);
-                setGrandTotal(0);
-                await handlePrint(data.invoice);
-                // handleServerPrint()
-            }
-        } catch (error) {
-            console.error("Error creating invoice:", error);
-            toast.error("Something went wrong");
-        }
-    };
 
     // Fetching Data
     const FetchProducts = async () => {
@@ -360,50 +166,122 @@ export default function BillingComponent() {
     };
 
     const invoiceRef = useRef<HTMLDivElement>(null);
-    const handlePrintDocument = () => {
+
+    const handlePrintDocument = (event: React.MouseEvent) => {
+        event.preventDefault();
         if (invoiceRef.current) {
             const printContents = invoiceRef.current.innerHTML;
             const originalContents = document.body.innerHTML;
-
-            const printWindow = window.open('', '_blank', 'width=600,height=400');
-
-            if (printWindow) { // Check if printWindow is not null
-                printWindow.document.write(` ${printContents}`);
-                printWindow.document.close();
-                printWindow.print();
-                printWindow.close();
-            } else {
-                console.error('Failed to open print window');
+            document.body.innerHTML = printContents;
+            window.print();
+            document.body.innerHTML = originalContents;
+            window.location.reload();
+        }
+        setShowInvoice(false);
+    };
+    const OnContinue = async () => {
+        try {
+            if (products.length === 0) {
+                toast.error("Please add at least one product");
+                return;
             }
+
+            if (paymentMode === "") {
+                toast.error("Please select payment mode");
+                return;
+            }
+            if (User?.role === "Owner" && selectedBranch === "") {
+                toast.error("Please select branch");
+                return;
+            }
+
+            const totalTaxAmount = appliedTaxes.reduce((sum, tax) => sum + tax.amount, 0);
+
+            const { data } = await axios.post(`${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/Invoice/create`, {
+                clientName,
+                phoneNumber,
+                products,
+                subTotal,
+                grandTotal,
+                paymentMode,
+                appliedTaxes,
+                totalTaxAmount,
+                selectedBranch, // Pass selected branch
+            });
+
+            if (data.invoice) {
+                setInvoice(data.invoice);
+                setShowInvoice(true);
+                setClientName("");
+                setPhoneNumber("");
+                setProducts([]);
+                setSubTotal(0);
+                setGrandTotal(0);
+            }
+        } catch (error) {
+            console.error("Error creating invoice:", error);
+            toast.error("Something went wrong");
         }
     };
 
+
+
     return (
         <>
+            {showInvoice && invoice && (
+                <div>
+                    <Dialog open={showInvoice} onOpenChange={setShowInvoice}>
+                        <DialogContent className="max-w-7xl w-full ">
+                            <DialogTitle>Print Invoice</DialogTitle>
+                            <div ref={invoiceRef} className="max-h-[80vh] overflow-auto">
+                                <PrintInvoiceFormate invoice={invoice} />
+                            </div>
+
+                            <div className="flex justify-end my-4">
+                                <Button
+                                    onClick={handlePrintDocument}
+                                    className="cursor-pointer w-full" >
+                                    Print
+                                </Button>
+
+                            </div>
+                        </DialogContent>
+                    </Dialog>
+
+                </div>
+
+            )
+
+            }
+
             <div className="flex justify-between flex-col sm:flex-row gap-2">
 
                 <div className="w-[50%] mx-auto p-6 bg-white rounded-2xl shadow-2xl">
                     {User?.role === "Owner" && (
                         <div className=" ">
-                            {Company?.branch?.map((branch: any) => (
-                                <div key={branch._id}>
-                                    <label className="block text-sm font-medium mb-1">Branch</label>
-                                    <Select onValueChange={setSelectedBranch}>
-                                        <SelectTrigger>
-                                            <SelectValue placeholder="Select Branch" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value={branch._id}>{branch.branchName}</SelectItem>
-                                        </SelectContent>
-                                    </Select>
-                                </div>
-                            ))}
+                            {
+                                Company?.branch?.length > 0 && (
+
+                                    <div >
+                                        <label className="block text-sm font-medium mb-1">Branch</label>
+                                        <Select onValueChange={setSelectedBranch}>
+                                            <SelectTrigger>
+                                                <SelectValue placeholder="Select Branch" />
+                                            </SelectTrigger>
+                                            <SelectContent >
+                                                {Company?.branch?.map((branch: any) => (
+                                                    <SelectItem key={branch._id} value={branch._id}>{branch.branchName}</SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+                                )
+                            }
                         </div>
                     )
                     }
 
                     <h1 className="text-2xl font-bold mb-4">Create Bill</h1>
-                    <p className="mb-4">Printer Status: {printerStatus}</p>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                         <Input
@@ -430,6 +308,12 @@ export default function BillingComponent() {
 
                     {/* List of Products */}
                     <div className="flex flex-wrap gap-4 overflow-y-auto max-h-[280px]">
+                        <div
+                            onClick={() => AddProduct(ComplementProduct)}
+                            className="bg-neutral-300 max-w-[200px] flex justify-center items-center hover:bg-gray-400 hover:shadow-md transition-all duration-300 p-4 cursor-pointer rounded-md">
+                            {/* <h3 className="text-lg font-bold">Add Product</h3> */}
+                            <PlusCircle className="text-8xl font-bold" />
+                        </div>
                         {filteredProducts?.map((product: any, index: any) => (
                             <div
                                 onClick={() => AddProduct(product)}
@@ -437,7 +321,7 @@ export default function BillingComponent() {
                                 className="bg-gray-300 max-w-[200px] hover:bg-gray-400 hover:shadow-md transition-all duration-300 p-4 cursor-pointer rounded-md"
                             >
                                 <h3 className="text-lg font-bold">{product.name}</h3>
-                                <p className="text-sm">₹{product.price}</p>
+                                <p className="text-md">₹{product.price}</p>
                             </div>
                         ))}
                     </div>
@@ -578,10 +462,6 @@ export default function BillingComponent() {
                     </div>
                 </div>
             </div>
-            {
-                invoice && <PrintBill Invoice={invoice} />
-            }
-
         </>
     );
 }

@@ -21,20 +21,25 @@ export default function Dashboard() {
     const FetchInvoice: () => Promise<void> = async () => {
         try {
             setIsLoading(true)
-            const { data } = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/Invoice/fetch?limit=10&sort=-createdAt`)
+            const { data } = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/Invoice/fetch?sort=-createdAt`)
             setInvoice(data.invoices)
+            console.log(Invoice);
+
             setIsLoading(false)
         } catch (error) {
             setIsLoading(false)
         }
     }
 
-    const filterInvoice = (branchId: string) => {
+    const filterInvoice = async (branchId: string) => {
         if (branchId === "") {
             FetchInvoice()
+            return
         } else {
-            const filteredInvoice = Invoice.filter((invoice: any) => invoice.branchId._id === branchId)
+            const { data: { invoices } } = await axios.post(`${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/Invoice/filter/byBranch`, { branchId })
+            const filteredInvoice = invoices.filter((invoice: any) => invoice.branchId._id === branchId)
             setInvoice(filteredInvoice)
+            return
         }
     }
 
@@ -187,7 +192,7 @@ export default function Dashboard() {
                                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                                 </tr>
                             </thead>
-                            <tbody className="bg-white divide-y divide-gray-200">
+                            <tbody className="bg-white divide-y divide-gray-200 ">
                                 {Invoice?.map((invoice: any) => (
                                     <tr key={invoice.invoiceId} className="hover:bg-gray-50">
                                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium ">
