@@ -133,8 +133,15 @@ export default function BillingComponent() {
         try {
             const { data } = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/company/product/fetch`);
             if (data.success) {
-                setProductsList(data?.products);
-                setFilteredProducts(data?.products);
+
+                if (User.branchId) {
+                    const BranchProduct = data?.products?.filter((product: any) => product.branchId?._id === User.branchId) || [];
+                    setFilteredProducts(BranchProduct);
+                    setProductsList(BranchProduct);
+                } else {
+                    setProductsList(data?.products);
+                    setFilteredProducts(data?.products);
+                }
             }
         } catch (error) {
             console.error("Error fetching products:", error);

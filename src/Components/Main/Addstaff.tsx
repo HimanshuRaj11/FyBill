@@ -69,6 +69,7 @@ export default function AddStaff({ setShowAddStaffModal }: { setShowAddStaffModa
             if (data.success) {
                 toast.success('Staff added successfully')
                 setShowAddStaffModal(false)
+                router.back()
             }
             reset()
 

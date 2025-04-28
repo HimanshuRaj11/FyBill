@@ -24,7 +24,6 @@ export async function PUT(request: NextRequest) {
         }
         const { product } = await request.json();
         const { _id, name, price, description, category, branchId } = product;
-        console.log(product);
 
         const Product = await ProductModel.findByIdAndUpdate({ _id: _id }, { name, price, description, category, branchId });
         if (!Product) {

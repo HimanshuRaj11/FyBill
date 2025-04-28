@@ -23,7 +23,6 @@ export default function Dashboard() {
             setIsLoading(true)
             const { data } = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/Invoice/fetch?sort=-createdAt`)
             setInvoice(data.invoices)
-            console.log(Invoice);
 
             setIsLoading(false)
         } catch (error) {
