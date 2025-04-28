@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import UserModel from "@/Model/User.model";
 import CompanyModel from "@/Model/Company.model";
 import ProductModel from "@/Model/Product.model";
+import branchModel from "@/Model/branch.model";
 
 export async function GET(request: NextRequest) {
     try {
@@ -18,7 +19,11 @@ export async function GET(request: NextRequest) {
         if (!company) {
             return NextResponse.json({ success: false, error: 'Company not found' });
         }
-        const products = await ProductModel.find({ companyId: company._id });
+        const products = await ProductModel.find({ companyId: company._id }).populate({
+            path: 'branchId',
+            model: branchModel
+        }).lean();
+
         return NextResponse.json({ success: true, products });
     } catch (error) {
         return NextResponse.json({ success: false, error: error instanceof Error ? error.message : 'An unknown error occurred' });

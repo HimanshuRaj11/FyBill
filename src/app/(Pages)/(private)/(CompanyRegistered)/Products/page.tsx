@@ -13,12 +13,12 @@ interface Product {
     description: string;
     category: string;
     name: string;
+    branchId: any
 }
 
 export default function ProductsPage() {
     const { User } = useSelector((state: any) => state.User);
     const { Company } = useSelector((state: any) => state.Company);
-    const company = Company
     const [products, setProducts] = useState<Product[]>([]);
 
 
@@ -112,6 +112,10 @@ export default function ProductsPage() {
                         <thead>
                             <tr className=''>
                                 <th className="p-4 text-left">Product Name</th>
+                                <th className="p-4 text-left">Category</th>
+                                {
+                                    Company?.branch.length > 0 && <th className="p-4 text-left">Branch</th>
+                                }
                                 <th className="p-4 text-left">Price</th>
                                 <th className="p-4 text-left">Actions</th>
                             </tr>
@@ -124,10 +128,22 @@ export default function ProductsPage() {
                                             {product?.name}
                                         </h3>
                                     </td>
+                                    {
+                                        Company?.branch.length > 0 && <td className="px-4">
+                                            <h3 className="text-md text-gray-800 line-clamp-2 mb-2">
+                                                {product?.branchId?.branchName}
+                                            </h3>
+                                        </td>
+                                    }
+                                    <td className="px-4">
+                                        <h3 className="text-md text-gray-800 line-clamp-2 mb-2">
+                                            {product?.category}
+                                        </h3>
+                                    </td>
 
                                     <td className="px-4">
                                         <span className="text-xl font-bold text-blue-600">
-                                            {company?.currency.symbol} {product.price.toFixed(2)}
+                                            {Company?.currency.symbol} {product.price.toFixed(2)}
                                         </span>
                                     </td>
                                     <td className="px-4">

@@ -17,6 +17,7 @@ const productSchema = z.object({
     }),
     description: z.string().optional(),
     category: z.string().min(1, "Category is required"),
+    branchId: z.string(),
 })
 
 type ProductFormData = z.infer<typeof productSchema>
@@ -26,9 +27,13 @@ const initialData: ProductFormData = {
     price: '',
     description: '',
     category: '',
+    branchId: "",
 }
 
 export default function AddProduct() {
+    const { Company } = useSelector((state: any) => state.Company);
+
+    const branches = Company?.branch
     const [loading, setLoading] = useState(false)
     const [categories, setCategories] = useState<string[]>([]);
     const [formData, setFormData] = useState<ProductFormData>(initialData)
@@ -197,6 +202,24 @@ export default function AddProduct() {
                         </select>
                         {errors.category && <p className="text-red-500 text-sm mt-1">{errors.category}</p>}
                     </div>
+                </div>
+                <div>
+                    <label className="block text-sm font-medium mb-2">Branch</label>
+                    <select
+                        name="branchId"
+                        value={formData.branchId}
+                        onChange={handleChange}
+                        className="w-full rounded-md border border-input bg-background px-3 py-2"
+                        required
+                    >
+                        <option value="">Select a Branch</option>
+                        {branches.map((branch: any, index: number) => (
+                            <option key={index} value={branch._id}>
+                                {branch.branchName}
+                            </option>
+                        ))}
+                    </select>
+                    {errors.category && <p className="text-red-500 text-sm mt-1">{errors.category}</p>}
                 </div>
 
                 <div>

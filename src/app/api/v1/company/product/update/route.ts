@@ -3,7 +3,7 @@ import ProductModel from "@/Model/Product.model";
 import { verifyUser } from "@/lib/verifyUser";
 import UserModel from "@/Model/User.model";
 import CompanyModel from "@/Model/Company.model";
-export async function POST(request: NextRequest) {
+export async function PUT(request: NextRequest) {
     try {
         const User_id = await verifyUser();
         if (!User_id) {
@@ -22,13 +22,18 @@ export async function POST(request: NextRequest) {
         if (!company) {
             return NextResponse.json({ success: false, error: 'Company not found' });
         }
-        const { _id, name, price, description, category } = await request.json();
-        const product = await ProductModel.findByIdAndUpdate({ _id: _id }, { name, price, description, category });
-        if (!product) {
+        const { product } = await request.json();
+        const { _id, name, price, description, category, branchId } = product;
+        console.log(product);
+
+        const Product = await ProductModel.findByIdAndUpdate({ _id: _id }, { name, price, description, category, branchId });
+        if (!Product) {
             return NextResponse.json({ success: false, error: 'Product not found' });
         }
         return NextResponse.json({ success: true, message: "Product updated" });
     } catch (error) {
+        console.log(error);
+
         return NextResponse.json({ success: false, error: error instanceof Error ? error.message : 'An unknown error occurred' });
     }
 

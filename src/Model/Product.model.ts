@@ -6,6 +6,7 @@ interface IProduct extends Document {
     description: string;
     category: string;
     companyId: mongoose.Types.ObjectId;
+    branchId: mongoose.Types.ObjectId;
 }
 
 const ProductSchema = new Schema<IProduct>({
@@ -29,6 +30,10 @@ const ProductSchema = new Schema<IProduct>({
         type: Schema.Types.ObjectId,
         ref: 'Company',
         required: [true, 'Company ID is required']
+    },
+    branchId: {
+        type: Schema.Types.ObjectId,
+        ref: 'Branch',
     }
 }, {
     timestamps: true
