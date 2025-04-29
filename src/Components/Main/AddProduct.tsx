@@ -41,7 +41,6 @@ export default function AddProduct() {
 
     const [errors, setErrors] = useState<Partial<ProductFormData>>({})
     const { User } = useSelector((state: any) => state.User);
-    const user = User
     const router = useRouter()
     useEffect(() => {
         setLoading(true)
@@ -50,7 +49,7 @@ export default function AddProduct() {
     }, []);
 
 
-    if (user?.role !== "admin" && user?.role !== "Owner") {
+    if (User?.role !== "admin" && User?.role !== "Owner") {
         toast.error("You are not authorized to add Products")
         router.back()
         return
@@ -203,24 +202,36 @@ export default function AddProduct() {
                         {errors.category && <p className="text-red-500 text-sm mt-1">{errors.category}</p>}
                     </div>
                 </div>
-                <div>
-                    <label className="block text-sm font-medium mb-2">Branch</label>
-                    <select
-                        name="branchId"
-                        value={formData.branchId}
-                        onChange={handleChange}
-                        className="w-full rounded-md border border-input bg-background px-3 py-2"
-                        required
-                    >
-                        <option value="">Select a Branch</option>
-                        {branches.map((branch: any, index: number) => (
-                            <option key={index} value={branch._id}>
-                                {branch.branchName}
-                            </option>
-                        ))}
-                    </select>
-                    {errors.category && <p className="text-red-500 text-sm mt-1">{errors.category}</p>}
-                </div>
+                {
+                    User.branchId ? "" :
+                        <div className="">
+
+
+                            {
+                                branches && (
+                                    <div>
+                                        <label className="block text-sm font-medium mb-2">Branch</label>
+                                        <select
+                                            name="branchId"
+                                            value={formData.branchId}
+                                            onChange={handleChange}
+                                            className="w-full rounded-md border border-input bg-background px-3 py-2"
+                                            required
+                                        >
+                                            <option value="">Select a Branch</option>
+                                            {branches.map((branch: any, index: number) => (
+                                                <option key={index} value={branch._id}>
+                                                    {branch.branchName}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                )
+                            }
+
+                        </div>
+                }
+
 
                 <div>
                     <label className="block text-sm font-medium mb-2">Description</label>

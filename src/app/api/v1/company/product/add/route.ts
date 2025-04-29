@@ -18,12 +18,20 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ success: false, error: 'Unauthorized' });
         }
 
+
         const company = await CompanyModel.findById({ _id: User.companyId });
         if (!company) {
             return NextResponse.json({ success: false, error: 'Company not found' });
         }
         const { name, price, description, category, branchId } = await request.json();
-        const product = await ProductModel.create({ name, price, description, category, companyId: company._id, branchId });
+        let Branch;
+        if (User.branchId) {
+            Branch = User.branchId;
+        } else {
+            Branch = branchId
+        }
+
+        const product = await ProductModel.create({ name, price, description, category, companyId: company._id, branchId: Branch });
 
         return NextResponse.json({ success: true, product });
     } catch (error) {
