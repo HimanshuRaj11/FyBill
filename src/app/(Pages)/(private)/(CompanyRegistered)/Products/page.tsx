@@ -69,7 +69,7 @@ export default function ProductsPage() {
     return (
         <div className=" min-h-screen py-8 px-4 sm:px-6 lg:px-8">
             {/* Category Filter */}
-            {User?.role === "Owner" && (
+            {User?.role === "Owner" || User?.role === "admin" && (
                 <div className="w-full flex justify-end mb-4">
                     <Button>
                         <Link href="/Products/add">Add Product</Link>
@@ -112,10 +112,10 @@ export default function ProductsPage() {
                         <thead>
                             <tr className=''>
                                 <th className="p-4 text-left">Product Name</th>
-                                <th className="p-4 text-left">Category</th>
                                 {
                                     Company?.branch.length > 0 && <th className="p-4 text-left">Branch</th>
                                 }
+                                <th className="p-4 text-left">Category</th>
                                 <th className="p-4 text-left">Price</th>
                                 <th className="p-4 text-left">Actions</th>
                             </tr>

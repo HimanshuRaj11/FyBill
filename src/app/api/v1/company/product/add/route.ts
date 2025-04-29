@@ -22,8 +22,8 @@ export async function POST(request: NextRequest) {
         if (!company) {
             return NextResponse.json({ success: false, error: 'Company not found' });
         }
-        const { name, price, description, category } = await request.json();
-        const product = await ProductModel.create({ name, price, description, category, companyId: company._id });
+        const { name, price, description, category, branchId } = await request.json();
+        const product = await ProductModel.create({ name, price, description, category, companyId: company._id, branchId });
 
         return NextResponse.json({ success: true, product });
     } catch (error) {
