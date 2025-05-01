@@ -4,101 +4,75 @@ import React from 'react'
 export default function PrintInvoiceFormate({ invoice }: { invoice: any }) {
 
     return (
-        <>
-
-            <div className="p-4 sm:p-6 lg:p-8">
-                <div className="flex flex-col gap-4 mb-8">
-                    <div className="flex flex-row justify-between">
-                        <h2 className="text-3xl sm:text-4xl font-bold text-gray-800">INVOICE</h2>
-                        <div className="bg-indigo-50 text-indigo-700 px-6 py-3 rounded-lg font-bold text-lg">
-                            {invoice.invoiceId}
-                        </div>
-                    </div>
-                    <div className="space-y-4">
-                        <div className="text-gray-500 space-y-1">
-                            <p className="font-medium">From:</p>
-                            <p className="text-lg">{invoice.companyName}</p>
-                            <p className="text-sm">{invoice.companyAddress}</p>
-                        </div>
-                    </div>
-                    <div className="flex flex-col items-start md:items-end space-y-4">
-                        <div className="text-left md:text-right text-gray-500">
-                            <p className="font-medium">Date Issued:</p>
-                            <p>{moment(invoice.createdAt).format('DD/MM/YYYY HH:mm')}</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div className="mb-8">
-                    <div className="bg-gray-50 p-4 rounded-lg">
-                        <p className="font-semibold text-gray-700 mb-2">Bill To:</p>
-                        <p className="text-gray-800 font-medium text-lg">{invoice.clientName}</p>
-                        <p className="text-gray-600">{invoice.clientPhone}</p>
-                    </div>
-                </div>
-
-                <div className="overflow-x-auto rounded-lg border border-gray-200">
-                    <table className="w-full text-left">
-                        <thead>
-                            <tr className="bg-gray-50">
-                                <th className="p-4 font-semibold text-gray-700">Product</th>
-                                <th className="p-4 font-semibold text-gray-700 text-right">QTY</th>
-                                <th className="p-4 font-semibold text-gray-700 text-right">PRICE</th>
-                                <th className="p-4 font-semibold text-gray-700 text-right">TOTAL</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-gray-200">
-                            {invoice.products.map((product: any, index: any) => (
-                                <tr key={index} className="hover:bg-gray-50 transition-colors duration-150">
-                                    <td className="p-4 text-gray-800">{product.name}</td>
-                                    <td className="p-4 text-gray-800 text-right">{product.quantity}</td>
-                                    <td className="p-4 text-gray-800 text-right">{invoice.currency} {product.rate.toFixed(2)}</td>
-                                    <td className="p-4 text-gray-800 text-right font-medium">{invoice.currency} {product.amount.toFixed(2)}</td>
-                                </tr>
-                            ))}
-                        </tbody>
-                        <tfoot className="bg-gray-50">
-                            <tr className="border-t-2 border-gray-200">
-                                <td className="p-4 text-gray-700 font-medium" colSpan={3}>SUBTOTAL</td>
-                                <td className="p-4 text-gray-800 text-right font-bold">{invoice.currency} {invoice.subTotal.toFixed(2)}</td>
-                            </tr>
-                            {invoice?.appliedTaxes?.map((tax: any, index: any) => (
-                                <tr key={index}>
-                                    <td className="p-4 text-gray-700" colSpan={3}>
-                                        {tax.taxName} ({tax.percentage}%)
-                                    </td>
-                                    <td className="p-4 text-gray-800 text-right">
-                                        {invoice.currency} {tax.amount}
-                                    </td>
-                                </tr>
-                            ))}
-                            <tr className="border-t-2 border-gray-200 bg-gray-100">
-                                <td className="p-4 text-gray-800 font-bold text-lg" colSpan={3}>GRAND TOTAL</td>
-                                <td className="p-4 text-gray-800 font-bold text-lg text-right">{invoice.currency} {invoice.grandTotal.toFixed(2)}</td>
-                            </tr>
-                        </tfoot>
-                    </table>
-                </div>
-
-                <div className="mt-8 space-y-6">
-                    <div className="bg-gray-50 p-6 rounded-lg">
-                        <p className="font-semibold text-gray-700 mb-4">Payment Information:</p>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                            <div className="bg-white p-4 rounded-md shadow-sm">
-                                <p className="text-sm text-gray-500 mb-1">Payment Mode</p>
-                                <p className="font-medium text-gray-800">{invoice.paymentMode}</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="text-center py-8">
-                        <div className="text-4xl sm:text-5xl font-bold text-gray-200 mb-2">THANK YOU</div>
-                        <p className="text-gray-500">For your business!</p>
-                    </div>
+        <div className="w-full max-w-xs mx-auto p-2 text-black">
+            {/* Header */}
+            <div className="text-center mb-2">
+                <h2 className="text-xl font-bold">{invoice.companyName}</h2>
+                <p className="text-xs">{invoice.companyAddress}</p>
+                <div className="text-sm font-bold mt-1">INVOICE: {invoice.invoiceId}</div>
+                <div className="text-xs">
+                    Date: {moment(invoice.createdAt).format('DD/MM/YYYY HH:mm')}
                 </div>
             </div>
 
+            {/* Customer Info */}
+            <div className="mb-2 border-t border-b border-gray-400 py-1">
+                <p className="text-xs font-bold">Customer: {invoice.clientName}</p>
+                <p className="text-xs">Phone: {invoice.clientPhone}</p>
+            </div>
 
-        </>
+            {/* Items Table */}
+            <table className="w-full text-xs mb-2">
+                <thead>
+                    <tr className="border-b border-gray-400">
+                        <th className="text-left py-1">Item</th>
+                        <th className="text-right py-1">Qty</th>
+                        <th className="text-right py-1">Price</th>
+                        <th className="text-right py-1">Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {invoice.products.map((product: any, index: any) => (
+                        <tr key={index} className="border-b border-gray-200">
+                            <td className="text-left py-1">{product.name}</td>
+                            <td className="text-right py-1">{product.quantity}</td>
+                            <td className="text-right py-1">{product.rate.toFixed(2)}</td>
+                            <td className="text-right py-1">{product.amount.toFixed(2)}</td>
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
+
+            {/* Totals */}
+            <div className="text-xs">
+                <div className="flex justify-between py-1">
+                    <span>Subtotal:</span>
+                    <span>{invoice.currency} {invoice.subTotal.toFixed(2)}</span>
+                </div>
+
+                {invoice?.appliedTaxes?.map((tax: any, index: any) => (
+                    <div key={index} className="flex justify-between py-1">
+                        <span>{tax.taxName} ({tax.percentage}%):</span>
+                        <span>{invoice.currency} {tax.amount}</span>
+                    </div>
+                ))}
+
+                <div className="flex justify-between border-t border-gray-400 pt-1 font-bold">
+                    <span>TOTAL:</span>
+                    <span>{invoice.currency} {invoice.grandTotal.toFixed(2)}</span>
+                </div>
+            </div>
+
+            {/* Payment Info */}
+            <div className="mt-2 text-xs">
+                <p className="font-bold">Payment: {invoice.paymentMode}</p>
+            </div>
+
+            {/* Footer */}
+            <div className="text-center mt-3 mb-1">
+                <p className="font-bold text-sm">THANK YOU</p>
+                <p className="text-xs">For your business!</p>
+            </div>
+        </div>
     )
 }
