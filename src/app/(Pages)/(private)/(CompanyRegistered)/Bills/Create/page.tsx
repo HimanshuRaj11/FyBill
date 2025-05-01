@@ -1,7 +1,7 @@
 'use client'
 import BillingComponent from '@/Components/Main/CreateBill'
 import WebLoader from '@/Components/Other/loader';
-import USBPrinter from '@/Components/Other/PrintBill';
+
 import { Button } from '@/Components/ui/button'
 import axios from 'axios';
 import Link from 'next/link'
