@@ -186,6 +186,7 @@ export default function BillingComponent() {
         }
         setShowInvoice(false);
     };
+
     const OnContinue = async () => {
         try {
             if (products.length === 0) {

@@ -117,7 +117,11 @@ export default function ProductsPage() {
                                 }
                                 <th className="p-4 text-left">Category</th>
                                 <th className="p-4 text-left">Price</th>
-                                <th className="p-4 text-left">Actions</th>
+                                {
+                                    User.role == "Owner" && (
+                                        <th className="p-4 text-left">Actions</th>
+                                    )
+                                }
                             </tr>
                         </thead>
                         <tbody>
@@ -146,20 +150,25 @@ export default function ProductsPage() {
                                             {Company?.currency.symbol} {product.price.toFixed(2)}
                                         </span>
                                     </td>
-                                    <td className="px-4">
-                                        <div className="flex gap-2">
-                                            <Button variant="default" className="flex items-center justify-center gap-2">
-                                                <Link className='w-full flex items-center justify-center gap-2' href={`/Products/edit/${product._id}`}>
-                                                    <FiEdit2 className="w-4 h-4" />
-                                                    Edit
-                                                </Link>
-                                            </Button>
-                                            <Button variant="destructive" className="flex items-center justify-center gap-2" onClick={() => deleteProduct(product._id)}>
-                                                <FiTrash2 className="w-4 h-4" />
-                                                Delete
-                                            </Button>
-                                        </div>
-                                    </td>
+                                    {
+                                        User?.role == "Owner" && (
+                                            <td className="px-4">
+                                                <div className="flex gap-2">
+                                                    <Button variant="default" className="flex items-center justify-center gap-2">
+                                                        <Link className='w-full flex items-center justify-center gap-2' href={`/Products/edit/${product._id}`}>
+                                                            <FiEdit2 className="w-4 h-4" />
+                                                            Edit
+                                                        </Link>
+                                                    </Button>
+                                                    <Button variant="destructive" className="flex items-center justify-center gap-2" onClick={() => deleteProduct(product._id)}>
+                                                        <FiTrash2 className="w-4 h-4" />
+                                                        Delete
+                                                    </Button>
+                                                </div>
+                                            </td>
+
+                                        )
+                                    }
                                 </tr>
                             ))}
                         </tbody>

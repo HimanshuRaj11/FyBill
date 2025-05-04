@@ -135,12 +135,17 @@ export default function Navbar() {
                                     </div>
                                 </Link>
                                 <DropdownMenuSeparator className="my-2" />
-                                <Link href={'/Setting'}>
-                                    <DropdownMenuItem className="cursor-pointer p-2 rounded-lg hover:bg-indigo-50 transition-colors">
-                                        <Settings className="h-4 w-4 mr-2 text-indigo-600" />
-                                        <span>Settings</span>
-                                    </DropdownMenuItem>
-                                </Link>
+                                {
+                                    User.role == "Owner" && (
+                                        <Link href={'/Setting'}>
+                                            <DropdownMenuItem className="cursor-pointer p-2 rounded-lg hover:bg-indigo-50 transition-colors">
+                                                <Settings className="h-4 w-4 mr-2 text-indigo-600" />
+                                                <span>Settings</span>
+                                            </DropdownMenuItem>
+                                        </Link>
+
+                                    )
+                                }
 
                                 <DropdownMenuSeparator className="my-2" />
 

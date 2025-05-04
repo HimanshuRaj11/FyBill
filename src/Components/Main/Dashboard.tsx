@@ -10,6 +10,7 @@ import { useSelector } from 'react-redux'
 import DashboardTopCards from '../Other/DashboardTopCards'
 
 export default function Dashboard() {
+    const { User } = useSelector((state: any) => state.User);
     const { Company } = useSelector((state: any) => state.Company)
     const [isLoading, setIsLoading] = useState(false)
 
@@ -74,22 +75,27 @@ export default function Dashboard() {
 
                 </div>
             </div>
+            {
+                User.role == "Owner" && (
+                    <div className="flex flex-row justify-start mb-2.5 gap-2">
+                        <div onClick={() => filterInvoice("")} className='flex justify-center items-center p-2 rounded-lg bg-gray-100 cursor-pointer hover:shadow-md transition-colors'>
+                            <span className="text-md text-gray-900 font-semibold min-w-20 text-center">All</span>
+                        </div>
+                        {
+                            Company?.branch?.length > 0 && (
+                                Company?.branch?.map((branch: any) => (
+                                    <div onClick={() => filterInvoice(branch._id)} key={branch._id} className='flex justify-center items-center p-2 rounded-lg bg-gray-100 cursor-pointer hover:shadow-md transition-colors'>
+                                        <span className="text-md text-gray-900 font-semibold">{branch?.branchName}</span>
+                                    </div>
+                                ))
+                            )
+                        }
 
-            <div className="flex flex-row justify-start mb-2.5 gap-2">
-                <div onClick={() => filterInvoice("")} className='flex justify-center items-center p-2 rounded-lg bg-gray-100 cursor-pointer hover:shadow-md transition-colors'>
-                    <span className="text-md text-gray-900 font-semibold min-w-20 text-center">All</span>
-                </div>
-                {
-                    Company?.branch?.length > 0 && (
-                        Company?.branch?.map((branch: any) => (
-                            <div onClick={() => filterInvoice(branch._id)} key={branch._id} className='flex justify-center items-center p-2 rounded-lg bg-gray-100 cursor-pointer hover:shadow-md transition-colors'>
-                                <span className="text-md text-gray-900 font-semibold">{branch?.branchName}</span>
-                            </div>
-                        ))
-                    )
-                }
+                    </div>
+                )
+            }
 
-            </div>
+
             {/* Search and Filter */}
             <div className="flex flex-col sm:flex-row gap-3 mb-6">
                 <div className="relative flex-grow">

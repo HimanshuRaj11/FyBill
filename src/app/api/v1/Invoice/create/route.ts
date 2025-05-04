@@ -24,6 +24,8 @@ export async function POST(request: Request) {
             return Response.json({ message: "Company not found" }, { status: 404 });
         }
         const Branch = await BranchModel.findOne({ companyId: User.companyId })
+        console.log(Branch);
+
         let companyAddress = ''
         if (Branch) {
             companyAddress = Branch.address.street + " " + Branch.address.city + " " + Branch.address.state + " " + Branch.address.country + " " + Branch.address.zipCode

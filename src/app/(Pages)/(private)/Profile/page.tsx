@@ -58,11 +58,18 @@ export default function ProfilePage() {
                                 <h1 className="text-2xl font-bold text-gray-900">{user?.name}</h1>
                                 <p className="text-sm text-gray-500">{user?.role}</p>
                             </div>
-                            <Button>
-                                <Link href="/Profile/edit">
-                                    Edit Profile
-                                </Link>
-                            </Button>
+                            <div className="space-x-2">
+                                <Button>
+                                    <Link href="/Profile/edit">
+                                        Edit Profile
+                                    </Link>
+                                </Button>
+                                <Button variant="outline">
+                                    <Link href="/Profile/update-password">
+                                        Update Password
+                                    </Link>
+                                </Button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -158,7 +165,7 @@ export default function ProfilePage() {
                 }
 
                 {
-                    company && (
+                    User?.role == "Owner" && company && (
                         <div className="mt-6 bg-white rounded-lg shadow-md p-6 space-y-6">
                             <h2 className="text-xl font-semibold text-gray-900">Company Details</h2>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -281,6 +288,7 @@ export default function ProfilePage() {
                                 </div>
 
                             </div>
+
                             {
                                 branches?.length > 0 && (
                                     <div className="mt-6">
@@ -386,6 +394,23 @@ export default function ProfilePage() {
                         </div>
                     )
                 }
+
+                {/* Account Security Section */}
+                <div className="mt-6 bg-white rounded-lg shadow-md p-6">
+                    <h2 className="text-xl font-semibold text-gray-900 border-b pb-2">
+                        Account Security
+                    </h2>
+                    <div className="mt-4">
+                        <p className="text-sm text-gray-500 mb-4">
+                            {`It's`} a good practice to update your password regularly to keep your account secure.
+                        </p>
+                        <Button variant="outline">
+                            <Link href="/Profile/update-password">
+                                Update Password
+                            </Link>
+                        </Button>
+                    </div>
+                </div>
             </div>
         </div>
     );

@@ -3,13 +3,17 @@ import type { NextRequest } from 'next/server'
 
 const publicPaths = ['/Login', '/Register', '/forgot-password', '/reset-password']
 const privatePaths = ['/Dashboard', '/Profile', '/Setting', '/Invoice', '/Customers', '/Staff', '/Bills', '/Products']
-
+const pathForStaff = [' / Profile', ' / Setting', ' / Invoice', ' / Customers', '/Bills']
 const isPublicPath = (path: string) => {
     return publicPaths.some(publicPath => path.startsWith(publicPath))
 }
 
 const isPrivatePath = (path: string) => {
     return privatePaths.some(privatePath => path.startsWith(privatePath))
+}
+
+const isStaffPath = (path: string) => {
+    return pathForStaff.some(pathForStaff => path.startsWith(pathForStaff))
 }
 
 const verifyToken = (request: NextRequest) => {

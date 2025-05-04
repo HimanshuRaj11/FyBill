@@ -22,10 +22,18 @@ export async function GET() {
         if (!company) {
             return NextResponse.json({ message: "Company not found", success: false }, { status: 404 });
         }
-        const invoices = await InvoiceModel.find({ companyId: companyId }).populate({
-            path: 'branchId',
-            model: branchModel
-        }).sort({ createdAt: -1 }).lean()
+        let invoices;
+        if (User?.role == 'Owner') {
+            invoices = await InvoiceModel.find({ companyId: companyId }).populate({
+                path: 'branchId',
+                model: branchModel
+            }).sort({ createdAt: -1 }).lean()
+        } else {
+            invoices = await InvoiceModel.find({ createdBy: user_id }).populate({
+                path: 'branchId',
+                model: branchModel
+            }).sort({ createdAt: -1 }).lean()
+        }
 
         return NextResponse.json({ invoices, success: true }, { status: 200 });
 
