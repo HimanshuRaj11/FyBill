@@ -3,12 +3,20 @@ import React from 'react'
 
 export default function PrintInvoiceFormate({ invoice }: { invoice: any }) {
 
+    const Branch = invoice?.branchId;
+    const Address = Branch?.address.street + " " + Branch?.address.city + " " + Branch?.address.state + " " + Branch?.address.country + " " + Branch?.address.zipCode
     return (
-        <div className="w-full max-w-xs mx-auto p-2 text-black">
+        <div className="w-[20rem] mx-auto p-2 text-black">
             {/* Header */}
             <div className="text-center mb-2">
                 <h2 className="text-xl font-bold">{invoice.companyName}</h2>
-                <p className="text-xs">{invoice.companyAddress}</p>
+                {
+                    Address ?
+                        <p className="text-xs">{Address}</p>
+                        :
+                        <p className="text-xs">{invoice.companyAddress}</p>
+
+                }
                 <div className="text-sm font-bold mt-1">INVOICE: {invoice.invoiceId}</div>
                 <div className="text-xs">
                     Date: {moment(invoice.createdAt).format('DD/MM/YYYY HH:mm')}

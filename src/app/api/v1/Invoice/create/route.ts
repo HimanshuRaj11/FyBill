@@ -23,9 +23,7 @@ export async function POST(request: Request) {
         if (!Company) {
             return Response.json({ message: "Company not found" }, { status: 404 });
         }
-        const Branch = await BranchModel.findOne({ companyId: User.companyId })
-        console.log(Branch);
-
+        const Branch = await BranchModel.findOne({ _id: User.branchId })
         let companyAddress = ''
         if (Branch) {
             companyAddress = Branch.address.street + " " + Branch.address.city + " " + Branch.address.state + " " + Branch.address.country + " " + Branch.address.zipCode
@@ -60,7 +58,7 @@ export async function POST(request: Request) {
             grandTotal,
             paymentMode,
             currency: Company.currency.symbol,
-            createdBy: User._id
+            createdBy: User._id,
         })
         if (User.branchId || selectedBranch) {
             invoice.branchId = User.branchId || selectedBranch;

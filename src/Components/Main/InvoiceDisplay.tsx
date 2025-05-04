@@ -11,28 +11,35 @@ import { toast } from "react-toastify";
 import { useSelector } from "react-redux";
 import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
+import { Dialog, DialogContent, DialogTitle } from "../ui/dialog";
+import PrintInvoiceFormate from "./PrintInvoiceFormate";
 
 
 export default function InvoiceDisplay({ invoice }: { invoice: any }) {
     const { User } = useSelector((state: any) => state.User);
     const user = User
+    const Branch = invoice?.branchId;
+    const Address = Branch?.address.street + " " + Branch?.address.city + " " + Branch?.address.state + " " + Branch?.address.country + " " + Branch?.address.zipCode
 
     const [isPrinting, setIsPrinting] = useState(false);
-    const invoiceRef = useRef<HTMLDivElement>(null);
     const router = useRouter();
     const handlePrint = () => {
+        setIsPrinting(true)
+    };
+    const invoiceRef = useRef<HTMLDivElement>(null);
+
+    const handlePrintDocument = (event: React.MouseEvent) => {
+        event.preventDefault();
         if (invoiceRef.current) {
-            setIsPrinting(true);
             const printContents = invoiceRef.current.innerHTML;
             const originalContents = document.body.innerHTML;
             document.body.innerHTML = printContents;
             window.print();
             document.body.innerHTML = originalContents;
             window.location.reload();
-            setIsPrinting(false);
         }
+        setIsPrinting(false)
     };
-
 
     const handleDownload = async () => {
         const element = document.getElementById('invoice-content');
@@ -65,6 +72,33 @@ export default function InvoiceDisplay({ invoice }: { invoice: any }) {
     }
     return (
         <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            {isPrinting && invoice && (
+                <div>
+                    <Dialog open={isPrinting} onOpenChange={setIsPrinting}>
+                        <DialogContent className="max-w-7xl w-full ">
+                            <DialogTitle>Print Invoice</DialogTitle>
+                            <div ref={invoiceRef} className="max-h-[80vh] overflow-auto">
+                                <PrintInvoiceFormate invoice={invoice} />
+                            </div>
+
+                            <div className="flex justify-end my-4">
+                                <Button
+                                    onClick={handlePrintDocument}
+                                    className="cursor-pointer w-full"
+                                    onKeyDown={(e) => e.key == "Enter" ? { handlePrintDocument } : ""}
+                                >
+                                    Print
+                                </Button>
+
+                            </div>
+                        </DialogContent>
+                    </Dialog>
+
+                </div>
+
+            )
+
+            }
             {/* Header with actions */}
             <div className="flex flex-col sm:flex-row items-center justify-between mb-8 gap-4">
                 <div className="w-full sm:w-auto flex items-center gap-3">
@@ -112,7 +146,7 @@ export default function InvoiceDisplay({ invoice }: { invoice: any }) {
                     transition={{ duration: 0.4 }}
                     className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300"
                 >
-                    <div ref={invoiceRef} className="p-4 sm:p-6 lg:p-8">
+                    <div className="p-4 sm:p-6 lg:p-8">
                         <div className="flex flex-col gap-4 mb-8">
                             <div className="flex flex-row justify-between">
                                 <h2 className="text-3xl sm:text-4xl font-bold text-gray-800">INVOICE</h2>
@@ -124,7 +158,12 @@ export default function InvoiceDisplay({ invoice }: { invoice: any }) {
                                 <div className="text-gray-500 space-y-1">
                                     <p className="font-medium">From:</p>
                                     <p className="text-lg">{invoice.companyName}</p>
-                                    <p className="text-sm">{invoice.companyAddress}</p>
+                                    {
+                                        Address ?
+                                            <p className="text-sm">{Address}</p>
+                                            :
+                                            <p className="text-sm">{invoice.companyAddress}</p>
+                                    }
                                 </div>
                             </div>
                             <div className="flex flex-col items-start md:items-end space-y-4">

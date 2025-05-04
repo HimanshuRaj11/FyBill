@@ -7,6 +7,7 @@ import { FiMail, FiLock, FiEye, FiEyeOff } from 'react-icons/fi'
 import { useDispatch } from 'react-redux'
 import { FetchUser } from '@/app/Redux/Slice/User.slice'
 import { useRouter } from 'next/navigation'
+import { FetchCompany } from '@/app/Redux/Slice/Company.slice'
 
 const base_url = process.env.NEXT_PUBLIC_BASE_URL
 
@@ -112,8 +113,9 @@ export default function Login() {
             const { data } = await axios.post(`${base_url}/api/v1/auth/Login`, InputData)
 
             if (data.success) {
-                router.push('/Dashboard')
+                router.push('/Bills/Create')
                 dispatch(FetchUser() as any);
+                dispatch(FetchCompany() as any);
                 toast.success(data.message)
                 return;
             }

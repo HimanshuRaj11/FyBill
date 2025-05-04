@@ -227,7 +227,6 @@ export default function BillingComponent() {
                 setGrandTotal(0);
             }
         } catch (error) {
-            console.error("Error creating invoice:", error);
             toast.error("Something went wrong");
         }
     };
@@ -248,7 +247,8 @@ export default function BillingComponent() {
                             <div className="flex justify-end my-4">
                                 <Button
                                     onClick={handlePrintDocument}
-                                    className="cursor-pointer w-full" >
+                                    className="cursor-pointer w-full"
+                                    onKeyDown={(e) => e.key == "Enter" ? { handlePrintDocument } : ""}>
                                     Print
                                 </Button>
 
@@ -463,6 +463,7 @@ export default function BillingComponent() {
                                 // printerStatus !== "Connected"
                             }
                             className="cursor-pointer w-full"
+                            onKeyDown={(e) => e.key == "Enter" ? { OnContinue } : ""}
                         >
                             Continue
                         </Button>
