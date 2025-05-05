@@ -26,9 +26,9 @@ export async function POST(request: Request) {
         const Branch = await BranchModel.findOne({ _id: User.branchId })
         let companyAddress = ''
         if (Branch) {
-            companyAddress = Branch.address.street + " " + Branch.address.city + " " + Branch.address.state + " " + Branch.address.country + " " + Branch.address.zipCode
+            companyAddress = Branch.address.street + " " + Branch.address.city + " " + Branch.address.state
         } else {
-            companyAddress = Company.address.street + " " + Company.address.city + " " + Company.address.state + " " + Company.address.country + " " + Company.address.zipCode
+            companyAddress = Company.address.street + " " + Company.address.city + " " + Company.address.state
         }
         const {
             clientName,

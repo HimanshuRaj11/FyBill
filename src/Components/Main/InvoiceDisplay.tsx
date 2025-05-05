@@ -16,10 +16,11 @@ import PrintInvoiceFormate from "./PrintInvoiceFormate";
 
 
 export default function InvoiceDisplay({ invoice }: { invoice: any }) {
+    const { Company } = useSelector((state: any) => state.Company)
     const { User } = useSelector((state: any) => state.User);
     const user = User
     const Branch = invoice?.branchId;
-    const Address = Branch?.address.street + " " + Branch?.address.city + " " + Branch?.address.state + " " + Branch?.address.country + " " + Branch?.address.zipCode
+    const Address = Branch?.address.street + " " + Branch?.address.city + " " + Branch?.address.state
 
     const [isPrinting, setIsPrinting] = useState(false);
     const router = useRouter();
@@ -125,7 +126,7 @@ export default function InvoiceDisplay({ invoice }: { invoice: any }) {
                         className="bg-indigo-600 hover:bg-indigo-700 text-white flex items-center gap-2 text-sm sm:text-base cursor-pointer"
                     >
                         <Printer className="h-4 w-4" />
-                        <span>{isPrinting ? 'Printing...' : 'Print'}</span>
+                        <span>Print</span>
                     </Button>
                     {/* <Button
                         onClick={handleDownload}
@@ -155,7 +156,7 @@ export default function InvoiceDisplay({ invoice }: { invoice: any }) {
                                 </div>
                             </div>
                             <div className="space-y-4">
-                                <div className="text-gray-500 space-y-1">
+                                <div className="space-y-1">
                                     <p className="font-medium">From:</p>
                                     <p className="text-lg">{invoice.companyName}</p>
                                     {
@@ -165,11 +166,14 @@ export default function InvoiceDisplay({ invoice }: { invoice: any }) {
                                             <p className="text-sm">{invoice.companyAddress}</p>
                                     }
                                 </div>
+                                <div className="">
+                                    {Branch?.phone ? Branch?.phone : Company?.phone}
+                                </div>
                             </div>
                             <div className="flex flex-col items-start md:items-end space-y-4">
                                 <div className="text-left md:text-right text-gray-500">
                                     <p className="font-medium">Date Issued:</p>
-                                    <p>{moment(invoice.createdAt).format('DD/MM/YYYY HH:mm')}</p>
+                                    <p>{moment(invoice.createdAt).format('DD/MM/YYYY HH:mm A')}</p>
                                 </div>
                             </div>
                         </div>

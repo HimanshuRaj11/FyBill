@@ -11,6 +11,7 @@ export interface ICompany extends Document {
     };
     email?: string;
     phone: string;
+    countryCode: string;
     gstNumber?: string;
     panNumber?: string;
     logoUrl?: string;
@@ -43,6 +44,7 @@ const CompanySchema: Schema = new Schema<ICompany>(
         },
         email: { type: String },
         phone: { type: String, required: true },
+        countryCode: { type: String, },
         gstNumber: { type: String },
         panNumber: { type: String },
         logoUrl: { type: String },
