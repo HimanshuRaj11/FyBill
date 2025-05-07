@@ -6,7 +6,7 @@ import { useSelector } from 'react-redux';
 export default function PrintInvoiceFormate({ invoice }: { invoice: any }) {
     const { Company } = useSelector((state: any) => state.Company)
     const Branch = invoice?.branchId;
-    const Address = Branch?.address.street + " " + Branch?.address.city + " " + Branch?.address.state
+    const Address = Branch?.address?.street + " " + Branch?.address?.city + " " + Branch?.address?.state
 
 
     const formatPhoneNumber = (phone: number) => {
