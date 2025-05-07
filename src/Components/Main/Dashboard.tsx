@@ -76,7 +76,7 @@ export default function Dashboard() {
                 </div>
             </div>
             {
-                User.role == "Owner" && (
+                User?.role == "Owner" && (
                     <div className="flex flex-row justify-start mb-2.5 gap-2">
                         <div onClick={() => filterInvoice("")} className='flex justify-center items-center p-2 rounded-lg bg-gray-100 cursor-pointer hover:shadow-md transition-colors'>
                             <span className="text-md text-gray-900 font-semibold min-w-20 text-center">All</span>
