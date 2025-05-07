@@ -33,16 +33,15 @@ export default function Sidebar() {
                         </Button>
                         <div className="h-full px-3 py-4 overflow-y-auto rounded-2xl  bg-gray-50 dark:bg-gray-800">
                             <ul className="space-y-2 font-medium">
+                                <li>
+                                    <Link href="/Dashboard" className={`flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-300 dark:hover:bg-gray-700 group ${isActive('/Dashboard') ? 'bg-gray-300 dark:bg-gray-700' : ''}`}>
+                                        <FaTachometerAlt className={`w-5 h-5 transition duration-75 ${isActive('/Dashboard') ? 'text-gray-900 dark:text-white' : 'text-gray-500 dark:text-gray-400'} group-hover:text-gray-900 dark:group-hover:text-white`} aria-hidden="true" />
+                                        <span className="ms-3">Dashboard</span>
+                                    </Link>
+                                </li>
                                 {
                                     User?.role == "Owner" && (
                                         <>
-                                            <li>
-                                                <Link href="/Dashboard" className={`flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-300 dark:hover:bg-gray-700 group ${isActive('/Dashboard') ? 'bg-gray-300 dark:bg-gray-700' : ''}`}>
-                                                    <FaTachometerAlt className={`w-5 h-5 transition duration-75 ${isActive('/Dashboard') ? 'text-gray-900 dark:text-white' : 'text-gray-500 dark:text-gray-400'} group-hover:text-gray-900 dark:group-hover:text-white`} aria-hidden="true" />
-                                                    <span className="ms-3">Dashboard</span>
-                                                </Link>
-                                            </li>
-
                                             <li>
                                                 <Link href="/Staff" className={`flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-300 dark:hover:bg-gray-700 group ${isActive('/Staff') ? 'bg-gray-300 dark:bg-gray-700' : ''}`}>
                                                     <FaUsers className={`shrink-0 w-5 h-5 transition duration-75 ${isActive('/Staff') ? 'text-gray-900 dark:text-white' : 'text-gray-500 dark:text-gray-400'} group-hover:text-gray-900 dark:group-hover:text-white`} aria-hidden="true" />

@@ -14,6 +14,7 @@ export async function POST(request: Request) {
         const userId = await verifyUser();
 
         const user = await UserModel.findById(userId);
+        console.log(user, "old");
 
         if (!user) {
             return NextResponse.json({ message: "User not found" });
@@ -23,22 +24,17 @@ export async function POST(request: Request) {
         const CheckPassword = bcrypt.compareSync(currentPassword, user.password);
 
         if (!CheckPassword) {
-            return NextResponse.json({ message: "Wrong Password!!" });
+            return NextResponse.json({ message: "Wrong Current Password!!", success: false });
         }
         const hashedPassword = bcrypt.hashSync(newPassword, salt);
 
-        await user.updateOne({
+        const Up = await user.updateOne({
             password: hashedPassword,
-        }).then(() => {
-            return NextResponse.json({ message: "Password updated successfully", success: true });
-        }).catch((err: any) => {
-            return NextResponse.json({ message: "Failed to update Password", error: err, success: false });
         })
+        console.log(Up);
 
+        return NextResponse.json({ message: "Password updated successfully", success: true });
 
-
-
-        return NextResponse.json({ message: "Staff registered", });
     } catch (error) {
         console.error("Error registering staff:", error);
         return NextResponse.json({ message: "Internal server error" });

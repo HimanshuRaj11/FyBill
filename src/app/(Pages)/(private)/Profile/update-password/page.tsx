@@ -121,16 +121,19 @@ export default function UpdatePassword() {
 
         setLoading(true);
         try {
-            const response = await axios.put(
+            const { data } = await axios.post(
                 `${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/user/update-password`,
                 {
                     currentPassword: formData.currentPassword,
                     newPassword: formData.newPassword
                 }
             );
-
-            if (response.data.success) {
-                toast.success('Password updated successfully');
+            console.log(data);
+            if (data.success == false) {
+                toast.error(data.message);
+            }
+            if (data.success) {
+                toast.success(data.message);
                 router.push('/Profile');
             }
         } catch (error: any) {

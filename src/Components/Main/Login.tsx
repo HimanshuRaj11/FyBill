@@ -113,7 +113,7 @@ export default function Login() {
             const { data } = await axios.post(`${base_url}/api/v1/auth/Login`, InputData)
 
             if (data.success) {
-                router.push('/Bills/Create')
+                router.push('/Dashboard')
                 dispatch(FetchUser() as any);
                 dispatch(FetchCompany() as any);
                 toast.success(data.message)
