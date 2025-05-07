@@ -6,17 +6,17 @@ import { useSelector } from 'react-redux';
 export default function PrintInvoiceFormate({ invoice }: { invoice: any }) {
     const { Company } = useSelector((state: any) => state.Company)
     const Branch = invoice?.branchId;
-    const Address = Branch?.address?.street + " " + Branch?.address?.city + " " + Branch?.address?.state
 
-
-    const formatPhoneNumber = (phone: number) => {
-        const cleaned = ('' + phone).replace(/\D/g, '');
-        const match = cleaned.match(/^(\d{3})(\d{3})(\d{4})$/);
-        if (match) {
-            return `(${match[1]}) ${match[2]}-${match[3]}`;
-        }
-        return phone; // return original if format fails
+    let Address;
+    if (Branch?.address) {
+        Address = Branch?.address?.street + " " + Branch?.address?.city + " " + Branch?.address?.state
     }
+    console.log(Address);
+
+    console.log(invoice);
+
+
+
     return (
         <div className="w-[20rem] mx-auto p-2 text-black uppercase text-">
             {/* Header */}
@@ -31,7 +31,7 @@ export default function PrintInvoiceFormate({ invoice }: { invoice: any }) {
                 }
                 <div className="text-center mb-2">
                     <p className='text-sm font-semibold'>
-                        {Branch?.phone ? formatPhoneNumber(Branch.phone) : formatPhoneNumber(Company?.phone)}
+                        {Branch?.phone ? Branch.phone : Company?.phone}
                     </p>
 
                 </div>

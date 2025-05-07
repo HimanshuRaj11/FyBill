@@ -23,6 +23,7 @@ export async function GET() {
             return NextResponse.json({ message: "Company not found", success: false }, { status: 404 });
         }
         let invoices;
+
         if (User?.role == 'Owner') {
             invoices = await InvoiceModel.find({ companyId: companyId }).populate({
                 path: 'branchId',

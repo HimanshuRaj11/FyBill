@@ -23,13 +23,7 @@ export async function POST(request: Request) {
         if (!Company) {
             return Response.json({ message: "Company not found" }, { status: 404 });
         }
-        const Branch = await BranchModel.findOne({ _id: User.branchId })
-        let companyAddress = ''
-        if (Branch) {
-            companyAddress = Branch.address.street + " " + Branch.address.city + " " + Branch.address.state
-        } else {
-            companyAddress = Company.address.street + " " + Company.address.city + " " + Company.address.state
-        }
+
         const {
             clientName,
             phoneNumber,
@@ -42,6 +36,13 @@ export async function POST(request: Request) {
             selectedBranch
         } = await request.json();
 
+        const Branch = await BranchModel.findOne({ _id: User.branchId || selectedBranch })
+        let companyAddress = ''
+        if (Branch) {
+            companyAddress = Branch.address.street + " " + Branch.address.city + " " + Branch.address.state
+        } else {
+            companyAddress = Company.address.street + " " + Company.address.city + " " + Company.address.state
+        }
 
         const invoice = await InvoiceModel.create({
             invoiceId: Unique_id,
