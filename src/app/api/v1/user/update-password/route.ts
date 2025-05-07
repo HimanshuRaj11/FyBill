@@ -12,10 +12,7 @@ export async function POST(request: Request) {
     try {
         // await connectDB();
         const userId = await verifyUser();
-
         const user = await UserModel.findById(userId);
-        console.log(user, "old");
-
         if (!user) {
             return NextResponse.json({ message: "User not found" });
         }
@@ -28,10 +25,9 @@ export async function POST(request: Request) {
         }
         const hashedPassword = bcrypt.hashSync(newPassword, salt);
 
-        const Up = await user.updateOne({
+        await user.updateOne({
             password: hashedPassword,
         })
-        console.log(Up);
 
         return NextResponse.json({ message: "Password updated successfully", success: true });
 
