@@ -158,9 +158,16 @@ export default function InvoiceDisplay({ invoice }: { invoice: any }) {
                             </div>
                             <div className="space-y-4">
                                 <div className="space-y-1">
-                                    <h1 className='text-sm'>
-                                        {invoice?.BillType ? "Bill Type: " + invoice?.BillType : ""}
-                                    </h1>
+                                    {
+                                        invoice?.BillType ?
+                                            <div className="flex flex-row">
+                                                <p className="text-2xl font-bold"> Bill Type : </p>
+                                                <p className='text-2xl font-bold'>
+                                                    {invoice?.BillType}
+                                                </p>
+                                            </div>
+                                            : ""
+                                    }
                                     <p className="font-medium">From:</p>
                                     <p className="text-lg">{invoice.companyName}</p>
                                     {

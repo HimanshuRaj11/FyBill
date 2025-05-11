@@ -15,9 +15,16 @@ export default function PrintInvoiceFormate({ invoice }: { invoice: any }) {
     return (
         <div className="w-[20rem] mx-auto p-2 text-black uppercase text-">
             <div className="flex justify-end">
-                <h1 className='font-black text-xl'>
-                    {invoice?.BillType ? "Bill Type: " + invoice?.BillType : ""}
-                </h1>
+                {
+                    invoice?.BillType ?
+                        <div className="flex flex-row">
+                            <p className="text-xl font-bold">#</p>
+                            <p className='text-xl font-bold'>
+                                {invoice?.BillType}
+                            </p>
+                        </div>
+                        : ""
+                }
             </div>
             {/* Header */}
             <div className="text-center mb-2">
