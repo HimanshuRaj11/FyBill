@@ -168,7 +168,7 @@ export default function Staff() {
                                     variant="destructive"
                                     size="sm"
                                     onClick={() => handleDelete(staff._id)}
-                                    className="text-sm"
+                                    className="text-sm cursor-pointer"
                                 >
                                     Delete
                                 </Button>

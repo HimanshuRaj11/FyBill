@@ -16,7 +16,6 @@ export async function POST(req: Request) {
         if (!Company) { return NextResponse.json({ success: false, message: "Company not found" }, { status: 404 }) }
 
         const { currency } = await req.json();
-        console.log(currency);
 
         await Company.updateOne({ currency: currency });
 

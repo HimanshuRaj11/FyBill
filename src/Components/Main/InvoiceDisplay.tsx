@@ -151,12 +151,16 @@ export default function InvoiceDisplay({ invoice }: { invoice: any }) {
                         <div className="flex flex-col gap-4 mb-8">
                             <div className="flex flex-row justify-between">
                                 <h2 className="text-3xl sm:text-4xl font-bold text-gray-800">INVOICE</h2>
+
                                 <div className="bg-indigo-50 text-indigo-700 px-6 py-3 rounded-lg font-bold text-lg">
                                     {invoice.invoiceId}
                                 </div>
                             </div>
                             <div className="space-y-4">
                                 <div className="space-y-1">
+                                    <h1 className='text-sm'>
+                                        {invoice?.BillType ? "Bill Type: " + invoice?.BillType : ""}
+                                    </h1>
                                     <p className="font-medium">From:</p>
                                     <p className="text-lg">{invoice.companyName}</p>
                                     {

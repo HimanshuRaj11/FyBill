@@ -11,14 +11,14 @@ export default function PrintInvoiceFormate({ invoice }: { invoice: any }) {
     if (Branch?.address) {
         Address = Branch?.address?.street + " " + Branch?.address?.city + " " + Branch?.address?.state
     }
-    console.log(Address);
-
-    console.log(invoice);
-
-
 
     return (
         <div className="w-[20rem] mx-auto p-2 text-black uppercase text-">
+            <div className="flex justify-end">
+                <h1 className='font-black text-xl'>
+                    {invoice?.BillType ? "Bill Type: " + invoice?.BillType : ""}
+                </h1>
+            </div>
             {/* Header */}
             <div className="text-center mb-2">
                 <h2 className="text-2xl font-bold">{invoice.companyName}</h2>

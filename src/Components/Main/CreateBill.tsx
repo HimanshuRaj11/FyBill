@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import BillProductEdit from "../Other/BillProductEdit";
 import { DialogTitle } from "@radix-ui/react-dialog";
 import PrintInvoiceFormate from "./PrintInvoiceFormate";
+import Link from "next/link";
 
 interface Product {
     name: string;
@@ -28,6 +29,7 @@ export default function BillingComponent() {
     const { User } = useSelector((state: any) => state.User)
     const { Company } = useSelector((state: any) => state.Company)
     const [invoice, setInvoice] = useState<any>(null);
+    const [BillType, setBillType] = useState("");
     const [clientName, setClientName] = useState("");
     const [phoneNumber, setPhoneNumber] = useState("");
     const [productName, setProductName] = useState("");
@@ -214,7 +216,8 @@ export default function BillingComponent() {
                 paymentMode,
                 appliedTaxes,
                 totalTaxAmount,
-                selectedBranch, // Pass selected branch
+                BillType,
+                selectedBranch,
             });
 
             if (data.invoice) {
@@ -235,6 +238,7 @@ export default function BillingComponent() {
 
     return (
         <>
+
             {showInvoice && invoice && (
                 <div>
                     <Dialog open={showInvoice} onOpenChange={setShowInvoice}>
@@ -262,8 +266,14 @@ export default function BillingComponent() {
 
             }
 
+            <div className="my-3">
+                <Link href={'/Dashboard'} >
+                    <Button className="cursor-pointer">
+                        Go To Dashboard
+                    </Button>
+                </Link>
+            </div>
             <div className="flex justify-between flex-col sm:flex-row gap-2">
-
                 <div className="w-[50%] mx-auto p-6 bg-white rounded-2xl shadow-2xl">
                     {User?.role === "Owner" && (
                         <div className=" ">
@@ -302,6 +312,25 @@ export default function BillingComponent() {
                             value={phoneNumber}
                             onChange={(e) => setPhoneNumber(e.target.value)}
                         />
+                    </div>
+                    <div className="my-6">
+                        <label className="block text-sm font-medium mb-2">Bill Type</label>
+                        <select
+                            className="w-full p-2 border rounded-md bg-white"
+                            onChange={(e) => setBillType(e.target.value)}
+                            value={BillType}
+                        >
+                            <option value="" disabled>
+                                Select Bill type
+                            </option>
+                            <option value="BILL" >
+                                Bill
+                            </option>
+                            <option value="KOT">
+                                KOT
+                            </option>
+
+                        </select>
                     </div>
 
                     <div className="flex">

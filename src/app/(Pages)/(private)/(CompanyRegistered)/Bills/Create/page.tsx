@@ -11,14 +11,14 @@ export default function Page() {
     const [products, setProducts] = useState<any[]>([]);
     const [loading, setLoading] = useState(false);
     const fetchProducts = async () => {
+        setLoading(true)
         const res = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/company/product/fetch`);
         const data = res.data;
         setProducts(data.products);
+        setLoading(false)
     }
     useEffect(() => {
-        setLoading(true);
         fetchProducts();
-        setLoading(false);
     }, []);
 
     if (loading) {
@@ -28,7 +28,7 @@ export default function Page() {
     return (
         <div className=''>
             {
-                products.length === 0 ? (
+                products?.length === 0 ? (
                     <div className="min-h-screen flex flex-col items-center justify-center space-y-6">
                         <div className="min-h-screen flex flex-col items-center justify-center space-y-6">
                             <div className="text-center space-y-4">

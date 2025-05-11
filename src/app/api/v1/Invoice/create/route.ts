@@ -32,6 +32,7 @@ export async function POST(request: Request) {
             appliedTaxes,
             totalTaxAmount,
             grandTotal,
+            BillType,
             paymentMode,
             selectedBranch
         } = await request.json();
@@ -56,6 +57,7 @@ export async function POST(request: Request) {
             subTotal,
             appliedTaxes,
             totalTaxAmount,
+            BillType,
             grandTotal,
             paymentMode,
             currency: Company.currency.symbol,
