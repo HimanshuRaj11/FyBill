@@ -275,7 +275,7 @@ export default function BillingComponent() {
                 </Link>
             </div>
             <div className="flex justify-between flex-col sm:flex-row gap-2">
-                <div className="w-[50%] mx-auto p-6 bg-white rounded-2xl shadow-2xl">
+                <div className=" w-[100%] sm:w-[50%] mx-auto p-6 bg-white rounded-2xl shadow-2xl">
                     {User?.role === "Owner" && (
                         <div className=" ">
                             {
@@ -383,7 +383,7 @@ export default function BillingComponent() {
                 </div>
 
                 {/* Bill Summary */}
-                <div className="mx-auto h-fit p-6 w-[50%] sm:w-auto bg-white rounded-2xl shadow-2xl">
+                <div className="mx-auto h-fit p-6 w-[100%] sm:w-auto bg-white rounded-2xl shadow-2xl">
                     <div className="flex justify-around">
                         <div>
                             <label className="block text-sm font-medium mb-1">Name</label>

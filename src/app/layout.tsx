@@ -37,7 +37,7 @@ export default function RootLayout({
           <ToastContainer />
           <Navbar />
           <div className="mt-20">
-            <div className="px-4 pb-4">
+            <div className="sm:px-4 pb-4">
               {children}
             </div>
           </div>
