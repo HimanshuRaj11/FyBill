@@ -92,6 +92,7 @@ export default function BillingComponent() {
                 },
             ]);
         }
+        setProductName('')
     };
 
     const handleDelete = (index: number) => {
