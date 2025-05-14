@@ -316,22 +316,32 @@ export default function BillingComponent() {
                     </div>
                     <div className="my-6">
                         <label className="block text-sm font-medium mb-2">Bill Type</label>
-                        <select
-                            className="w-full p-2 border rounded-md bg-white"
-                            onChange={(e) => setBillType(e.target.value)}
-                            value={BillType}
-                        >
-                            <option value="" disabled>
-                                Select Bill type
-                            </option>
-                            <option value="BILL" >
-                                Bill
-                            </option>
-                            <option value="KOT">
-                                KOT
-                            </option>
-
-                        </select>
+                        <div className="flex space-x-4">
+                            <div className="flex items-center">
+                                <input
+                                    type="radio"
+                                    id="bill-type-bill"
+                                    name="billType"
+                                    value="BILL"
+                                    checked={BillType === "BILL"}
+                                    onChange={(e) => setBillType(e.target.value)}
+                                    className="mr-2"
+                                />
+                                <label htmlFor="bill-type-bill">Bill</label>
+                            </div>
+                            <div className="flex items-center">
+                                <input
+                                    type="radio"
+                                    id="bill-type-kot"
+                                    name="billType"
+                                    value="KOT"
+                                    checked={BillType === "KOT"}
+                                    onChange={(e) => setBillType(e.target.value)}
+                                    className="mr-2"
+                                />
+                                <label htmlFor="bill-type-kot">KOT</label>
+                            </div>
+                        </div>
                     </div>
 
                     <div className="flex">
@@ -383,7 +393,7 @@ export default function BillingComponent() {
                 </div>
 
                 {/* Bill Summary */}
-                <div className="mx-auto h-fit p-6 w-[100%] sm:w-auto bg-white rounded-2xl shadow-2xl">
+                <div className="mx-auto h-fit p-6 w-[100%] sm:w-[40%] bg-white rounded-2xl shadow-2xl">
                     <div className="flex justify-around">
                         <div>
                             <label className="block text-sm font-medium mb-1">Name</label>
