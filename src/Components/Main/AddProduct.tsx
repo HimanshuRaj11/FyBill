@@ -49,12 +49,6 @@ export default function AddProduct() {
     }, []);
 
 
-    if (User?.role !== "admin" && User?.role !== "Owner") {
-        toast.error("You are not authorized to add Products")
-        router.back()
-        return
-    }
-
 
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {

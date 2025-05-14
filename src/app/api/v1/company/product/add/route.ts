@@ -13,10 +13,10 @@ export async function POST(request: NextRequest) {
         if (!User) {
             return NextResponse.json({ success: false, error: 'User not found' });
         }
-        const checkUserRole = User.role === 'Owner' || User.role === 'admin';
-        if (!checkUserRole) {
-            return NextResponse.json({ success: false, error: 'Unauthorized' });
-        }
+        // const checkUserRole = User.role === 'Owner' || User.role === 'admin';
+        // if (!checkUserRole) {
+        //     return NextResponse.json({ success: false, error: 'Unauthorized' });
+        // }
 
 
         const company = await CompanyModel.findById({ _id: User.companyId });

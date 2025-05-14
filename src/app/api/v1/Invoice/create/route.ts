@@ -36,6 +36,8 @@ export async function POST(request: Request) {
             paymentMode,
             selectedBranch
         } = await request.json();
+        console.log(totalTaxAmount, grandTotal);
+
 
         const Branch = await BranchModel.findOne({ _id: User.branchId || selectedBranch })
         let companyAddress = ''

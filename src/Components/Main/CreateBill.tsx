@@ -21,7 +21,7 @@ interface Product {
 }
 const ComplementProduct = {
     name: "Complement",
-    rate: 0,
+    price: 0,
     amount: 0,
     quantity: 1,
 }
@@ -29,6 +29,7 @@ export default function BillingComponent() {
     const { User } = useSelector((state: any) => state.User)
     const { Company } = useSelector((state: any) => state.Company)
     const [invoice, setInvoice] = useState<any>(null);
+
     const [BillType, setBillType] = useState("");
     const [clientName, setClientName] = useState("");
     const [phoneNumber, setPhoneNumber] = useState("");
@@ -189,7 +190,6 @@ export default function BillingComponent() {
         }
         setShowInvoice(false);
     };
-
     const OnContinue = async () => {
         try {
             if (products.length === 0) {
@@ -197,7 +197,7 @@ export default function BillingComponent() {
                 return;
             }
 
-            if (paymentMode === "") {
+            if (BillType != 'KOT' && paymentMode === "") {
                 toast.error("Please select payment mode");
                 return;
             }
@@ -398,9 +398,15 @@ export default function BillingComponent() {
                         <thead className="bg-gray-100">
                             <tr>
                                 <th className="p-2">Product Name</th>
-                                <th className="p-2">Rate</th>
+                                {
+                                    BillType != 'KOT' &&
+                                    <th className="p-2">Rate</th>
+                                }
                                 <th className="p-2">Quantity</th>
-                                <th className="p-2">Amount</th>
+                                {
+                                    BillType != 'KOT' &&
+                                    <th className="p-2">Amount</th>
+                                }
                                 <th className="p-2">Actions</th>
                             </tr>
                         </thead>
@@ -408,7 +414,10 @@ export default function BillingComponent() {
                             {products.map((product, index) => (
                                 <tr key={index} className="border-t">
                                     <td className="p-2">{product.name}</td>
-                                    <td className="p-2">₹{product.rate}</td>
+                                    {
+                                        BillType != 'KOT' &&
+                                        <td className="p-2">₹{product.rate}</td>
+                                    }
                                     <td className="p-2 flex items-center gap-2">
                                         <Button
                                             size="sm"
@@ -428,7 +437,10 @@ export default function BillingComponent() {
                                             <Plus />
                                         </Button>
                                     </td>
-                                    <td className="p-2">₹{product.amount}</td>
+                                    {
+                                        BillType != "KOT" &&
+                                        <td className="p-2">₹{product.amount}</td>
+                                    }
                                     <td className="p-2 space-x-2">
                                         <Button
                                             size="sm"
@@ -438,14 +450,17 @@ export default function BillingComponent() {
                                         >
                                             <Trash2 />
                                         </Button>
-                                        <Button
-                                            size="sm"
-                                            className="cursor-pointer"
-                                            variant="secondary"
-                                            onClick={() => handleProductEdit(product, index)}
-                                        >
-                                            <Edit />
-                                        </Button>
+                                        {
+                                            BillType != 'KOT' &&
+                                            <Button
+                                                size="sm"
+                                                className="cursor-pointer"
+                                                variant="secondary"
+                                                onClick={() => handleProductEdit(product, index)}
+                                            >
+                                                <Edit />
+                                            </Button>
+                                        }
                                     </td>
                                     <Dialog open={editProductPopUp} onOpenChange={setEditProductPopUp}>
                                         <DialogContent className="max-w-7xl w-full max-h-[90vh] overflow-auto">
@@ -460,37 +475,40 @@ export default function BillingComponent() {
                             ))}
                         </tbody>
                     </table>
-                    <div className="mt-6 space-y-4">
-                        <div className="flex justify-between items-center border-t pt-4">
-                            <span className="text-sm font-medium">Sub Total:</span>
-                            <span>₹{subTotal.toFixed(2)}</span>
-                        </div>
-                        {appliedTaxes?.map((tax, index) => (
-                            <div key={index} className="flex justify-between items-center">
-                                <span className="text-sm font-medium">
-                                    {tax.taxName} ({tax.percentage}%):
-                                </span>
-                                <span>₹{tax.amount.toFixed(2)}</span>
+                    {
+                        BillType != 'KOT' &&
+                        <div className="mt-6 space-y-4">
+                            <div className="flex justify-between items-center border-t pt-4">
+                                <span className="text-sm font-medium">Sub Total:</span>
+                                <span>₹{subTotal.toFixed(2)}</span>
                             </div>
-                        ))}
-                        <div className="flex justify-between items-center border-t pt-4">
-                            <span>Total Tax Amount:</span>
-                            <span>
-                                ₹{appliedTaxes?.reduce((sum, tax) => sum + tax.amount, 0)?.toFixed(2)}
-                            </span>
+                            {appliedTaxes?.map((tax, index) => (
+                                <div key={index} className="flex justify-between items-center">
+                                    <span className="text-sm font-medium">
+                                        {tax.taxName} ({tax.percentage}%):
+                                    </span>
+                                    <span>₹{tax.amount.toFixed(2)}</span>
+                                </div>
+                            ))}
+                            <div className="flex justify-between items-center border-t pt-4">
+                                <span>Total Tax Amount:</span>
+                                <span>
+                                    ₹{appliedTaxes?.reduce((sum, tax) => sum + tax.amount, 0)?.toFixed(2)}
+                                </span>
+                            </div>
+                            <div className="flex justify-between items-center border-t pt-4 font-bold">
+                                <span>Grand Total:</span>
+                                <span>₹{grandTotal.toFixed(2)}</span>
+                            </div>
                         </div>
-                        <div className="flex justify-between items-center border-t pt-4 font-bold">
-                            <span>Grand Total:</span>
-                            <span>₹{grandTotal.toFixed(2)}</span>
-                        </div>
-                    </div>
+                    }
+
                     <div className="flex justify-end my-4">
                         <Button
                             onClick={OnContinue}
                             disabled={
                                 products.length === 0 ||
-                                paymentMode === ""
-                                // printerStatus !== "Connected"
+                                BillType != 'KOT' && paymentMode === ""
                             }
                             className="cursor-pointer w-full"
                             onKeyDown={(e) => e.key == "Enter" ? { OnContinue } : ""}
