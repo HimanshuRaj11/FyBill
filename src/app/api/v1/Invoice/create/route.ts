@@ -34,11 +34,10 @@ export async function POST(request: Request) {
             grandTotal,
             BillType,
             paymentMode,
-            selectedBranch
+            selectedBranch,
+            InvoiceStatus,
+            HoldedInvoice
         } = await request.json();
-        console.log(totalTaxAmount, grandTotal);
-
-
         const Branch = await BranchModel.findOne({ _id: User.branchId || selectedBranch })
         let companyAddress = ''
         if (Branch) {
@@ -46,6 +45,23 @@ export async function POST(request: Request) {
         } else {
             companyAddress = Company.address.street + " " + Company.address.city + " " + Company.address.state
         }
+
+        if (HoldedInvoice) {
+            const HoldInvoice = await InvoiceModel.findByIdAndUpdate({ _id: HoldedInvoice }, {
+                clientName,
+                clientPhone: phoneNumber,
+                products,
+                subTotal,
+                appliedTaxes,
+                totalTaxAmount,
+                grandTotal,
+                BillType,
+                paymentMode,
+                InvoiceStatus,
+            })
+
+        }
+
 
         const invoice = await InvoiceModel.create({
             invoiceId: Unique_id,
@@ -62,8 +78,10 @@ export async function POST(request: Request) {
             BillType,
             grandTotal,
             paymentMode,
+            InvoiceStatus,
             currency: Company.currency.symbol,
             createdBy: User._id,
+
         })
         if (User.branchId || selectedBranch) {
             invoice.branchId = User.branchId || selectedBranch;
@@ -75,7 +93,6 @@ export async function POST(request: Request) {
         return Response.json({ message: "Invoice created successfully", invoice }, { status: 200 });
 
     } catch (error) {
-        console.log(error);
         return Response.json({ message: "Internal server error", error }, { status: 500 });
     }
 

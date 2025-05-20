@@ -8,7 +8,7 @@ export async function POST(request: NextRequest) {
     try {
         MenuData.map(async (menu) => {
 
-            // const product = await ProductModel.create(menu);
+            const product = await ProductModel.create(menu);
         })
         return NextResponse.json({ success: true });
     } catch (error) {

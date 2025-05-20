@@ -1,5 +1,6 @@
 'use client'
 import BillingComponent from '@/Components/Main/CreateBill'
+import HeldInvoices from '@/Components/Other/HeldInvoices';
 import WebLoader from '@/Components/Other/loader';
 
 import { Button } from '@/Components/ui/button'
@@ -10,6 +11,8 @@ import React, { useEffect, useState } from 'react'
 export default function Page() {
     const [products, setProducts] = useState<any[]>([]);
     const [loading, setLoading] = useState(false);
+    const [HoldInvoices, setHoldInvoices] = useState<any>(null);
+    const [HoldInvoiceUpdate, setHoldInvoiceUpdate] = useState<any>(null)
     const fetchProducts = async () => {
         setLoading(true)
         const res = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/company/product/fetch`);
@@ -21,10 +24,27 @@ export default function Page() {
         fetchProducts();
     }, []);
 
+
+    const FetchHoldInvoices = async () => {
+        try {
+            const { data } = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/Invoice/fetchHoldInvoices`)
+            if (data.success) {
+                setHoldInvoices(data.invoices);
+            }
+        } catch (error) {
+            return
+        }
+    }
+
+
+    useEffect(() => {
+        FetchHoldInvoices()
+    }, [])
+
+
     if (loading) {
         return <WebLoader />
     }
-
     return (
         <div className=''>
             {
@@ -47,8 +67,13 @@ export default function Page() {
                     </div>
                 ) : (
                     <>
-                        <BillingComponent />
+                        <BillingComponent HoldInvoiceUpdate={HoldInvoiceUpdate} setHoldInvoices={setHoldInvoices} />
                     </>
+                )
+            }
+            {
+                HoldInvoices?.length > 0 && (
+                    <HeldInvoices HoldInvoices={HoldInvoices} setHoldInvoiceUpdate={setHoldInvoiceUpdate} />
                 )
             }
         </div>

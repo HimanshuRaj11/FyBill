@@ -1,12 +1,11 @@
 export const MenuData = [
-
     // {
-    //     name: "Paneer tikka",
-    //     price: 1900,
+    //     name: "Rajma (Kidney Beans) with Lachha Parata",
+    //     price: 1300,
     //     description: "",
-    //     category: "Veg Appetizer",
+    //     category: "Lunch Special",
     //     companyId: "6803e4c62a9cdbcaf5b3e6e4",
-    //     branchId: "680e7ca78749137a2cf7c8ad"
+    //     branchId: "6804bb2d07e003e9a987349a"
     // },
 
 

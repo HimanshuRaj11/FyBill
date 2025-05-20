@@ -7,7 +7,6 @@ import { NextResponse } from "next/server";
 import moment from "moment";
 const today = moment().startOf('day').toDate();
 const tomorrow = moment().startOf('day').add(1, 'day').toDate();
-
 export async function GET() {
     try {
         const user_id = await verifyUser();
@@ -29,26 +28,27 @@ export async function GET() {
 
         if (User?.role == 'Owner') {
             invoices = await InvoiceModel.find({
-                companyId: companyId, createdAt: {
+                companyId: companyId,
+                createdAt: {
                     $gte: today,
                     $lt: tomorrow
-                },
-                InvoiceStatus: "Done"
+                }, InvoiceStatus: "Hold"
             }).populate({
                 path: 'branchId',
                 model: branchModel
-            }).sort({ createdAt: -1 }).lean()
+            }).sort({ updatedAt: -1 }).lean()
         } else {
             invoices = await InvoiceModel.find({
-                createdBy: user_id, createdAt: {
+                createdBy: user_id,
+                createdAt: {
                     $gte: today,
                     $lt: tomorrow
                 },
-                InvoiceStatus: "Done"
+                InvoiceStatus: "Hold"
             }).populate({
                 path: 'branchId',
                 model: branchModel
-            }).sort({ createdAt: -1 }).lean()
+            }).sort({ updatedAt: -1 }).lean()
         }
 
         return NextResponse.json({ invoices, success: true }, { status: 200 });

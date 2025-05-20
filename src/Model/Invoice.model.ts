@@ -34,6 +34,7 @@ export interface IInvoice extends Document {
     createdAt: Date;
     updatedAt: Date;
     currency: string;
+    InvoiceStatus: string
 }
 
 const ProductSchema: Schema = new Schema({
@@ -68,6 +69,7 @@ const InvoiceSchema: Schema = new Schema<IInvoice>(
         grandTotal: { type: Number, required: true },
         createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
         BillType: { type: String, default: "" },
+        InvoiceStatus: { type: String, default: "", enum: ['Done', 'Hold', 'Cancel'] },
         paymentMode: {
             type: String,
             default: "CASH",
