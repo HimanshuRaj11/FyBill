@@ -24,6 +24,7 @@
     "@radix-ui/react-switch": "^1.1.3",
     "@radix-ui/react-tabs": "^1.1.3",
     "@radix-ui/react-toast": "^1.2.7",
+    "@radix-ui/react-tooltip": "^1.2.6",
     "@reduxjs/toolkit": "^2.6.1",
     "@types/escpos": "^2.5.5",
     "axios": "^1.8.4",
@@ -51,6 +52,7 @@
     "react-toastify": "^11.0.5",
     "tailwind-merge": "^3.1.0",
     "tw-animate-css": "^1.2.5",
+    "use-debounce": "^10.0.4",
     "yup": "^1.6.1",
     "zod": "^3.24.2"
   },

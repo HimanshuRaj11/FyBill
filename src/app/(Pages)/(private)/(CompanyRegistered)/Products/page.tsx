@@ -8,6 +8,10 @@ import { toast } from 'react-toastify';
 import { useSelector } from 'react-redux';
 import { Input } from '@/Components/ui/input';
 import { X } from 'lucide-react';
+import { useDebounce } from 'use-debounce'; // Optional: Install use-debounce for debouncing search
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/Components/ui/alert-dialog'; // Assuming a dialog component from your UI library
+import { Skeleton } from '@/Components/ui/skeleton'; // Assuming a skeleton component
+
 // TypeScript interface for Product
 interface Product {
     _id: string;
@@ -15,125 +19,158 @@ interface Product {
     description: string;
     category: string;
     name: string;
-    branchId: any
+    branchId: any;
 }
 
 export default function ProductsPage() {
-    const { User } = useSelector((state: any) => state.User);
     const { Company } = useSelector((state: any) => state.Company);
     const [products, setProducts] = useState<Product[]>([]);
-    const [productName, setProductName] = useState("");
+    const [productName, setProductName] = useState('');
+    const [debouncedProductName] = useDebounce(productName, 300); // Debounce search input
     const [loading, setLoading] = useState(true);
     const [selectedCategory, setSelectedCategory] = useState<string>('all');
     const [categories, setCategories] = useState<string[]>([]);
+    const [filteredProductsList, setFilteredProductList] = useState<Product[]>([]);
+    const [deletingId, setDeletingId] = useState<string | null>(null);
 
-
-    const [filterSearchProducts, setFilterSearchProducts] = useState<any[]>([]);
-    const [filterCategoryProducts, setFilterCategoryProducts] = useState<any[]>([]);
-
-    const [FilteredProductsList, setFilteredProductList] = useState<Product[]>([]);
-
-    const deleteProduct = async (id: string) => {
-        const res = await axios.post(`${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/company/product/delete`, { _id: id });
-        const data = res.data;
-        if (data.success) {
-            toast.success(data.message);
-            fetchProducts();
-        } else {
-            toast.error(data.error);
-        }
-    }
-    const handleProductSearch = (searchTerm: string) => {
-        if (searchTerm == "") {
-            setFilterSearchProducts(products)
-        }
-        setProductName(searchTerm);
-        const filtered = products?.filter((product) =>
-            product.name.toLowerCase().includes(searchTerm.toLowerCase())
-        );
-
-        setFilterSearchProducts(filtered)
-    }
-    const handleCategoryFilter = (e: any) => {
-        setSelectedCategory(e.target.value)
-        const filteredProducts = selectedCategory === 'all'
-            ? products
-            : products.filter(product => product.category === selectedCategory);
-
-        setFilterCategoryProducts(filteredProducts)
-    }
-
-    const handleFilteredProduct = useCallback(() => {
-        setFilteredProductList(filterSearchProducts || filterCategoryProducts);
-    }, [filterSearchProducts, filterCategoryProducts]);
-
-    useEffect(() => {
-        handleFilteredProduct()
-    }, [handleFilteredProduct])
-
-
-    const fetchProducts = async () => {
+    // Fetch products
+    const fetchProducts = useCallback(async () => {
         try {
+            setLoading(true);
             const res = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/company/product/fetch`);
             const data = res.data;
             setProducts(data.products);
-
+            setFilteredProductList(data.products);
             const uniqueCategories = [...new Set(data.products.map((product: Product) => product.category))];
             setCategories(uniqueCategories as string[]);
-            setLoading(false);
         } catch (error) {
+            toast.error('Failed to fetch products');
+        } finally {
             setLoading(false);
         }
-    };
-    const ClearSearch = () => {
-        setProductName("")
-        handleProductSearch("")
-    }
-    useEffect(() => {
-        fetchProducts();
     }, []);
 
+    // Delete product with confirmation
+    const deleteProduct = async (id: string) => {
+        try {
+            setDeletingId(id);
+            const res = await axios.post(`${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/company/product/delete`, { _id: id });
+            const data = res.data;
+            if (data.success) {
+                toast.success(data.message);
+                fetchProducts();
+            } else {
+                toast.error(data.error);
+            }
+        } catch (error) {
+            toast.error('Failed to delete product');
+        } finally {
+            setDeletingId(null);
+        }
+    };
 
+    // Filtering
+    useEffect(() => {
+        if (!products.length) return;
+
+        let filtered = [...products];
+
+        // Apply search filter
+        if (debouncedProductName.trim() !== '') {
+            filtered = filtered.filter((product) =>
+                product.name.toLowerCase().includes(debouncedProductName.toLowerCase())
+            );
+        }
+
+        // Apply category filter
+        if (selectedCategory !== 'all') {
+            filtered = filtered.filter((product) => product.category === selectedCategory);
+        }
+
+        setFilteredProductList(filtered);
+    }, [products, debouncedProductName, selectedCategory]);
+
+    // Fetch products on mount
+    useEffect(() => {
+        fetchProducts();
+    }, [fetchProducts]);
+
+    // Clear search
+    const clearSearch = () => {
+        setProductName('');
+    };
+
+    // Skeleton loader for table rows
+    const renderSkeletonRows = () => (
+        Array(5).fill(0).map((_, index) => (
+            <tr key={index} className="border-b">
+                <td className="p-4"><Skeleton className="h-6 w-3/4" /></td>
+                {Company?.branch.length > 0 && <td className="p-4"><Skeleton className="h-6 w-1/2" /></td>}
+                <td className="p-4"><Skeleton className="h-6 w-1/2" /></td>
+                <td className="p-4"><Skeleton className="h-6 w-1/4" /></td>
+                <td className="p-4"><Skeleton className="h-10 w-32" /></td>
+            </tr>
+        ))
+    );
 
     if (loading) {
         return (
             <div className="min-h-screen flex items-center justify-center">
-                <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-500"></div>
+                <div className="w-full max-w-7xl px-4">
+                    <table className="min-w-full bg-white rounded-lg shadow-md">
+                        <thead>
+                            <tr className="bg-gray-100">
+                                <th className="p-4 text-left text-sm font-medium text-gray-600">Product Name</th>
+                                {Company?.branch.length > 0 && <th className="p-4 text-left text-sm font-medium text-gray-600">Branch</th>}
+                                <th className="p-4 text-left text-sm font-medium text-gray-600">Category</th>
+                                <th className="p-4 text-left text-sm font-medium text-gray-600">Price</th>
+                                <th className="p-4 text-left text-sm font-medium text-gray-600">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>{renderSkeletonRows()}</tbody>
+                    </table>
+                </div>
             </div>
         );
     }
 
     return (
-        <div className=" min-h-screen py-8 px-4 sm:px-6 lg:px-8">
-            {/* Category Filter */}
-
-            <div className="w-full flex justify-end mb-4">
-                <Button>
-                    <Link href="/Products/add">Add Product</Link>
-                </Button>
-            </div>
-
-
-            <div className="w-full border-t border-gray-800 my-4"></div>
-            <div className="flex">
-                <div className="relative w-full mb-4">
-                    <Input
-                        placeholder="Search Products"
-                        value={productName}
-                        onChange={(e) => handleProductSearch(e.target.value)}
-                    />
-                    <X onClick={ClearSearch} className="absolute right-2 top-1.5 cursor-pointer text-gray-700 hover:text-black " />
+        <div className="min-h-screen ">
+            <div className="max-w-7xl mx-auto">
+                {/* Header with Add Product Button */}
+                <div className="flex justify-between items-center mb-6">
+                    <h1 className="text-2xl font-bold text-gray-800">Products</h1>
+                    <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+                        <Link href="/Products/add">Add Product</Link>
+                    </Button>
                 </div>
-            </div>
-            <div className="max-w-7xl mx-auto mb-8">
-                <div className="flex justify-center">
-                    <div className="relative inline-block w-64">
+
+                {/* Search and Category Filter */}
+                <div className="flex flex-col sm:flex-row gap-4 mb-6">
+                    <div className="relative flex-1">
+                        <Input
+                            className="bg-white border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500"
+                            placeholder="Search products..."
+                            value={productName}
+                            onChange={(e) => setProductName(e.target.value)}
+                            aria-label="Search products"
+                        />
+                        {productName && (
+                            <X
+                                onClick={clearSearch}
+                                className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer text-gray-500 hover:text-gray-700"
+                                aria-label="Clear search"
+                            />
+                        )}
+                    </div>
+                    <div className="relative w-full sm:w-64">
                         <select
                             value={selectedCategory}
-                            onChange={(e) => handleCategoryFilter(e)}
-                            className="block appearance-none w-full bg-white border border-gray-300 hover:border-gray-400 px-4 py-2 pr-8 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                            onChange={(e) => setSelectedCategory(e.target.value)}
+                            className="block w-full bg-white border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 py-2.5 px-4 text-sm appearance-none"
+                            aria-label="Filter by category"
                         >
-                            <option value="all">All Products</option>
+                            <option value="all">All Categories</option>
                             {categories.map((category) => (
                                 <option key={category} value={category}>
                                     {category.charAt(0).toUpperCase() + category.slice(1)}
@@ -147,69 +184,85 @@ export default function ProductsPage() {
                         </div>
                     </div>
                 </div>
-            </div>
 
-            {/* Products Grid */}
-            <div className="w-full mx-auto">
-                <div className="">
-                    <table className="min-w-full bg-white rounded-lg shadow-md">
-                        <thead>
-                            <tr className=''>
-                                <th className="p-4 text-left">Product Name</th>
-                                {
-                                    Company?.branch.length > 0 && <th className="p-4 text-left">Branch</th>
-                                }
-                                <th className="p-4 text-left">Category</th>
-                                <th className="p-4 text-left">Price</th>
-                                <th className="p-4 text-left">Actions</th>
+                {/* Products Table */}
+                <div className="bg-white rounded-lg shadow-md overflow-hidden">
+                    <table className="min-w-full">
+                        <thead className="bg-gray-100 sticky top-0 z-10">
+                            <tr>
+                                <th className="p-4 text-left text-sm font-medium text-gray-600">Product Name</th>
+                                {Company?.branch.length > 0 && <th className="p-4 text-left text-sm font-medium text-gray-600">Branch</th>}
+                                <th className="p-4 text-left text-sm font-medium text-gray
 
+-600">Category</th>
+                                <th className="p-4 text-left text-sm font-medium text-gray-600">Price</th>
+                                <th className="p-4 text-left text-sm font-medium text-gray-600">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {FilteredProductsList.map((product) => (
-                                <tr key={product._id} className="hover:bg-gray-100 border-b-2">
-                                    <td className="px-4">
-                                        <h3 className="text-lg font-semibold text-gray-800 line-clamp-2 mb-2">
-                                            {product?.name}
-                                        </h3>
+                            {filteredProductsList.length === 0 ? (
+                                <tr>
+                                    <td colSpan={Company?.branch.length > 0 ? 5 : 4} className="p-4 text-center text-gray-500">
+                                        No products found. Try adjusting your search or filters.
                                     </td>
-                                    {
-                                        Company?.branch.length > 0 && <td className="px-4">
-                                            <h3 className="text-md text-gray-800 line-clamp-2 mb-2">
-                                                {product?.branchId?.branchName}
-                                            </h3>
-                                        </td>
-                                    }
-                                    <td className="px-4">
-                                        <h3 className="text-md text-gray-800 line-clamp-2 mb-2">
-                                            {product?.category}
-                                        </h3>
-                                    </td>
-
-                                    <td className="px-4">
-                                        <span className="text-xl font-bold text-blue-600">
-                                            {Company?.currency.symbol} {product.price.toFixed(2)}
-                                        </span>
-                                    </td>
-
-                                    <td className="px-4">
-                                        <div className="flex gap-2">
-                                            <Button variant="default" className="flex items-center justify-center gap-2">
-                                                <Link className='w-full flex items-center justify-center gap-2' href={`/Products/edit/${product._id}`}>
-                                                    <FiEdit2 className="w-4 h-4" />
-                                                    Edit
-                                                </Link>
-                                            </Button>
-                                            <Button variant="destructive" className="flex items-center justify-center gap-2" onClick={() => deleteProduct(product._id)}>
-                                                <FiTrash2 className="w-4 h-4" />
-                                                Delete
-                                            </Button>
-                                        </div>
-                                    </td>
-
-
                                 </tr>
-                            ))}
+                            ) : (
+                                filteredProductsList.map((product) => (
+                                    <tr key={product._id} className="hover:bg-gray-50 border-b">
+                                        <td className="p-4 text-gray-800">{product.name}</td>
+                                        {Company?.branch.length > 0 && (
+                                            <td className="p-4 text-gray-600">{product?.branchId?.branchName}</td>
+                                        )}
+                                        <td className="p-4 text-gray-600">{product.category}</td>
+                                        <td className="p-4 text-blue-600 font-semibold">
+                                            {Company?.currency.symbol} {product.price.toFixed(2)}
+                                        </td>
+                                        <td className="p-4">
+                                            <div className="flex gap-2">
+                                                <Button
+                                                    variant="outline"
+                                                    className="flex items-center gap-2 border-blue-500 text-blue-500 hover:bg-blue-50"
+                                                    asChild
+                                                >
+                                                    <Link href={`/Products/edit/${product._id}`}>
+                                                        <FiEdit2 className="w-4 h-4" />
+                                                        Edit
+                                                    </Link>
+                                                </Button>
+                                                <AlertDialog>
+                                                    <AlertDialogTrigger asChild>
+                                                        <Button
+                                                            variant="destructive"
+                                                            className="flex items-center gap-2"
+                                                            disabled={deletingId === product._id}
+                                                        >
+                                                            <FiTrash2 className="w-4 h-4" />
+                                                            {deletingId === product._id ? 'Deleting...' : 'Delete'}
+                                                        </Button>
+                                                    </AlertDialogTrigger>
+                                                    <AlertDialogContent>
+                                                        <AlertDialogHeader>
+                                                            <AlertDialogTitle>Delete Product</AlertDialogTitle>
+                                                            <AlertDialogDescription>
+                                                                Are you sure you want to delete {product.name}? This action cannot be undone.
+                                                            </AlertDialogDescription>
+                                                        </AlertDialogHeader>
+                                                        <AlertDialogFooter>
+                                                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                                            <AlertDialogAction
+                                                                onClick={() => deleteProduct(product._id)}
+                                                                className="bg-red-600 hover:bg-red-700"
+                                                            >
+                                                                Delete
+                                                            </AlertDialogAction>
+                                                        </AlertDialogFooter>
+                                                    </AlertDialogContent>
+                                                </AlertDialog>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))
+                            )}
                         </tbody>
                     </table>
                 </div>

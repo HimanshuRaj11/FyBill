@@ -15,6 +15,14 @@ export async function GET(request: NextRequest) {
         if (!User) {
             return NextResponse.json({ success: false, error: 'User not found' });
         }
+        if (User.branchId) {
+            const products = await ProductModel.find({ branchId: User.branchId }).populate({
+                path: 'branchId',
+                model: branchModel
+            }).lean();
+
+            return NextResponse.json({ success: true, products });
+        }
         const company = await CompanyModel.findById({ _id: User.companyId });
         if (!company) {
             return NextResponse.json({ success: false, error: 'Company not found' });
