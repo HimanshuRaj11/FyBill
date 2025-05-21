@@ -1,16 +1,13 @@
 import { verifyUser } from "@/lib/verifyUser";
 import branchModel from "@/Model/branch.model";
 import CompanyModel from "@/Model/Company.model";
-import InvoiceModel from "@/Model/Invoice.model";
 import UserModel from "@/Model/User.model";
 import { NextResponse } from "next/server";
-import moment from "moment";
-const today = moment().startOf('day').toDate();
-const tomorrow = moment().startOf('day').add(1, 'day').toDate();
 
-export async function POST(request: Request) {
+export async function GET(Request: Request, { params }: { params: Promise<{ StaffId: string }> }) {
     try {
         const user_id = await verifyUser();
+        const { StaffId } = await params;
 
         if (!user_id) {
             return NextResponse.json({ message: "Unauthorized", success: false }, { status: 401 });
@@ -25,20 +22,17 @@ export async function POST(request: Request) {
         if (!company) {
             return NextResponse.json({ message: "Company not found", success: false }, { status: 404 });
         }
-        const invoices = await InvoiceModel.find({
-            createdBy: user_id, createdAt: {
-                $gte: today,
-                $lt: tomorrow
-            }
-        }).populate({
+        const Staff = await UserModel.findOne({ _id: StaffId }).populate({
             path: 'branchId',
             model: branchModel
-        }).sort({ createdAt: -1 }).lean()
+        })
 
-        return NextResponse.json({ invoices, success: true }, { status: 200 });
+        if (!Staff) {
+            return NextResponse.json({ message: "Staff not found", success: false }, { status: 404 });
+        }
+        return NextResponse.json({ Staff, success: true }, { status: 200 });
 
     } catch (error) {
-        console.log(error);
         return NextResponse.json({ message: "Internal server error", success: false }, { status: 500 });
     }
 }

@@ -260,8 +260,8 @@ export default function InvoiceDisplay({ invoice }: { invoice: any }) {
                 </motion.div>
 
                 {/* User Details */}
-                <div className='flex justify-end mt-8 bg-gradient-to-r from-gray-50 to-gray-100 p-4 rounded-lg shadow-sm'>
-                    <div className='flex flex-col sm:flex-row gap-4 sm:gap-6'>
+                <div className='flex justify-start mt-8 bg-gradient-to-r from-gray-50 to-gray-100 p-4 rounded-lg shadow-sm'>
+                    <div className='flex flex-col sm:flex-row gap-4 sm:gap-6 flex-wrap'>
                         {
                             invoice?.branchName && (
                                 <div className='flex items-center gap-2'>

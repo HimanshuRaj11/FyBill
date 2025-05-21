@@ -7,13 +7,13 @@ import axios from 'axios';
 export default function Page({ params }: { params: Promise<{ InvoiceId: string }> }) {
     const [invoice, setInvoice] = useState<IInvoice | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(true);
-    const resolvedParams = React.use(params);
+    const { InvoiceId } = React.use(params);
 
     const fetchInvoice = useCallback(async () => {
         try {
             setIsLoading(true);
             const { data } = await axios.get(
-                `${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/Invoice/${resolvedParams.InvoiceId}`,
+                `${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/Invoice/${InvoiceId}`,
                 { withCredentials: true }
             );
             if (data.success) {
@@ -23,7 +23,7 @@ export default function Page({ params }: { params: Promise<{ InvoiceId: string }
         } catch (error) {
             setIsLoading(false);
         }
-    }, [resolvedParams.InvoiceId]);
+    }, [InvoiceId]);
 
     useEffect(() => {
         fetchInvoice();

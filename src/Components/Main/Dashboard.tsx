@@ -1,5 +1,5 @@
 "use client"
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { Button } from '../ui/button'
 import { Download, ChevronDown, Filter, Search, RefreshCw } from 'lucide-react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card'
@@ -8,16 +8,72 @@ import moment from 'moment'
 import Link from 'next/link'
 import { useSelector } from 'react-redux'
 import DashboardTopCards from '../Other/DashboardTopCards'
+import { BarChartComponent } from '../Other/BarChart'
+import { PieChartComponent } from '../Other/PaiChart'
 
 export default function Dashboard() {
     const { User } = useSelector((state: any) => state.User);
     const { Company } = useSelector((state: any) => state.Company)
     const [isLoading, setIsLoading] = useState(false)
 
+    const [Invoice, setInvoice] = useState([])
+    const [selectedBranch, setSelectedBranch] = useState("All");
+
     const [searchQuery, setSearchQuery] = useState('')
     const [isFilterOpen, setIsFilterOpen] = useState(false)
 
-    const [Invoice, setInvoice] = useState([])
+
+    const [dateRange, setDateRange] = useState('Today')
+
+    const [startDate, setStartDate] = useState(moment().startOf('day').toDate())
+    const [endDate, setEndDate] = useState(moment().endOf('day').toDate())
+
+
+    const HandleDateRange = (dateRange: string) => {
+        setIsFilterOpen(false)
+        setDateRange(dateRange);
+        if (dateRange == "Today") {
+            setStartDate(moment().startOf('day').toDate())
+            setEndDate(moment().endOf('day').toDate())
+        }
+        if (dateRange == "Yesterday") {
+            setStartDate(moment().subtract(1, 'day').startOf('day').toDate())
+            setEndDate(moment().subtract(1, 'day').endOf('day').toDate())
+        }
+        if (dateRange == "Last 7 days") {
+            setStartDate(moment().subtract(7, 'days').startOf('day').toDate())
+            setEndDate(moment().endOf('day').toDate())
+        }
+        if (dateRange == "Last 30 days") {
+            setStartDate(moment().subtract(30, 'days').startOf('day').toDate())
+            setEndDate(moment().endOf('day').toDate())
+        }
+        if (dateRange == "Last 90 days") {
+            setStartDate(moment().subtract(90, 'days').startOf('day').toDate())
+            setEndDate(moment().endOf('day').toDate())
+        }
+        if (dateRange == "Last 6 Months") {
+            setStartDate(moment().subtract(6, 'months').startOf('day').toDate())
+            setEndDate(moment().endOf('day').toDate())
+        }
+        if (dateRange == "Last 1 Year") {
+            setStartDate(moment().subtract(1, 'year').startOf('day').toDate())
+            setEndDate(moment().endOf('day').toDate())
+        }
+        if (dateRange == "Custom range") {
+            setStartDate(moment().subtract(1, 'year').startOf('day').toDate())
+            setEndDate(moment().endOf('day').toDate())
+        }
+    }
+
+    const FilterInvoice = useCallback(async () => {
+        const { data } = await axios.post(`${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/Invoice/filter`, { selectedBranch, startDate, endDate })
+        setInvoice(data.invoices)
+    }, [startDate, endDate, selectedBranch])
+
+
+
+
 
     const FetchInvoice: () => Promise<void> = async () => {
         try {
@@ -31,21 +87,14 @@ export default function Dashboard() {
         }
     }
 
-    const filterInvoice = async (branchId: string) => {
-        if (branchId === "") {
-            FetchInvoice()
-            return
-        } else {
-            const { data: { invoices } } = await axios.post(`${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/Invoice/filter/byBranch`, { branchId })
-            const filteredInvoice = invoices.filter((invoice: any) => invoice.branchId._id === branchId)
-            setInvoice(filteredInvoice)
-            return
-        }
-    }
-
     useEffect(() => {
+        setDateRange("Today");
         FetchInvoice()
     }, [])
+
+    useEffect(() => {
+        FilterInvoice()
+    }, [dateRange, FilterInvoice])
 
     const handleRefresh = () => {
         FetchInvoice()
@@ -76,71 +125,118 @@ export default function Dashboard() {
                 </div>
             </div>
             {
-                User?.role == "Owner" && (
-                    <div className="flex flex-row justify-start mb-2.5 gap-2">
-                        <div onClick={() => filterInvoice("")} className='flex justify-center items-center p-2 rounded-lg bg-gray-100 cursor-pointer hover:shadow-md transition-colors'>
-                            <span className="text-md text-gray-900 font-semibold min-w-20 text-center">All</span>
+                User?.role === "Owner" && (
+                    <div className="flex flex-row justify-start mb-2.5 gap-2 flex-wrap">
+                        <div
+                            onClick={() => setSelectedBranch("All")}
+                            className={`flex justify-center items-center p-2 rounded-lg cursor-pointer hover:shadow-md transition-colors ${selectedBranch === "All"
+                                ? "bg-blue-500 text-white"
+                                : "bg-gray-100 text-gray-900"
+                                }`}
+                        >
+                            <input
+                                type="radio"
+                                name="branch"
+                                id="branch-all"
+                                className="hidden"
+                                checked={selectedBranch === "All"}
+                                onChange={() => setSelectedBranch("All")}
+                            />
+                            <label
+                                htmlFor="branch-all"
+                                className="text-md font-semibold min-w-20 text-center cursor-pointer"
+                            >
+                                All
+                            </label>
                         </div>
-                        {
-                            Company?.branch?.length > 0 && (
-                                Company?.branch?.map((branch: any) => (
-                                    <div onClick={() => filterInvoice(branch._id)} key={branch._id} className='flex justify-center items-center p-2 rounded-lg bg-gray-100 cursor-pointer hover:shadow-md transition-colors'>
-                                        <span className="text-md text-gray-900 font-semibold">{branch?.branchName}</span>
-                                    </div>
-                                ))
-                            )
-                        }
 
+                        {Company?.branch?.length > 0 &&
+                            Company.branch.map((branch: any) => (
+                                <div
+                                    onClick={() => setSelectedBranch(branch?.branchName)}
+                                    key={branch._id}
+                                    className={`flex justify-center items-center p-2 rounded-lg cursor-pointer hover:shadow-md transition-colors ${selectedBranch === branch?.branchName
+                                        ? "bg-blue-500 text-white"
+                                        : "bg-gray-100 text-gray-900"
+                                        }`}
+                                >
+                                    <input
+                                        type="radio"
+                                        name="branch"
+                                        id={`branch-${branch._id}`}
+                                        className="hidden"
+                                        checked={selectedBranch === branch?.branchName}
+                                        onChange={() => setSelectedBranch(branch?.branchName)}
+                                    />
+                                    <label
+                                        htmlFor={`branch-${branch._id}`}
+                                        className="text-md font-semibold cursor-pointer"
+                                    >
+                                        {branch?.branchName}
+                                    </label>
+                                </div>
+                            ))
+                        }
                     </div>
                 )
             }
 
 
             {/* Search and Filter */}
-            <div className="flex flex-col sm:flex-row gap-3 mb-6">
-                <div className="relative flex-grow">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                    <input
-                        type="text"
-                        placeholder="Search invoices, customers..."
-                        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                    />
-                </div>
-                <div className="relative">
-                    <Button
-                        variant="outline"
-                        className="!rounded-lg whitespace-nowrap flex items-center gap-2"
-                        onClick={() => setIsFilterOpen(!isFilterOpen)}
-                    >
-                        <Filter className="h-4 w-4" />
-                        Filter
-                        <ChevronDown className={`h-4 w-4 transition-transform ${isFilterOpen ? 'rotate-180' : ''}`} />
-                    </Button>
-                    {isFilterOpen && (
-                        <div className="absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-lg border border-gray-200 p-4 z-10">
-                            <h3 className="font-medium mb-3">Filter Options</h3>
-                            <div className="space-y-3">
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Date Range</label>
-                                    <select className="w-full border border-gray-300 rounded-md p-2 text-sm">
-                                        <option>Last 7 days</option>
-                                        <option>Last 30 days</option>
-                                        <option>Last 90 days</option>
-                                        <option>Custom range</option>
-                                    </select>
-                                </div>
-
-                                <div className="flex justify-end">
-                                    <Button variant="outline" size="sm" className="mr-2">Reset</Button>
-                                    <Button size="sm">Apply</Button>
-                                </div>
+            {
+                (User?.role == "Owner" || User?.role == "admin") && (
+                    <>
+                        <div className="flex flex-col sm:flex-row gap-3 mb-6">
+                            <div className="relative flex-grow">
+                                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                                <input
+                                    type="text"
+                                    placeholder="Search invoices, customers..."
+                                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                />
+                            </div>
+                            <div className="relative">
+                                <Button
+                                    variant="outline"
+                                    className="!rounded-lg whitespace-nowrap flex items-center gap-2"
+                                    onClick={() => setIsFilterOpen(!isFilterOpen)}
+                                >
+                                    <Filter className="h-4 w-4" />
+                                    Filter
+                                    <ChevronDown className={`h-4 w-4 transition-transform ${isFilterOpen ? 'rotate-180' : ''}`} />
+                                </Button>
+                                {isFilterOpen && (
+                                    <div className="absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-lg border border-gray-200 p-4 z-10">
+                                        <h3 className="font-medium mb-3">Filter Options</h3>
+                                        <div className="space-y-3">
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-1">Date Range</label>
+                                                <select value={dateRange} onChange={(e) => { HandleDateRange(e.target.value) }} className="w-full border border-gray-300 rounded-md p-2 text-sm">
+                                                    <option value="Today">Today</option>
+                                                    <option value="Yesterday">Yesterday</option>
+                                                    <option value="Last 7 days">Last 7 days</option>
+                                                    <option value="Last 30 days">Last 30 days</option>
+                                                    <option value="Last 90 days">Last 90 days</option>
+                                                    <option value="Last 6 Months">Last 6 Months</option>
+                                                    <option value="Last 1 Year">Last 1 Year</option>
+                                                    {/*  <option value="Custom range">Custom range</option> */}
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         </div>
-                    )}
-                </div>
-            </div>
+                        <div className=" p-2">
+                            <h1 className="text-xl font-extrabold text-gray-800 mb-4">{dateRange} Invoice Data</h1>
+                        </div>
+                    </>
+                )
+            }
+
+
 
             {/* Stats Cards */}
             <DashboardTopCards Invoice={Invoice} />
@@ -148,29 +244,11 @@ export default function Dashboard() {
 
             {/* Charts */}
             {/* <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 mb-6">
-                <Card className="hover:shadow-md transition-shadow duration-200">
-                    <CardHeader>
-                        <CardTitle>Revenue Overview</CardTitle>
-                        <CardDescription>Monthly revenue for the last 6 months</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                        <div id="revenue-chart" className="h-80 w-full bg-gray-50 rounded-lg flex items-center justify-center">
-                            <p className="text-gray-400">Chart will be rendered here</p>
-                        </div>
-                    </CardContent>
-                </Card>
 
-                <Card className="hover:shadow-md transition-shadow duration-200">
-                    <CardHeader>
-                        <CardTitle>Subscription Distribution</CardTitle>
-                        <CardDescription>Active subscriptions by plan type</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                        <div id="subscription-chart" className="h-80 w-full bg-gray-50 rounded-lg flex items-center justify-center">
-                            <p className="text-gray-400">Chart will be rendered here</p>
-                        </div>
-                    </CardContent>
-                </Card>
+
+                <BarChartComponent Invoice={Invoice} dateRange={dateRange} />
+                <PieChartComponent Invoice={Invoice} dateRange={dateRange} />
+
             </div> */}
 
             {/* Recent Activity */}

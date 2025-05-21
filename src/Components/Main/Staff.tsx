@@ -9,6 +9,7 @@ import moment from 'moment'
 import { useSelector } from 'react-redux'
 import { toast } from 'react-toastify'
 import Image from 'next/image'
+import Link from 'next/link'
 
 interface StaffMember {
     _id: string
@@ -124,12 +125,13 @@ export default function Staff() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {filteredStaff.map((staff) => (
                     <div
+
                         key={staff._id}
                         className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 hover:shadow-md transition-shadow"
                     >
                         <div className="flex items-center space-x-4">
                             <Image
-                                src={staff.avatar}
+                                src={staff?.avatar || '/avatar.png'}
                                 alt={staff.name}
                                 className="h-12 w-12 rounded-full"
                                 width={100}
@@ -163,7 +165,15 @@ export default function Staff() {
                         </div>
                         {(user?.role === "admin" || user?.role === "Owner") && (
 
-                            <div className="mt-4 flex justify-end">
+                            <div className="mt-4 gap-2 flex justify-end">
+                                <Button
+                                    size="sm"
+                                    className="text-sm cursor-pointer"
+                                >
+                                    <Link href={`Staff/${staff._id}`}>
+                                        View
+                                    </Link>
+                                </Button>
                                 <Button
                                     variant="destructive"
                                     size="sm"

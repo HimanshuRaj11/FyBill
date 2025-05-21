@@ -29,7 +29,7 @@ export default function Page({ params }: { params: Promise<{ product_id: string 
         const { name, value } = e.target;
         setProduct(prev => ({
             ...prev,
-            [name]: name === 'rate' ? parseFloat(value) || 0 : value
+            [name]: value
         }));
     };
 
@@ -207,13 +207,12 @@ export default function Page({ params }: { params: Promise<{ product_id: string 
                                     <input
                                         type="number"
                                         id="rate"
-                                        name="rate"
+                                        name="price"
                                         value={product.price}
                                         onChange={handleInputChange}
                                         className="w-full pl-8 pr-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
                                         placeholder="0.00"
                                         min="0"
-                                        step="0.01"
                                         required
                                     />
                                 </div>

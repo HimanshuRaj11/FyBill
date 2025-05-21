@@ -332,7 +332,7 @@ export default function BillingComponent({
             }
 
             setIsProcessing(true);
-            const totalTaxAmount = appliedTaxes.reduce((sum, tax) => sum + tax.amount, 0);
+            const totalTaxAmount = (appliedTaxes.reduce((sum, tax) => sum + tax.amount, 0)).toFixed(2);
 
             const { data } = await axios.post(
                 `${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/Invoice/create`,

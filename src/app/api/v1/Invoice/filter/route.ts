@@ -4,12 +4,7 @@ import CompanyModel from "@/Model/Company.model";
 import InvoiceModel from "@/Model/Invoice.model";
 import UserModel from "@/Model/User.model";
 import { NextResponse } from "next/server";
-import moment from "moment";
-const today = moment().startOf('day').toDate();
-const tomorrow = moment().startOf('day').add(1, 'day').toDate();
 
-
-// Have to work
 export async function POST(request: Request) {
     try {
         const user_id = await verifyUser();
@@ -27,15 +22,37 @@ export async function POST(request: Request) {
         if (!company) {
             return NextResponse.json({ message: "Company not found", success: false }, { status: 404 });
         }
-        const invoices = await InvoiceModel.find({
-            createdBy: user_id, createdAt: {
-                $gte: today,
-                $lt: tomorrow
-            }
-        }).populate({
-            path: 'branchId',
-            model: branchModel
-        }).sort({ createdAt: -1 }).lean()
+
+        const { selectedBranch, startDate, endDate } = await request.json();
+        let invoices;
+
+        if (User?.role == 'Owner') {
+            invoices = await InvoiceModel.find({
+                companyId: companyId,
+                createdAt: {
+                    $gte: startDate,
+                    $lt: endDate
+                },
+                ...(selectedBranch !== "All" && { branchName: selectedBranch }),
+                InvoiceStatus: "Done",
+                BillType: { $ne: "KOT" }
+            }).populate({
+                path: 'branchId',
+                model: branchModel
+            }).sort({ createdAt: -1 }).lean()
+        } else {
+            invoices = await InvoiceModel.find({
+                createdBy: user_id, createdAt: {
+                    $gte: startDate,
+                    $lt: endDate
+                },
+                InvoiceStatus: "Done",
+                BillType: { $ne: "KOT" }
+            }).populate({
+                path: 'branchId',
+                model: branchModel
+            }).sort({ createdAt: -1 }).lean()
+        }
 
         return NextResponse.json({ invoices, success: true }, { status: 200 });
 

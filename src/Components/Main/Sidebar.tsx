@@ -1,7 +1,7 @@
 'use client'
 import Link from 'next/link';
 import React, { useState } from 'react';
-import { FaBars, FaTachometerAlt, FaFileInvoice, FaUsers, FaBox, FaCog, FaSignInAlt, FaUserPlus, FaFileInvoiceDollar } from 'react-icons/fa';
+import { FaBars, FaTachometerAlt, FaFileInvoice, FaUsers, FaBox, FaCog, FaSignInAlt, FaUserPlus, FaFileInvoiceDollar, FaTimes, FaAngleRight } from 'react-icons/fa';
 import { useSelector } from 'react-redux';
 import { usePathname } from 'next/navigation';
 import { Button } from '../ui/button';
@@ -26,10 +26,13 @@ export default function Sidebar() {
                 <div className='relative'>
 
 
-                    <aside id="default-sidebar" className={`fixed top-20 left-2 z-40 w-64 h-[88vh] transition-transform -translate-x-full sm:translate-x-0 ${ShowSidebar ? "translate-x-0" : ""} `} aria-label="Sidebar">
-                        <Button variant={'ghost'} onClick={() => setShowSidebar(!ShowSidebar)} data-drawer-target="default-sidebar" data-drawer-toggle="default-sidebar" aria-controls="default-sidebar" type="button" className="inline-flex left-60 fixed items-center p-2 mt-2 ms-3 text-sm text-gray-500 rounded-lg sm:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600">
-                            <span className="sr-only">Open sidebar</span>
-                            <FaBars className="w-6 h-6" aria-hidden="true" />
+                    <aside id="default-sidebar" className={`fixed top-20 left-1 z-40 w-64 h-[88vh] transition-transform -translate-x-full sm:translate-x-0 ${ShowSidebar ? "translate-x-0" : ""} `} aria-label="Sidebar">
+                        <Button variant={'ghost'} onClick={() => setShowSidebar(!ShowSidebar)} data-drawer-target="default-sidebar" data-drawer-toggle="default-sidebar" aria-controls="default-sidebar" type="button" className="inline-flex left-60 cursor-pointer fixed items-center p-2 mt-2 ms-3 text-sm bg-gray-50 rounded-lg sm:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600">
+                            {ShowSidebar ? (
+                                <FaTimes className="w-6 h-6" aria-hidden="true" />
+                            ) : (
+                                <FaAngleRight className="w-6 h-6" aria-hidden="true" />
+                            )}
                         </Button>
                         <div className="h-full px-3 py-4 overflow-y-auto rounded-2xl  bg-gray-50 dark:bg-gray-800">
                             <ul className="space-y-2 font-medium">
@@ -40,7 +43,7 @@ export default function Sidebar() {
                                     </Link>
                                 </li>
                                 {
-                                    User?.role == "Owner" && (
+                                    (User?.role == "Owner" || User?.role == "admin") && (
                                         <>
                                             <li>
                                                 <Link href="/Staff" className={`flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-300 dark:hover:bg-gray-700 group ${isActive('/Staff') ? 'bg-gray-300 dark:bg-gray-700' : ''}`}>

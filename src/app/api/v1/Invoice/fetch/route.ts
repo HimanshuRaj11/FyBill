@@ -29,22 +29,25 @@ export async function GET() {
 
         if (User?.role == 'Owner') {
             invoices = await InvoiceModel.find({
-                companyId: companyId, createdAt: {
+                companyId: companyId,
+                createdAt: {
                     $gte: today,
                     $lt: tomorrow
                 },
-                InvoiceStatus: "Done"
+                InvoiceStatus: "Done",
+                BillType: { $ne: "KOT" }
             }).populate({
                 path: 'branchId',
                 model: branchModel
-            }).sort({ createdAt: -1 }).lean()
+            }).sort({ createdAt: -1 }).lean();
         } else {
             invoices = await InvoiceModel.find({
                 createdBy: user_id, createdAt: {
                     $gte: today,
                     $lt: tomorrow
                 },
-                InvoiceStatus: "Done"
+                InvoiceStatus: "Done",
+                BillType: { $ne: "KOT" }
             }).populate({
                 path: 'branchId',
                 model: branchModel
@@ -54,7 +57,6 @@ export async function GET() {
         return NextResponse.json({ invoices, success: true }, { status: 200 });
 
     } catch (error) {
-        console.log(error);
         return NextResponse.json({ message: "Internal server error", success: false }, { status: 500 });
     }
 }

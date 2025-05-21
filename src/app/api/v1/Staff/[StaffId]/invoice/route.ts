@@ -5,10 +5,11 @@ import InvoiceModel from "@/Model/Invoice.model";
 import UserModel from "@/Model/User.model";
 import { NextResponse } from "next/server";
 
-export async function POST(request: Request) {
+export async function POST(req: Request, { params }: { params: Promise<{ StaffId: string }> }) {
     try {
         const user_id = await verifyUser();
-
+        const { StaffId } = await params;
+        const { startDate, endDate } = await req.json();
         if (!user_id) {
             return NextResponse.json({ message: "Unauthorized", success: false }, { status: 401 });
         }
@@ -22,17 +23,20 @@ export async function POST(request: Request) {
         if (!company) {
             return NextResponse.json({ message: "Company not found", success: false }, { status: 404 });
         }
-        const { branchId } = await request.json();
-        const invoices = await InvoiceModel.find({ companyId: companyId, branchId: branchId }).populate({
+        const invoices = await InvoiceModel.find({
+            createdBy: StaffId, createdAt: {
+                $gte: startDate,
+                $lt: endDate
+            },
+            InvoiceStatus: "Done",
+            BillType: { $ne: "KOT" }
+        }).populate({
             path: 'branchId',
             model: branchModel
-        }).sort({ createdAt: -1 }).lean();
-
-
+        }).sort({ createdAt: -1 }).lean()
         return NextResponse.json({ invoices, success: true }, { status: 200 });
 
     } catch (error) {
-        console.log(error);
         return NextResponse.json({ message: "Internal server error", success: false }, { status: 500 });
     }
 }
