@@ -33,7 +33,6 @@ export default function Dashboard() {
 
 
     const HandleDateRange = (dateRange: string) => {
-        setIsFilterOpen(false)
         setDateRange(dateRange);
         if (dateRange == "Today") {
             setStartDate(moment().startOf('day').toDate())
@@ -329,10 +328,7 @@ export default function Dashboard() {
 
             {/* Recent Activity */}
             <Card className="hover:shadow-md transition-shadow duration-200">
-                <CardHeader>
-                    <CardTitle>Recent Activity</CardTitle>
-                    <CardDescription>Latest transactions and updates</CardDescription>
-                </CardHeader>
+
                 <CardContent>
                     <div className="overflow-x-auto">
                         <table className="min-w-full divide-y divide-gray-200">
