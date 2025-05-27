@@ -24,7 +24,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ InvoiceI
         if (!company) {
             return NextResponse.json({ message: "Company not found", success: false }, { status: 404 });
         }
-        const invoice = await InvoiceModel.findOne({ invoiceId: InvoiceId }).populate({
+        const invoice = await InvoiceModel.findOne({ _id: InvoiceId }).populate({
             path: "createdBy",
             select: "_id email name phone role"
         }).populate({

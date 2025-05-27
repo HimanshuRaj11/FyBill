@@ -1,7 +1,6 @@
 import { verifyUser } from "@/lib/verifyUser";
 import InvoiceModel from "@/Model/Invoice.model";
 import UserModel from "@/Model/User.model";
-import { generateInvoiceId } from "@/lib/generateInvoiceId";
 import CompanyModel from "@/Model/Company.model";
 import BranchModel from "@/Model/branch.model";
 
@@ -9,8 +8,6 @@ import BranchModel from "@/Model/branch.model";
 export async function POST(request: Request) {
 
     try {
-        const Unique_id = generateInvoiceId();
-
         const User_id = await verifyUser();
         if (!User_id) {
             return Response.json({ message: "Unauthorized" }, { status: 401 });
@@ -22,6 +19,12 @@ export async function POST(request: Request) {
         const Company = await CompanyModel.findById({ _id: User.companyId })
         if (!Company) {
             return Response.json({ message: "Company not found" }, { status: 404 });
+        }
+        let invoiceLength = 0;
+
+        if (!Company.branch) {
+            const invoices = await InvoiceModel.find({ companyId: User.companyId });
+            invoiceLength = invoices.length;
         }
 
         const {
@@ -65,7 +68,7 @@ export async function POST(request: Request) {
             }
 
             invoice = await InvoiceModel.create({
-                invoiceId: Unique_id,
+                invoiceId: invoiceLength + 1,
                 companyId: Company._id,
                 clientName,
                 clientPhone: phoneNumber,
@@ -85,9 +88,12 @@ export async function POST(request: Request) {
 
             })
             if (User.branchId || selectedBranch) {
+                const invoices = await InvoiceModel.find({ branchId: User.branchId || selectedBranch });
+                invoiceLength = invoices.length;
                 invoice.branchId = User.branchId || selectedBranch;
                 const branch = await BranchModel.findById({ _id: User.branchId || selectedBranch })
                 invoice.branchName = branch?.branchName || "";
+                invoice.invoiceId = invoiceLength + 1;
             }
             await invoice.save();
         }

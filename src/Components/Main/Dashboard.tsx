@@ -351,7 +351,7 @@ export default function Dashboard() {
                                 {Invoice?.map((invoice: any) => (
                                     <tr key={invoice.invoiceId} className="hover:bg-gray-50">
                                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium ">
-                                            <Link href={`/Invoice/${invoice.invoiceId}`} className='text-blue-500'>
+                                            <Link href={`/Invoice/${invoice._id}`} className='text-blue-500'>
                                                 #{invoice.invoiceId}
                                             </Link>
                                         </td>
@@ -365,7 +365,7 @@ export default function Dashboard() {
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 ">{invoice.paymentMode} </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{moment(invoice.createdAt).format('MMM DD, YYYY')}</td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                            <Link href={`/Invoice/${invoice.invoiceId}`} className='text-blue-500'>View</Link>
+                                            <Link href={`/Invoice/${invoice._id}`} className='text-blue-500'>View</Link>
                                         </td>
                                     </tr>
                                 ))}

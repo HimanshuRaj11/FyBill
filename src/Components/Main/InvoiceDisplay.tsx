@@ -18,7 +18,6 @@ import PrintInvoiceFormate from "./PrintInvoiceFormate";
 export default function InvoiceDisplay({ invoice }: { invoice: any }) {
     const { Company } = useSelector((state: any) => state.Company)
     const { User } = useSelector((state: any) => state.User);
-    const user = User
     const Branch = invoice?.branchId;
     const Address = Branch?.address.street + " " + Branch?.address.city + " " + Branch?.address.state
 
@@ -63,7 +62,7 @@ export default function InvoiceDisplay({ invoice }: { invoice: any }) {
 
 
     const deleteInvoice = async () => {
-        const { data } = await axios.delete(`${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/Invoice/${invoice.invoiceId}/delete`, { withCredentials: true });
+        const { data } = await axios.delete(`${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/Invoice/${invoice._id}/delete`, { withCredentials: true });
         if (data.success) {
             toast.success("Invoice deleted successfully");
             router.back();
@@ -113,7 +112,7 @@ export default function InvoiceDisplay({ invoice }: { invoice: any }) {
 
 
                     {
-                        user?.role === "admin" || user?.role === "Owner" && (
+                        User?.role === "admin" || User?.role === "Owner" && (
                             <Button onClick={deleteInvoice} variant="outline" className="flex items-center gap-2 hover:bg-red-100 text-red-600 text-sm sm:text-base cursor-pointer">
                                 <Trash2 className="h-4 w-4" />
                                 <span className="hidden sm:inline">Delete</span>
