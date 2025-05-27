@@ -12,7 +12,7 @@ export interface IBranch extends Document {
     };
     email?: string;
     phone: string;
-    countryCode: string;
+    CountryCode: string;
     gstNumber?: string;
     panNumber?: string;
     ownerId: mongoose.Types.ObjectId;
@@ -35,7 +35,7 @@ const BranchSchema: Schema = new Schema<IBranch>(
         },
         email: { type: String },
         phone: { type: String, required: true },
-        countryCode: { type: String },
+        CountryCode: { type: String },
         gstNumber: { type: String },
         panNumber: { type: String },
         ownerId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },

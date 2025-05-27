@@ -38,16 +38,10 @@ export async function POST(request: Request) {
             InvoiceStatus,
             HoldedInvoice
         } = await request.json();
-        const Branch = await BranchModel.findOne({ _id: User.branchId || selectedBranch })
-        let companyAddress = ''
-        if (Branch) {
-            companyAddress = Branch.address.street + " " + Branch.address.city + " " + Branch.address.state
-        } else {
-            companyAddress = Company.address.street + " " + Company.address.city + " " + Company.address.state
-        }
+        let invoice
 
         if (HoldedInvoice) {
-            const HoldInvoice = await InvoiceModel.findByIdAndUpdate({ _id: HoldedInvoice }, {
+            invoice = await InvoiceModel.findByIdAndUpdate({ _id: HoldedInvoice }, {
                 clientName,
                 clientPhone: phoneNumber,
                 products,
@@ -58,41 +52,53 @@ export async function POST(request: Request) {
                 BillType,
                 paymentMode,
                 InvoiceStatus,
+            }, { returnDocument: "after" })
+            await invoice.save();
+        }
+        if (!HoldedInvoice) {
+            let companyAddress = ''
+            const Branch = await BranchModel.findOne({ _id: User.branchId || selectedBranch })
+            if (Branch) {
+                companyAddress = Branch.address.street + " " + Branch.address.city + " " + Branch.address.state
+            } else {
+                companyAddress = Company.address.street + " " + Company.address.city + " " + Company.address.state
+            }
+
+            invoice = await InvoiceModel.create({
+                invoiceId: Unique_id,
+                companyId: Company._id,
+                clientName,
+                clientPhone: phoneNumber,
+                companyName: Company.name,
+                companyAddress,
+                issueDate: new Date(),
+                products,
+                subTotal,
+                appliedTaxes,
+                totalTaxAmount,
+                BillType,
+                grandTotal,
+                paymentMode,
+                InvoiceStatus,
+                currency: Company.currency.symbol,
+                createdBy: User._id,
+
             })
-
+            if (User.branchId || selectedBranch) {
+                invoice.branchId = User.branchId || selectedBranch;
+                const branch = await BranchModel.findById({ _id: User.branchId || selectedBranch })
+                invoice.branchName = branch?.branchName || "";
+            }
+            await invoice.save();
         }
 
 
-        const invoice = await InvoiceModel.create({
-            invoiceId: Unique_id,
-            companyId: Company._id,
-            clientName,
-            clientPhone: phoneNumber,
-            companyName: Company.name,
-            companyAddress,
-            issueDate: new Date(),
-            products,
-            subTotal,
-            appliedTaxes,
-            totalTaxAmount,
-            BillType,
-            grandTotal,
-            paymentMode,
-            InvoiceStatus,
-            currency: Company.currency.symbol,
-            createdBy: User._id,
-
-        })
-        if (User.branchId || selectedBranch) {
-            invoice.branchId = User.branchId || selectedBranch;
-            const branch = await BranchModel.findById({ _id: User.branchId || selectedBranch })
-            invoice.branchName = branch?.branchName || "";
-        }
-        await invoice.save();
 
         return Response.json({ message: "Invoice created successfully", invoice }, { status: 200 });
 
     } catch (error) {
+        console.log(error);
+
         return Response.json({ message: "Internal server error", error }, { status: 500 });
     }
 

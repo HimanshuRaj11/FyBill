@@ -52,7 +52,7 @@ export default function Navbar() {
                 {
                     company && (
                         <Link href={'/Dashboard'}>
-                            <div className="logo font-bold text-3xl px-2 py-1 rounded-lg underline font-mono">
+                            <div className="logo font-bold text-xl md:text-3xl px-2 py-1 rounded-lg underline font-mono">
                                 {company?.name}
                             </div>
                         </Link>

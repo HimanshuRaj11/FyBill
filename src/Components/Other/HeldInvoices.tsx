@@ -1,15 +1,25 @@
 'use client'
 import { useState } from 'react';
-import { X, Clock, ChevronUp, ChevronDown, Search } from 'lucide-react';
+import { X, Clock, ChevronUp, ChevronDown, Search, Edit2, Printer, Receipt } from 'lucide-react';
 import moment from 'moment';
+import { Button } from '../ui/button';
 
-const HeldInvoices = ({ HoldInvoices, setHoldInvoiceUpdate }: { HoldInvoices: any, setHoldInvoiceUpdate: any }) => {
+const HeldInvoices = ({ HoldInvoices, setHoldInvoiceUpdate, setShowInvoice, setInvoice }: { setInvoice: any, setShowInvoice: any, HoldInvoices: any, setHoldInvoiceUpdate: any }) => {
     const [isExpanded, setIsExpanded] = useState(false);
 
     const ClickToModify = (invoice: any) => {
         setHoldInvoiceUpdate(invoice)
         setIsExpanded(false)
     }
+    const HandlePrintKOT = async (Invoice: any) => {
+        try {
+            setInvoice(Invoice)
+            setShowInvoice(true)
+        } catch (error) {
+
+        }
+    }
+
 
     return (
         <div className={`fixed bottom-0 cursor-pointer left-0 right-0 bg-white shadow-lg rounded-t-lg transition-all duration-300 ${isExpanded ? 'h-96' : 'h-16'}`}>
@@ -20,16 +30,16 @@ const HeldInvoices = ({ HoldInvoices, setHoldInvoiceUpdate }: { HoldInvoices: an
                         <Clock size={20} className="text-white" />
                     </div>
                     <div>
-                        <h3 className="font-semibold text-gray-800">Held Invoices</h3>
-                        <p className="text-xs text-gray-500">{HoldInvoices?.length} invoices on hold</p>
+                        <h3 className="font-semibold text-gray-800">Held & KOT Invoices</h3>
+                        <p className="text-xs text-gray-500">{HoldInvoices?.length} invoices on hold & KOT</p>
                     </div>
                 </div>
-                <button
+                <Button
                     onClick={() => setIsExpanded(!isExpanded)}
-                    className="p-1 rounded-full hover:bg-gray-100"
+                    className="p-1 rounded-full hover:bg-gray-100 hover:text-black"
                 >
                     {isExpanded ? <ChevronDown size={20} /> : <ChevronUp size={20} />}
-                </button>
+                </Button>
 
             </div>
 
@@ -39,8 +49,11 @@ const HeldInvoices = ({ HoldInvoices, setHoldInvoiceUpdate }: { HoldInvoices: an
                     {HoldInvoices?.length > 0 ? (
                         <div className="grid gap-3">
                             {HoldInvoices?.map((invoice: any, i: number) => (
-                                <div onClick={() => { ClickToModify(invoice) }} key={invoice?._id} className="flex items-center justify-between bg-gray-50 p-3 rounded-lg border border-gray-200 hover:border-amber-500 transition-colors">
+                                <div key={invoice?._id} className="flex items-center justify-between bg-gray-50 p-3 rounded-lg border border-gray-200 hover:border-amber-500 transition-colors">
                                     <div className="flex items-center">
+                                        {invoice.BillType === 'KOT' && (
+                                            <div className=" px-2 -rotate-90 bg-amber-700 w-fit rounded">KOT </div>
+                                        )}
                                         <div className="flex items-center justify-center w-10 h-10 rounded-full bg-amber-100 text-amber-700 font-bold mr-3">
 
                                             {invoice?.clientName?.charAt(0) || i + 1}
@@ -52,11 +65,15 @@ const HeldInvoices = ({ HoldInvoices, setHoldInvoiceUpdate }: { HoldInvoices: an
 
                                         </div>
                                     </div>
-                                    <div className="flex items-center">
-                                        <span className="font-semibold text-gray-800 mr-3">{invoice?.currency} {' '} {invoice?.grandTotal}</span>
-                                        <button className="p-1 rounded-full hover:bg-red-100 group">
-                                            <X size={18} className="text-gray-400 group-hover:text-red-500" />
-                                        </button>
+                                    <div className="flex items-center gap-1">
+                                        <span className="font-semibold text-gray-800 mr-3 ">{invoice?.currency} {' '} {invoice?.grandTotal}</span>
+
+                                        <Button onClick={() => HandlePrintKOT(invoice)} className=" ">
+                                            <Printer /> <span className=' group-hover:text-red-500'>Print</span>
+                                        </Button>
+                                        <Button onClick={() => { ClickToModify(invoice) }} className=" ">
+                                            <Edit2 /> <span className=' group-hover:text-red-500'>Edit</span>
+                                        </Button>
                                     </div>
                                 </div>
                             ))}

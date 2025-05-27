@@ -61,12 +61,12 @@ export default function BillingComponent({
     const { User } = useSelector((state: any) => state.User);
     const { Company } = useSelector((state: any) => state.Company);
     const [invoice, setInvoice] = useState<any>(null);
+    const [showInvoice, setShowInvoice] = useState(false);
     const [BillType, setBillType] = useState("BILL");
     const [clientName, setClientName] = useState("");
     const [phoneNumber, setPhoneNumber] = useState("");
     const [productName, setProductName] = useState("");
     const [products, setProducts] = useState<Product[]>([]);
-    const [showInvoice, setShowInvoice] = useState(false);
     const [filteredProducts, setFilteredProducts] = useState<any[]>([]);
     const [taxes, setTaxes] = useState<any[]>([]);
     const [productsList, setProductsList] = useState<any[]>([]);
@@ -208,6 +208,17 @@ export default function BillingComponent({
         }
     };
 
+    const Reset = () => {
+        SetHoldedInvoice("")
+        setClientName("");
+        setPhoneNumber("");
+        setProducts([]);
+        setSubTotal(0);
+        setGrandTotal(0);
+        setBillType("BILL");
+        setPaymentMode("");
+    }
+
     // Fetching Data
     const FetchProducts = async () => {
         try {
@@ -314,7 +325,7 @@ export default function BillingComponent({
         setShowInvoice(false);
     };
 
-    const OnContinue = async () => {
+    const CreateInvoice = async () => {
         try {
             if (products.length === 0) {
                 toast.error("Please add at least one product");
@@ -326,7 +337,7 @@ export default function BillingComponent({
                 return;
             }
 
-            if (User?.role === "Owner" && selectedBranch === "") {
+            if (User?.role === "Owner" && selectedBranch === "" && !HoldedInvoice) {
                 toast.error("Please select branch");
                 return;
             }
@@ -361,7 +372,9 @@ export default function BillingComponent({
                 setSubTotal(0);
                 setGrandTotal(0);
                 setBillType("BILL");
+                SetHoldedInvoice("")
                 setPaymentMode("");
+                setHoldInvoices((prev: any) => prev.filter((invoice: any) => invoice._id !== data.invoice._id));
             }
         } catch (error) {
             toast.error("Something went wrong");
@@ -419,6 +432,69 @@ export default function BillingComponent({
             setIsProcessing(false);
         }
     };
+
+    const HandleKOT = async () => {
+        try {
+            if (clientName === "") {
+                toast.error("Please Enter Client Name");
+                return;
+            }
+
+            if (products.length === 0) {
+                toast.error("Please add at least one product");
+                return;
+            }
+
+            if (User?.role === "Owner" && selectedBranch === "" && !HoldedInvoice) {
+                toast.error("Please select branch");
+                return;
+            }
+
+            setIsProcessing(true);
+
+            setIsProcessing(true);
+            const totalTaxAmount = appliedTaxes.reduce((sum, tax) => sum + tax.amount, 0);
+
+            const { data } = await axios.post(
+                `${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/Invoice/create`,
+                {
+                    clientName,
+                    phoneNumber,
+                    products,
+                    subTotal,
+                    grandTotal,
+                    paymentMode,
+                    appliedTaxes,
+                    totalTaxAmount,
+                    BillType,
+                    selectedBranch,
+                    HoldedInvoice,
+                    InvoiceStatus: "Hold",
+                }
+            );
+
+            if (data.invoice) {
+                setInvoice(data.invoice);
+                setShowInvoice(true);
+
+                if (!HoldedInvoice) {
+                    setHoldInvoices((prev: any) => [...prev, data.invoice]);
+                }
+                SetHoldedInvoice("")
+                setClientName("");
+                setPhoneNumber("");
+                setProducts([]);
+                setSubTotal(0);
+                setGrandTotal(0);
+                setPaymentMode("");
+                toast.success("KOT Invoice Created", { position: "bottom-right" });
+            }
+        } catch (error) {
+            toast.error("Something went wrong");
+        } finally {
+            setIsProcessing(false);
+        }
+    }
 
     return (
         <div className="container mx-auto px-4 pb-8">
@@ -498,7 +574,7 @@ export default function BillingComponent({
                                 </div>
                             </div>
 
-                            {User?.role === "Owner" && Company?.branch?.length > 0 && (
+                            {User?.role === "Owner" && Company?.branch?.length > 0 && !HoldedInvoice && (
                                 <div className="space-y-1">
                                     <label className="text-sm font-medium">Branch</label>
                                     <Select onValueChange={setSelectedBranch}>
@@ -779,31 +855,46 @@ export default function BillingComponent({
                                         </div>
                                     </div>
                                 )}
+                                {BillType == "KOT" ?
+                                    <div className="flex flex-col gap-2 pt-3">
+                                        <Button
+                                            onClick={HandleKOT}
+                                            variant="outline"
+                                            disabled={products.length === 0 || clientName === "" || isProcessing}
+                                            className="cursor-pointer w-full py-5 text-base flex gap-2 items-center"
+                                        >
+                                            <Save className="h-4 w-4" /> Continue
+                                        </Button>
+                                    </div>
+                                    :
+                                    <div className="flex flex-col gap-2 pt-3">
+                                        <Button
+                                            onClick={CreateInvoice}
+                                            disabled={
+                                                products.length === 0 ||
+                                                (BillType !== "KOT" && paymentMode === "") ||
+                                                isProcessing
+                                            }
+                                            className="cursor-pointer w-full py-6 text-base"
+                                        >
+                                            {isProcessing ? "Processing..." : "Create Invoice"}
+                                        </Button>
 
-                                <div className="flex flex-col gap-2 pt-3">
-                                    <Button
-                                        onClick={OnContinue}
-                                        disabled={
-                                            products.length === 0 ||
-                                            (BillType !== "KOT" && paymentMode === "") ||
-                                            isProcessing
-                                        }
-                                        className="cursor-pointer w-full py-6 text-base"
-                                    >
-                                        {isProcessing ? "Processing..." : "Create Invoice"}
-                                    </Button>
+                                        <Button
+                                            onClick={HoldInvoice}
+                                            variant="outline"
+                                            disabled={products.length === 0 || clientName === "" || isProcessing}
+                                            className="cursor-pointer w-full py-5 text-base flex gap-2 items-center"
+                                        >
+                                            <Save className="h-4 w-4" /> Hold Invoice
+                                        </Button>
+                                    </div>
+                                }
 
-                                    <Button
-                                        onClick={HoldInvoice}
-                                        variant="outline"
-                                        disabled={products.length === 0 || clientName === "" || isProcessing}
-                                        className="cursor-pointer w-full py-5 text-base flex gap-2 items-center"
-                                    >
-                                        <Save className="h-4 w-4" /> Hold Invoice
-                                    </Button>
-                                </div>
+                                <span className="text-red-600 cursor-pointer" onClick={Reset}>Reset</span>
                             </>
                         )}
+
                     </CardContent>
                 </Card>
             </div>

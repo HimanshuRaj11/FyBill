@@ -98,7 +98,7 @@ export default function PrintInvoiceFormate({ invoice }: { invoice: any }) {
                     {invoice?.appliedTaxes?.map((tax: any, index: any) => (
                         <div key={index} className="flex justify-between py-1">
                             <span>{tax.taxName} ({tax.percentage}%):</span>
-                            <span>{invoice.currency} {tax.amount}</span>
+                            <span>{invoice.currency} {tax.amount.toFixed(2)}</span>
                         </div>
                     ))}
 

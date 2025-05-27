@@ -7,13 +7,12 @@ import Link from 'next/link';
 import { AlertDialog, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger, AlertDialogCancel, AlertDialogAction } from '@/Components/ui/alert-dialog';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import WebLoader from '@/Components/Other/loader';
 export default function ProfilePage() {
     const { User } = useSelector((state: any) => state.User);
-    const user = User
     const { Company } = useSelector((state: any) => state.Company)
     const company = Company
     const [branches, setBranches] = useState([])
-
 
     const handleDeleteCompany = async () => {
         try {
@@ -34,6 +33,11 @@ export default function ProfilePage() {
         }
         fetchBranches()
     }, [])
+
+
+    if (!User) {
+        return (<WebLoader />)
+    }
     return (
         <div className=" min-h-screen ">
             <div className="max-w-3xl mx-auto">
@@ -43,7 +47,7 @@ export default function ProfilePage() {
                         <div className="absolute -bottom-16 left-8">
                             <div className="relative w-32 h-32 rounded-full border-4 border-white overflow-hidden bg-white">
                                 <Image
-                                    src={user?.profilePic || "/avatar.png"}
+                                    src={User?.profilePic || "/avatar.png"}
                                     alt="Profile Picture"
                                     fill
                                     className="object-cover"
@@ -55,8 +59,8 @@ export default function ProfilePage() {
                     <div className="pt-16 pb-6 px-8">
                         <div className="flex justify-between items-start">
                             <div>
-                                <h1 className="text-2xl font-bold text-gray-900">{user?.name}</h1>
-                                <p className="text-sm text-gray-500">{user?.role}</p>
+                                <h1 className="text-2xl font-bold text-gray-900">{User?.name}</h1>
+                                <p className="text-sm text-gray-500">{User?.role}</p>
                             </div>
                             <div className="space-x-2">
                                 <Button>
@@ -88,16 +92,19 @@ export default function ProfilePage() {
                                     <label className="text-sm font-medium text-gray-500">Email</label>
                                     <div className="mt-1">
                                         <p className="w-full px-3 py-2 border rounded-md bg-gray-50 border-gray-200">
-                                            {user?.email}
+                                            {User?.email}
                                         </p>
                                     </div>
                                 </div>
 
                                 <div>
                                     <label className="text-sm font-medium text-gray-500">Phone</label>
-                                    <div className="mt-1">
+                                    <div className="mt-1 flex flex-row gap-1">
+                                        <p className="w-fit px-3 py-2 border rounded-md bg-gray-50 border-gray-200">
+                                            {User?.CountryCode}
+                                        </p>
                                         <p className="w-full px-3 py-2 border rounded-md bg-gray-50 border-gray-200">
-                                            {user?.phone}
+                                            {User?.phone}
                                         </p>
                                     </div>
                                 </div>
@@ -115,7 +122,7 @@ export default function ProfilePage() {
                                     <label className="text-sm font-medium text-gray-500">Street</label>
                                     <div className="mt-1">
                                         <p className="w-full px-3 py-2 border rounded-md bg-gray-50 border-gray-200">
-                                            {user?.address?.street}
+                                            {User?.address?.street}
                                         </p>
                                     </div>
                                 </div>
@@ -125,7 +132,7 @@ export default function ProfilePage() {
                                         <label className="text-sm font-medium text-gray-500">City</label>
                                         <div className="mt-1">
                                             <p className="w-full px-3 py-2 border rounded-md bg-gray-50 border-gray-200">
-                                                {user?.address?.city}
+                                                {User?.address?.city}
                                             </p>
                                         </div>
                                     </div>
@@ -134,7 +141,7 @@ export default function ProfilePage() {
                                         <label className="text-sm font-medium text-gray-500">State</label>
                                         <div className="mt-1">
                                             <p className="w-full px-3 py-2 border rounded-md bg-gray-50 border-gray-200">
-                                                {user?.address?.state}
+                                                {User?.address?.state}
                                             </p>
                                         </div>
                                     </div>
@@ -144,7 +151,7 @@ export default function ProfilePage() {
                                     <label className="text-sm font-medium text-gray-500">ZIP Code</label>
                                     <div className="mt-1">
                                         <p className="w-full px-3 py-2 border rounded-md bg-gray-50 border-gray-200">
-                                            {user?.address?.zipCode}
+                                            {User?.address?.zipCode}
                                         </p>
                                     </div>
                                 </div>
@@ -153,7 +160,7 @@ export default function ProfilePage() {
                     </div>
                 </div>
                 {
-                    user?.role === "Owner" && !user?.companyId && (
+                    User?.role === "Owner" && !User?.companyId && (
                         <div className="mt-6 bg-white rounded-lg shadow-md p-6 space-y-6">
                             <Button>
                                 <Link href="/Company/Register">
@@ -200,7 +207,10 @@ export default function ProfilePage() {
                                 </div>
                                 <div>
                                     <label className="text-sm font-medium text-gray-500">Phone</label>
-                                    <div className="mt-1">
+                                    <div className="mt-1 flex flex-row gap-1">
+                                        <p className="w-fill px-3 py-2 border rounded-md bg-gray-50 border-gray-200">
+                                            {company?.CountryCode}
+                                        </p>
                                         <p className="w-full px-3 py-2 border rounded-md bg-gray-50 border-gray-200">
                                             {company?.phone}
                                         </p>
@@ -296,9 +306,13 @@ export default function ProfilePage() {
                                         {
                                             branches.map((branch: any) => (
                                                 <div className="mt-4 border rounded-lg p-4" key={branch._id}>
-                                                    <h1 className='text-md font-medium text-gray-900'>Branch Name:
-                                                        <span className='text-sm ml-2 font-medium text-gray-500'>{branch?.branchName}</span>
-                                                    </h1>
+                                                    <div className="">
+
+                                                        <h1 className='text-md font-medium text-gray-900'>Branch Name:
+                                                            <span className='text-sm ml-2 font-medium text-gray-500'>{branch?.branchName}</span>
+                                                        </h1>
+                                                        <Link href={`Profile/edit/${branch._id}`}>Edit</Link>
+                                                    </div>
                                                     <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-4">
                                                         <div>
                                                             <label className="text-sm font-medium text-gray-500">Street</label>
@@ -340,6 +354,17 @@ export default function ProfilePage() {
                                                                 </p>
                                                             </div>
                                                         </div>
+                                                        <div>
+                                                            <label className="text-sm font-medium text-gray-500">Phone</label>
+                                                            <div className="mt-1 flex flex-row gap-1">
+                                                                <p className="w-fill px-3 py-2 border rounded-md bg-gray-50 border-gray-200">
+                                                                    {branch?.CountryCode}
+                                                                </p>
+                                                                <p className="w-full px-3 py-2 border rounded-md bg-gray-50 border-gray-200">
+                                                                    {branch?.phone}
+                                                                </p>
+                                                            </div>
+                                                        </div>
 
                                                     </div>
                                                 </div>
@@ -364,7 +389,7 @@ export default function ProfilePage() {
 
 
                             {
-                                user?.role === "Owner" && user?.companyId && (
+                                User?.role === "Owner" && User?.companyId && (
                                     <div className="mt-6 bg-white rounded-lg  p-6 space-y-6">
                                         <AlertDialog>
                                             <AlertDialogTrigger asChild>
