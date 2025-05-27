@@ -808,16 +808,15 @@ export default function BillingComponent({
                                                         <Trash2 className="h-4 w-4" />
                                                     </Button>
 
-                                                    {BillType !== "KOT" && (
-                                                        <Button
-                                                            size="icon"
-                                                            variant="ghost"
-                                                            className="h-8 w-8 cursor-pointer text-blue-500 hover:text-blue-600 hover:bg-blue-50"
-                                                            onClick={() => handleProductEdit(product, index)}
-                                                        >
-                                                            <Edit className="h-4 w-4" />
-                                                        </Button>
-                                                    )}
+                                                    <Button
+                                                        size="icon"
+                                                        variant="ghost"
+                                                        className="h-8 w-8 cursor-pointer text-blue-500 hover:text-blue-600 hover:bg-blue-50"
+                                                        onClick={() => handleProductEdit(product, index)}
+                                                    >
+                                                        <Edit className="h-4 w-4" />
+                                                    </Button>
+
                                                 </div>
                                             </div>
                                         </div>
