@@ -1,7 +1,7 @@
 'use client'
 import Link from 'next/link';
 import React, { useState } from 'react';
-import { FaBars, FaTachometerAlt, FaFileInvoice, FaUsers, FaBox, FaCog, FaSignInAlt, FaUserPlus, FaFileInvoiceDollar, FaTimes, FaAngleRight } from 'react-icons/fa';
+import { FaBars, FaTachometerAlt, FaFileInvoice, FaUsers, FaBox, FaCog, FaSignInAlt, FaUserPlus, FaFileInvoiceDollar, FaTimes, FaAngleRight, FaTable, FaDatabase, FaChartArea, FaChartPie, FaChartLine, FaChartBar } from 'react-icons/fa';
 import { useSelector } from 'react-redux';
 import { usePathname } from 'next/navigation';
 import { Button } from '../ui/button';
@@ -27,7 +27,7 @@ export default function Sidebar() {
 
 
                     <aside id="default-sidebar" className={`fixed top-20 left-1 z-40 w-64 h-[88vh] transition-transform -translate-x-full sm:translate-x-0 ${ShowSidebar ? "translate-x-0" : ""} `} aria-label="Sidebar">
-                        <Button variant={'ghost'} onClick={() => setShowSidebar(!ShowSidebar)} data-drawer-target="default-sidebar" data-drawer-toggle="default-sidebar" aria-controls="default-sidebar" type="button" className="inline-flex left-60 cursor-pointer fixed items-center p-2 mt-2 ms-3 text-sm bg-gray-50 rounded-lg sm:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600">
+                        <Button variant={'ghost'} onClick={() => setShowSidebar(!ShowSidebar)} data-drawer-target="default-sidebar" data-drawer-toggle="default-sidebar" aria-controls="default-sidebar" type="button" className="inline-flex -top-6 left-60 cursor-pointer fixed items-center p-2 mt-2 ms-3 text-sm bg-gray-50 rounded-lg sm:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600">
                             {ShowSidebar ? (
                                 <FaTimes className="w-6 h-6" aria-hidden="true" />
                             ) : (
@@ -73,6 +73,13 @@ export default function Sidebar() {
                                     <Link href="/Bills/Create" className={`flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-300 dark:hover:bg-gray-700 group ${isActive('/Bills/Create') ? 'bg-gray-300 dark:bg-gray-700' : ''}`}>
                                         <FaFileInvoiceDollar className={`shrink-0 w-5 h-5 transition duration-75 ${isActive('/Bills/Create') ? 'text-gray-900 dark:text-white' : 'text-gray-500 dark:text-gray-400'} group-hover:text-gray-900 dark:group-hover:text-white`} aria-hidden="true" />
                                         <span className="flex-1 ms-3 whitespace-nowrap">Create Bill</span>
+                                    </Link>
+                                </li>
+
+                                <li>
+                                    <Link href="/data-summary" className={`flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-300 dark:hover:bg-gray-700 group ${isActive('/data-summary') ? 'bg-gray-300 dark:bg-gray-700' : ''}`}>
+                                        <FaChartPie className={`shrink-0 w-5 h-5 transition duration-75 ${isActive('/data-summary') ? 'text-gray-900 dark:text-white' : 'text-gray-500 dark:text-gray-400'} group-hover:text-gray-900 dark:group-hover:text-white`} aria-hidden="true" />
+                                        <span className="flex-1 ms-3 whitespace-nowrap">Data Summary</span>
                                     </Link>
                                 </li>
 

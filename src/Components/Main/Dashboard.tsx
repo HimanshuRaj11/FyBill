@@ -20,11 +20,10 @@ export default function Dashboard() {
     const [isLoading, setIsLoading] = useState(false)
 
     const [Invoice, setInvoice] = useState([])
-    const [selectedBranch, setSelectedBranch] = useState("All");
-
     const [searchQuery, setSearchQuery] = useState('')
-    const [isFilterOpen, setIsFilterOpen] = useState(false)
 
+    const [selectedBranch, setSelectedBranch] = useState("All");
+    const [isFilterOpen, setIsFilterOpen] = useState(false)
 
     const [dateRange, setDateRange] = useState('Today')
 

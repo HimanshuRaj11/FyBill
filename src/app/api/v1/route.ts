@@ -1,12 +1,16 @@
 import { InternalServerError } from "@/lib/handelError";
 import { verifyUser } from "@/lib/verifyUser";
+import branchModel from "@/Model/branch.model";
 import UserModel from "@/Model/User.model";
 import { NextResponse } from "next/server";
 
 export async function GET() {
     try {
         const user_id = await verifyUser();
-        const user = await UserModel.findById({ _id: user_id }).select("-password").lean()
+        const user = await UserModel.findById({ _id: user_id }).select("-password").populate({
+            path: 'branchId',
+            model: branchModel
+        }).lean()
         return NextResponse.json({ user, success: true }, { status: 200 })
 
     } catch (error) {
