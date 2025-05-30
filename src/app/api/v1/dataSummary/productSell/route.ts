@@ -28,8 +28,6 @@ export async function POST(request: Request) {
         }
         const { selectedBranch, startDate, endDate } = await request.json();
 
-        console.log(selectedBranch, startDate, endDate);
-
         const Invoices = await InvoiceModel.find({
             companyId: User.companyId,
             createdAt: {
@@ -40,7 +38,6 @@ export async function POST(request: Request) {
             InvoiceStatus: "Done",
             BillType: { $ne: "KOT" }
         })
-        console.log(Invoices);
 
         const FinalList = GetProductDataSummary(Invoices)
         return NextResponse.json({ message: "", FinalList, success: true }, { status: 200 });
@@ -55,7 +52,7 @@ export async function POST(request: Request) {
 
 function GetProductDataSummary(Invoices: any[]) {
 
-    let products = <IProduct[]>[];
+    const products = <IProduct[]>[];
     Invoices.map((invoice) => {
         const productList = invoice.products
         productList.forEach((product: IProduct) => {
