@@ -91,7 +91,7 @@ export default function Page() {
         } catch (error) {
             return error
         }
-    }, [startDate, endDate, selectedBranch])
+    }, [startDate, endDate, selectedBranch, User?.branchId])
 
 
     useEffect(() => {
