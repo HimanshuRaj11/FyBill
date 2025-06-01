@@ -317,7 +317,7 @@ export default function ProfilePage() {
                 }
 
                 {
-                    company && (
+                    user?.role === "Owner" && !user?.companyId && (
                         <div className="mt-6 bg-white rounded-lg shadow-md p-6 space-y-6">
                             <h2 className="text-xl font-semibold text-gray-900">Company Details</h2>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

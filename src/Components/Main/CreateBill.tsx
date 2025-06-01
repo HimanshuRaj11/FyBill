@@ -749,7 +749,7 @@ export default function BillingComponent({
                             </div>
                         ) : (
                             <>
-                                <div className="max-h-[280px] pr-1">
+                                <div className="max-h-[280px] pr-1 overflow-y-auto " >
                                     {products.map((product, index) => (
                                         <div
                                             key={index}
