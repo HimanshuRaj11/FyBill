@@ -490,7 +490,7 @@ export default function BillingComponent({
     }
 
     return (
-        <div className="container mx-auto px-4 pb-8">
+        <div className="container mx-auto pb-8">
             {showInvoice && invoice && (
                 <Dialog open={showInvoice} onOpenChange={setShowInvoice}>
                     <DialogContent className="max-w-4xl w-full">
@@ -749,7 +749,7 @@ export default function BillingComponent({
                             </div>
                         ) : (
                             <>
-                                <div className="max-h-[280px] overflow-y-auto pr-1">
+                                <div className="max-h-[280px] pr-1">
                                     {products.map((product, index) => (
                                         <div
                                             key={index}
@@ -769,10 +769,10 @@ export default function BillingComponent({
                                                     className="h-7 w-7 cursor-pointer rounded-full"
                                                     onClick={() => handleQuantityChange(product, -1)}
                                                 >
-                                                    <Minus className="h-3 w-3" />
+                                                    <Minus className="size-4" />
                                                 </Button>
 
-                                                <span className="w-6 text-center">{product.quantity}</span>
+                                                <span className=" text-center">{product.quantity}</span>
 
                                                 <Button
                                                     size="icon"
@@ -780,13 +780,13 @@ export default function BillingComponent({
                                                     className="h-7 w-7 cursor-pointer rounded-full"
                                                     onClick={() => handleQuantityChange(product, 1)}
                                                 >
-                                                    <Plus className="h-3 w-3" />
+                                                    <Plus className="size-4" />
                                                 </Button>
                                             </div>
 
-                                            <div className="flex items-center ml-4 gap-1">
+                                            <div className="flex items-center gap-1">
                                                 {BillType !== "KOT" && (
-                                                    <span className="text-right w-16 font-medium">
+                                                    <span className="text-right w-fit font-medium">
                                                         ₹{product.amount.toFixed(2)}
                                                     </span>
                                                 )}
