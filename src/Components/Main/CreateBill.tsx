@@ -822,7 +822,6 @@ export default function BillingComponent({
                                             <span className="text-gray-600">Subtotal</span>
                                             <span>₹{subTotal.toFixed(2)}</span>
                                         </div>
-
                                         {appliedTaxes?.map((tax, index) => (
                                             <div key={index} className="flex justify-between text-sm">
                                                 <span className="text-gray-600">

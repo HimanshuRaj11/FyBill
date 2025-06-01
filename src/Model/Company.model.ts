@@ -23,6 +23,7 @@ export interface ICompany extends Document {
     updatedAt: Date;
     industry: string;
     companySize: string;
+    lastInvoiceNo: number;
     currency: {
         name: string;
         code: string;
@@ -55,6 +56,7 @@ const CompanySchema: Schema = new Schema<ICompany>(
         industry: { type: String, required: true },
         companySize: { type: String, required: true },
         branch: [{ type: mongoose.Schema.Types.ObjectId, ref: "Branch" }],
+        lastInvoiceNo: { type: Number, default: 0 },
         currency: {
             name: { type: String, required: true, default: "United States Dollar" },
             code: { type: String, required: true, default: "USD" },

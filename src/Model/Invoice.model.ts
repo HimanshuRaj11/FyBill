@@ -53,7 +53,7 @@ const TaxSchema: Schema = new Schema({
 
 const InvoiceSchema: Schema = new Schema<IInvoice>(
     {
-        invoiceId: { type: String, required: true, unique: true },
+        invoiceId: { type: String, required: true, },
         companyId: { type: mongoose.Schema.Types.ObjectId, required: true, ref: "Company" },
         branchId: { type: mongoose.Schema.Types.ObjectId, ref: "Branch" },
         clientName: { type: String, default: "" },

@@ -20,13 +20,6 @@ export async function POST(request: Request) {
         if (!Company) {
             return Response.json({ message: "Company not found" }, { status: 404 });
         }
-        let invoiceLength = 0;
-
-        if (!Company.branch) {
-            const invoices = await InvoiceModel.find({ companyId: User.companyId });
-            invoiceLength = invoices.length;
-        }
-
         const {
             clientName,
             phoneNumber,
@@ -60,15 +53,23 @@ export async function POST(request: Request) {
         }
         if (!HoldedInvoice) {
             let companyAddress = ''
+            let lastInvoiceNo = 0;
+
             const Branch = await BranchModel.findOne({ _id: User.branchId || selectedBranch })
             if (Branch) {
-                companyAddress = Branch.address.street + " " + Branch.address.city + " " + Branch.address.state
+                lastInvoiceNo = Branch.lastInvoiceNo + 1;
+                companyAddress = Branch.address.street + " " + Branch.address.city + " " + Branch.address.state;
+                Branch.lastInvoiceNo = Branch.lastInvoiceNo + 1;
+                await Branch.save();
             } else {
+                lastInvoiceNo = Company.lastInvoiceNo + 1;
                 companyAddress = Company.address.street + " " + Company.address.city + " " + Company.address.state
+                Company.lastInvoiceNo = Company.lastInvoiceNo + 1;
+                await Company.save();
             }
 
             invoice = await InvoiceModel.create({
-                invoiceId: invoiceLength + 1,
+                invoiceId: lastInvoiceNo + 1,
                 companyId: Company._id,
                 clientName,
                 clientPhone: phoneNumber,
@@ -88,12 +89,10 @@ export async function POST(request: Request) {
 
             })
             if (User.branchId || selectedBranch) {
-                const invoices = await InvoiceModel.find({ branchId: User.branchId || selectedBranch });
-                invoiceLength = invoices.length;
                 invoice.branchId = User.branchId || selectedBranch;
                 const branch = await BranchModel.findById({ _id: User.branchId || selectedBranch })
                 invoice.branchName = branch?.branchName || "";
-                invoice.invoiceId = invoiceLength + 1;
+
             }
             await invoice.save();
         }

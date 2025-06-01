@@ -15,6 +15,7 @@ export interface IBranch extends Document {
     CountryCode: string;
     gstNumber?: string;
     panNumber?: string;
+    lastInvoiceNo: number;
     ownerId: mongoose.Types.ObjectId;
     staffIds: mongoose.Types.ObjectId[];
     createdAt: Date;
@@ -37,6 +38,7 @@ const BranchSchema: Schema = new Schema<IBranch>(
         phone: { type: String, required: true },
         CountryCode: { type: String },
         gstNumber: { type: String },
+        lastInvoiceNo: { type: Number, default: 0 },
         panNumber: { type: String },
         ownerId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
         staffIds: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
