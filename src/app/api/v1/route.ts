@@ -16,8 +16,6 @@ export async function GET() {
         return NextResponse.json({ user, success: true }, { status: 200 })
 
     } catch (error) {
-        console.log(error);
-
         return NextResponse.json(InternalServerError(error as Error), { status: 503 });
     }
 }

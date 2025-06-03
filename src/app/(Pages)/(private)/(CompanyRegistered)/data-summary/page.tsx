@@ -98,7 +98,6 @@ export default function Page() {
         getProductData()
     }, [getProductData])
 
-    const totalAmount = ProductsDataSummary.reduce((sum, product) => sum + product.amount, 0)
     const totalQuantity = ProductsDataSummary.reduce((sum, product) => sum + product.quantity, 0)
 
 
@@ -360,19 +359,7 @@ export default function Page() {
                                 </div>
                             </div>
 
-                            <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100 hover:shadow-xl transition-shadow duration-300">
-                                <div className="flex items-center justify-between">
-                                    <div>
-                                        <p className="text-sm font-medium text-gray-600">Total Revenue</p>
-                                        <p className="text-3xl font-bold text-gray-900">{Company?.currency?.symbol}{totalAmount.toLocaleString()}</p>
-                                    </div>
-                                    <div className="bg-purple-100 p-3 rounded-full">
-                                        <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
-                                        </svg>
-                                    </div>
-                                </div>
-                            </div>
+
                         </div>
 
                         {/* Products Grid */}
@@ -396,9 +383,7 @@ export default function Page() {
                                         <thead className="bg-gray-50">
                                             <tr>
                                                 <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product Name</th>
-                                                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rate</th>
                                                 <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quantity</th>
-                                                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
                                             </tr>
                                         </thead>
                                         <tbody className="divide-y divide-gray-200">
@@ -412,13 +397,11 @@ export default function Page() {
                                                             <div className="text-sm font-medium text-gray-900 capitalize">{product.name}</div>
                                                         </div>
                                                     </td>
-                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-medium">{Company?.currency?.symbol}{product.rate.toLocaleString()}</td>
                                                     <td className="px-6 py-4 whitespace-nowrap">
                                                         <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                                                             {product.quantity.toLocaleString()}
                                                         </span>
                                                     </td>
-                                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-green-600">{Company?.currency?.symbol}{product.amount.toLocaleString()}</td>
                                                 </tr>
                                             ))}
                                         </tbody>
