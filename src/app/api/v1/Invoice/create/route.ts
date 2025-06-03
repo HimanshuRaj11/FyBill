@@ -97,8 +97,6 @@ export async function POST(request: Request) {
             await invoice.save();
         }
 
-
-
         return Response.json({ message: "Invoice created successfully", invoice }, { status: 200 });
 
     } catch (error) {

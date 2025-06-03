@@ -232,7 +232,6 @@ export default function BillingComponent({
             }
         }
         catch (error) {
-            console.error("Error fetching products:", error);
             toast.error("Failed to fetch products");
         }
     };
@@ -244,7 +243,6 @@ export default function BillingComponent({
             );
             setTaxes(data?.tax?.taxes);
         } catch (error) {
-            console.error("Error fetching taxes:", error);
             toast.error("Failed to fetch taxes");
         }
     };
@@ -366,7 +364,6 @@ export default function BillingComponent({
                 setGrandTotal(0);
                 setBillType("BILL");
                 SetHoldedInvoice("")
-                setPaymentMode("");
                 setHoldInvoices((prev: any) => prev.filter((invoice: any) => invoice._id !== data.invoice._id));
             }
         } catch (error) {
@@ -496,7 +493,7 @@ export default function BillingComponent({
                     <DialogContent className="max-w-4xl w-full">
                         <DialogTitle className="text-2xl font-bold flex items-center gap-2">
                             <Receipt className="h-6 w-6" />
-                            Invoice #{invoice.invoiceNumber}
+                            Invoice #{invoice.invoiceId}
                         </DialogTitle>
                         <div ref={invoiceRef} className="max-h-[70vh] overflow-auto p-4 border rounded-lg">
                             <PrintInvoiceFormate invoice={invoice} />
