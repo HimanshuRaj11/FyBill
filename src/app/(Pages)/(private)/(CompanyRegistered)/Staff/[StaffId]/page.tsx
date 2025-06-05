@@ -146,14 +146,14 @@ export default function StaffDetailsCard({ params }: { params: Promise<{ StaffId
                             <h2 className="text-2xl font-bold text-gray-800">{staffMember?.name}</h2>
 
                             <div className="relative">
-                                <button
+                                {/* <button
                                     onClick={() => setShowOptions(!showOptions)}
                                     className="text-gray-500 hover:text-gray-800 focus:outline-none"
                                 >
                                     <MoreHorizontal size={20} />
-                                </button>
+                                </button> */}
 
-                                {showOptions && (
+                                {/* {showOptions && (
                                     <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10 border border-gray-200">
                                         <div className="py-1">
                                             <button
@@ -176,7 +176,7 @@ export default function StaffDetailsCard({ params }: { params: Promise<{ StaffId
                                             </button>
                                         </div>
                                     </div>
-                                )}
+                                )} */}
                             </div>
                         </div>
 
@@ -208,6 +208,10 @@ export default function StaffDetailsCard({ params }: { params: Promise<{ StaffId
                         </div>
                     </div>
                 </div>
+            </div>
+
+            <div className=" p-2">
+                <h1 className="text-xl font-extrabold text-gray-800 mb-4">{dateRange} Invoice Data</h1>
             </div>
 
 
@@ -332,9 +336,7 @@ export default function StaffDetailsCard({ params }: { params: Promise<{ StaffId
                         )}
                     </div>
                 </div>
-                <div className=" p-2">
-                    <h1 className="text-xl font-extrabold text-gray-800 mb-4">{dateRange} Invoice Data</h1>
-                </div>
+
             </>
             <Card className="hover:shadow-md transition-shadow duration-200">
                 <CardHeader>

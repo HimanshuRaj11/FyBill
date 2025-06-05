@@ -25,7 +25,7 @@ export default function Dashboard() {
     const [selectedBranch, setSelectedBranch] = useState("All");
     const [isFilterOpen, setIsFilterOpen] = useState(false)
 
-    const [dateRange, setDateRange] = useState('Today')
+    const [dateRange, setDateRange] = useState('')
 
     const [startDate, setStartDate] = useState(moment().startOf('day').toDate())
     const [endDate, setEndDate] = useState(moment().endOf('day').toDate())
@@ -68,29 +68,19 @@ export default function Dashboard() {
     }
 
     const FilterInvoice = useCallback(async () => {
-        const { data } = await axios.post(`${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/Invoice/filter`, { selectedBranch, startDate, endDate })
-        setInvoice(data.invoices)
+        try {
+            setIsLoading(true)
+            const { data } = await axios.post(`${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/Invoice/filter`, { selectedBranch, startDate, endDate })
+            setInvoice(data.invoices)
+            setIsLoading(false)
+        } catch (error) {
+
+        }
     }, [startDate, endDate, selectedBranch])
 
 
-
-
-
-    const FetchInvoice: () => Promise<void> = async () => {
-        try {
-            setIsLoading(true)
-            const { data } = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/Invoice/fetch?sort=-createdAt`)
-            setInvoice(data.invoices)
-
-            setIsLoading(false)
-        } catch (error) {
-            setIsLoading(false)
-        }
-    }
-
     useEffect(() => {
         setDateRange("Today");
-        FetchInvoice()
     }, [])
 
     useEffect(() => {
@@ -98,7 +88,7 @@ export default function Dashboard() {
     }, [dateRange, FilterInvoice])
 
     const handleRefresh = () => {
-        FetchInvoice()
+        FilterInvoice()
     }
 
 

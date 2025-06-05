@@ -94,6 +94,7 @@ export default function Page() {
     }, [startDate, endDate, selectedBranch, User.branchId])
 
 
+
     useEffect(() => {
         getProductData()
     }, [getProductData])
@@ -323,7 +324,7 @@ export default function Page() {
                 </div>
             </div>
             <div className=" p-2">
-                <h1 className="text-xl font-extrabold text-gray-800 mb-4">{dateRange} Sells Data</h1>
+                <h1 className="text-xl font-extrabold text-gray-800 mb-4"> {dateRange} Sales Data</h1>
             </div>
 
             {
