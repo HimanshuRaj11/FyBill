@@ -2,7 +2,7 @@ import mongoose, { Schema, Document } from 'mongoose';
 
 interface IProduct extends Document {
     name: string;
-    product_number: Number
+    product_number: number
     price: number;
     description: string;
     category: string;
