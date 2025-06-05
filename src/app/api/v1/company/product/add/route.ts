@@ -19,19 +19,27 @@ export async function POST(request: NextRequest) {
         // }
 
 
+
         const company = await CompanyModel.findById({ _id: User.companyId });
         if (!company) {
             return NextResponse.json({ success: false, error: 'Company not found' });
         }
         const { name, price, description, category, branchId } = await request.json();
         let Branch;
+        let product_number;
         if (User.branchId) {
             Branch = User.branchId;
         } else {
             Branch = branchId
         }
-
-        const product = await ProductModel.create({ name, price, description, category, companyId: company._id, branchId: Branch });
+        if (Branch) {
+            const BranchProducts = await ProductModel.find({ branchId: Branch })
+            product_number = BranchProducts.length
+        } else {
+            const CompanyProducts = await ProductModel.find({ companyId: company._id })
+            product_number = CompanyProducts.length
+        }
+        const product = await ProductModel.create({ name, price, product_number, description, category, companyId: company._id, branchId: Branch });
 
         return NextResponse.json({ success: true, product });
     } catch (error) {

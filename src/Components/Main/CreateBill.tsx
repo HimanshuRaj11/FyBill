@@ -83,6 +83,7 @@ export default function BillingComponent({
     const [selectedCategory, setSelectedCategory] = useState<string>("all");
     const [isProcessing, setIsProcessing] = useState(false);
 
+    const searchRef = useRef<HTMLInputElement>(null);
     useEffect(() => {
         if (HoldInvoiceUpdate) {
             SetHoldedInvoice(HoldInvoiceUpdate._id);
@@ -158,6 +159,7 @@ export default function BillingComponent({
             autoClose: 1000,
             hideProgressBar: true,
         });
+        ClearSearch()
     };
 
     const handleDelete = (index: number) => {
@@ -266,8 +268,10 @@ export default function BillingComponent({
 
         // Apply search term filter
         if (searchTerm) {
+            const term = searchTerm.toLowerCase();
             filtered = filtered.filter((product: any) =>
-                product.name.toLowerCase().includes(searchTerm.toLowerCase())
+                product.name.toLowerCase().includes(term) ||
+                product.product_number.toString().toLowerCase().includes(term)
             );
         }
 
@@ -299,6 +303,7 @@ export default function BillingComponent({
     const ClearSearch = () => {
         setProductName("");
         handleProductSearch("");
+        searchRef.current?.focus();
     };
 
     const invoiceRef = useRef<HTMLDivElement>(null);
@@ -658,6 +663,7 @@ export default function BillingComponent({
                                 <div className="relative">
                                     <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                                     <Input
+                                        ref={searchRef}
                                         placeholder="Search Products"
                                         value={productName}
                                         onChange={(e) => handleProductSearch(e.target.value)}
@@ -666,7 +672,7 @@ export default function BillingComponent({
                                     {productName && (
                                         <X
                                             onClick={ClearSearch}
-                                            className="absolute right-3 top-3 cursor-pointer text-gray-400 hover:text-gray-600"
+                                            className="absolute right-3 top-2 cursor-pointer text-gray-400 hover:text-gray-600"
                                         />
                                     )}
                                 </div>
@@ -687,7 +693,13 @@ export default function BillingComponent({
                                             key={index}
                                             className="bg-white hover:bg-blue-50 border rounded-lg p-4 shadow-sm hover:shadow cursor-pointer transition-all"
                                         >
-                                            <h3 className="font-medium truncate">{product.name}</h3>
+                                            <div className="span flex flex-row">
+                                                {
+                                                    product?.product_number &&
+                                                    <h4 className="font-medium px-2 bg-amber-500 rounded-full border ">{product?.product_number}</h4>
+                                                }
+                                                <h3 className="font-medium truncate">{product.name}</h3>
+                                            </div>
                                             <p className="text-blue-600 font-semibold mt-1">₹{product.price.toFixed(2)}</p>
                                             {product.category && (
                                                 <Badge variant="outline" className="mt-2 text-xs">
