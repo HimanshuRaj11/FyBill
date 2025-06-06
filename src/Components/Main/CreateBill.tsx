@@ -684,7 +684,7 @@ export default function BillingComponent({
                                     >
                                         <PlusCircle className="h-8 w-8 text-blue-500" />
                                         <span className="text-sm font-medium">Complement</span>
-                                        <span className="text-xs text-gray-500">₹0.00</span>
+                                        <span className="text-xs text-gray-500">{Company?.currency?.symbol}0.00</span>
                                     </div>
 
                                     {filteredProducts?.map((product: any, index: any) => (
@@ -700,7 +700,7 @@ export default function BillingComponent({
                                                 }
                                                 <h3 className="font-medium truncate">{product.name}</h3>
                                             </div>
-                                            <p className="text-blue-600 font-semibold mt-1">₹{product.price.toFixed(2)}</p>
+                                            <p className="text-blue-600 font-semibold mt-1">{Company?.currency?.symbol}{product.price.toFixed(2)}</p>
                                             {product.category && (
                                                 <Badge variant="outline" className="mt-2 text-xs">
                                                     {product.category}

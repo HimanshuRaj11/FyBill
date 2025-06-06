@@ -227,7 +227,7 @@ export default function InvoiceDisplay({ invoice }: { invoice: any }) {
                                                 {tax.taxName} ({tax.percentage}%)
                                             </td>
                                             <td className="p-4 text-gray-800 text-right">
-                                                {invoice.currency} {tax.amount}
+                                                {invoice.currency} {tax.amount.toFixed(2)}
                                             </td>
                                         </tr>
                                     ))}
