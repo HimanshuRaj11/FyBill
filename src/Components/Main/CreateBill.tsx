@@ -103,12 +103,11 @@ export default function BillingComponent({
             setProductCategories(categories);
         }
     }, [productsList]);
-
     // Tax calculation
     useEffect(() => {
         setAppliedTaxes([]);
         taxes?.forEach((tax) => {
-            const taxAmount = subTotal * (tax.percentage / 100);
+            const taxAmount: number = parseFloat((subTotal * (tax.percentage / 100)).toFixed(2));
             setAppliedTaxes((prev) => [
                 ...prev,
                 {
