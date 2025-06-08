@@ -130,12 +130,35 @@ export default function BillingComponent({
         const totalTaxAmount = appliedTaxes.reduce((sum, tax) => sum + tax.amount, 0);
         setGrandTotal(Number((newSubTotal + totalTaxAmount).toFixed(2)));
     }, [products, appliedTaxes]);
+    const handleProductSearch = (searchTerm: string) => {
+        setProductName(searchTerm);
 
-    const ClearSearch = () => {
+        let filtered = productsList;
+
+        // Apply category filter if not "all"
+        if (selectedCategory !== "all") {
+            filtered = filtered.filter((product: any) =>
+                (product.category || "uncategorized") === selectedCategory
+            );
+        }
+
+        // Apply search term filter
+        if (searchTerm) {
+            const term = searchTerm.toLowerCase();
+            filtered = filtered.filter((product: any) =>
+                product.name.toLowerCase().includes(term) ||
+                product.product_number.toString().toLowerCase().includes(term)
+            );
+        }
+
+        setFilteredProducts(filtered);
+    };
+
+    const ClearSearch = useCallback(() => {
         setProductName("");
         handleProductSearch("");
         searchRef.current?.focus();
-    };
+    }, [handleProductSearch, productName]);
 
     const AddProduct = useCallback((product: any) => {
         if (products.find((p) => p.name === product.name)) {
@@ -264,29 +287,7 @@ export default function BillingComponent({
         fetchTaxData();
     }, []);
 
-    const handleProductSearch = (searchTerm: string) => {
-        setProductName(searchTerm);
 
-        let filtered = productsList;
-
-        // Apply category filter if not "all"
-        if (selectedCategory !== "all") {
-            filtered = filtered.filter((product: any) =>
-                (product.category || "uncategorized") === selectedCategory
-            );
-        }
-
-        // Apply search term filter
-        if (searchTerm) {
-            const term = searchTerm.toLowerCase();
-            filtered = filtered.filter((product: any) =>
-                product.name.toLowerCase().includes(term) ||
-                product.product_number.toString().toLowerCase().includes(term)
-            );
-        }
-
-        setFilteredProducts(filtered);
-    };
 
     const handleCategoryChange = (category: string) => {
         setSelectedCategory(category);
