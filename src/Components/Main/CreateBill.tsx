@@ -520,7 +520,6 @@ export default function BillingComponent({
             else if (e.key === "Enter") {
                 const selected = filteredProducts[highlightedIndex];
                 AddProduct(selected)
-                setHighlightedIndex(0)
             }
         };
 
