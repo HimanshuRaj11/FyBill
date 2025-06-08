@@ -160,7 +160,7 @@ export default function BillingComponent({
         setProductName("");
         handleProductSearch("");
         searchRef.current?.focus();
-    }, [handleProductSearch, productName]);
+    }, [handleProductSearch]);
 
     const AddProduct = useCallback((product: any) => {
         if (products.find((p) => p.name === product.name)) {
