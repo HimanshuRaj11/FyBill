@@ -1,6 +1,6 @@
 'use client'
 import { useState } from 'react';
-import { X, Clock, ChevronUp, ChevronDown, Search, Edit2, Printer, Receipt } from 'lucide-react';
+import { X, Clock, ChevronUp, ChevronDown, Edit2, Printer } from 'lucide-react';
 import moment from 'moment';
 import { Button } from '../ui/button';
 

@@ -690,14 +690,14 @@ export default function BillingComponent({
                                         <div
                                             onClick={() => AddProduct(product)}
                                             key={index}
-                                            className="bg-white hover:bg-blue-50 border rounded-lg p-4 shadow-sm hover:shadow cursor-pointer transition-all"
+                                            className="bg-white hover:bg-blue-50 border rounded-lg p-2 shadow-sm hover:shadow cursor-pointer transition-all"
                                         >
-                                            <div className="span flex flex-row">
+                                            <div className="span flex flex-row ">
                                                 {
                                                     product?.product_number &&
-                                                    <h4 className="font-medium px-2 bg-amber-500 rounded-full border ">{product?.product_number}</h4>
+                                                    <h4 className="font-medium px-2 bg-amber-500 w-fit h-8 rounded-full border flex justify-center items-center">{product?.product_number}</h4>
                                                 }
-                                                <h3 className="font-medium truncate">{product.name}</h3>
+                                                <h3 className="font-medium">{product.name}</h3>
                                             </div>
                                             <p className="text-blue-600 font-semibold mt-1">{Company?.currency?.symbol}{product.price.toFixed(2)}</p>
                                             {product.category && (
