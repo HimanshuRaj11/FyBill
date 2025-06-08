@@ -84,6 +84,7 @@ export default function BillingComponent({
     const [selectedCategory, setSelectedCategory] = useState<string>("all");
     const [isProcessing, setIsProcessing] = useState(false);
 
+    const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
     const [highlightedIndex, setHighlightedIndex] = useState<number>(0);
 
     const searchRef = useRef<HTMLInputElement>(null);
@@ -130,6 +131,12 @@ export default function BillingComponent({
         setGrandTotal(Number((newSubTotal + totalTaxAmount).toFixed(2)));
     }, [products, appliedTaxes]);
 
+    const ClearSearch = () => {
+        setProductName("");
+        handleProductSearch("");
+        searchRef.current?.focus();
+    };
+
     const AddProduct = useCallback((product: any) => {
         if (products.find((p) => p.name === product.name)) {
             setProducts(
@@ -162,7 +169,7 @@ export default function BillingComponent({
             hideProgressBar: true,
         });
         ClearSearch()
-    }, [])
+    }, [ClearSearch, products])
 
 
     const handleDelete = (index: number) => {
@@ -303,11 +310,6 @@ export default function BillingComponent({
         setFilteredProducts(filtered);
     };
 
-    const ClearSearch = () => {
-        setProductName("");
-        handleProductSearch("");
-        searchRef.current?.focus();
-    };
 
     const invoiceRef = useRef<HTMLDivElement>(null);
 
@@ -497,7 +499,12 @@ export default function BillingComponent({
 
     // key selection
     useEffect(() => {
+
         const handleKeyDown = (e: KeyboardEvent) => {
+            const el = itemRefs.current[highlightedIndex];
+            if (el) {
+                el.scrollIntoView({ behavior: "smooth", block: "nearest" });
+            }
             if (e.key === "ArrowDown") {
                 setHighlightedIndex((prev) =>
                     prev === filteredProducts.length - 1 ? 0 : prev + 1
@@ -510,6 +517,7 @@ export default function BillingComponent({
             else if (e.key === "Enter") {
                 const selected = filteredProducts[highlightedIndex];
                 AddProduct(selected)
+                setHighlightedIndex(0)
             }
         };
 
@@ -717,6 +725,7 @@ export default function BillingComponent({
                                     {filteredProducts?.map((product: any, index: any) => (
                                         <div
                                             onClick={() => AddProduct(product)}
+                                            ref={(el: any) => (itemRefs.current[index] = el)}
                                             key={index}
                                             onKeyDown={(e) => {
                                                 if (e.key === "Enter") {
