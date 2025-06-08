@@ -19,7 +19,8 @@ import {
     CreditCard,
     Calendar,
     Phone,
-    User as UserIcon
+    User as UserIcon,
+    Command
 } from "lucide-react";
 import { useSelector } from "react-redux";
 import {
@@ -82,6 +83,8 @@ export default function BillingComponent({
     const [productCategories, setProductCategories] = useState<string[]>([]);
     const [selectedCategory, setSelectedCategory] = useState<string>("all");
     const [isProcessing, setIsProcessing] = useState(false);
+
+    const [highlightedIndex, setHighlightedIndex] = useState<number>(0);
 
     const searchRef = useRef<HTMLInputElement>(null);
     useEffect(() => {
@@ -490,6 +493,30 @@ export default function BillingComponent({
         }
     }
 
+
+    // key selection
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === "ArrowDown") {
+                setHighlightedIndex((prev) =>
+                    prev === filteredProducts.length - 1 ? 0 : prev + 1
+                );
+            } else if (e.key === "ArrowUp") {
+                setHighlightedIndex((prev) =>
+                    prev === 0 ? filteredProducts.length - 1 : prev - 1
+                );
+            }
+            else if (e.key === "Enter") {
+                const selected = filteredProducts[highlightedIndex];
+                AddProduct(selected)
+            }
+        };
+
+        window.addEventListener("keydown", handleKeyDown);
+        return () => window.removeEventListener("keydown", handleKeyDown);
+    }, [highlightedIndex, products, filteredProducts]);
+
+
     return (
         <div className="container mx-auto pb-8">
             {showInvoice && invoice && (
@@ -690,7 +717,17 @@ export default function BillingComponent({
                                         <div
                                             onClick={() => AddProduct(product)}
                                             key={index}
-                                            className="bg-white hover:bg-blue-50 border rounded-lg p-2 shadow-sm hover:shadow cursor-pointer transition-all"
+                                            onKeyDown={(e) => {
+                                                if (e.key === "Enter") {
+                                                    console.log(product);
+
+                                                }
+                                            }}
+
+                                            className={`bg-white hover:bg-blue-50 border rounded-lg p-2 shadow-sm hover:shadow cursor-pointer transition-all ${index === highlightedIndex
+                                                ? "border-blue-600"
+                                                : "hover:bg-gray-100"
+                                                }`}
                                         >
                                             <div className="span flex flex-row ">
                                                 {
@@ -766,7 +803,7 @@ export default function BillingComponent({
                                             <div className="flex-1">
                                                 <p className="font-medium">{product.name}</p>
                                                 {BillType !== "KOT" && (
-                                                    <p className="text-sm text-gray-500">₹{product.rate.toFixed(2)} each</p>
+                                                    <p className="text-sm text-gray-500">{Company.currency.symbol}{product.rate.toFixed(2)} each</p>
                                                 )}
                                             </div>
 
@@ -828,14 +865,14 @@ export default function BillingComponent({
                                     <div className="space-y-3 pt-3 border-t">
                                         <div className="flex justify-between">
                                             <span className="text-gray-600">Subtotal</span>
-                                            <span>₹{subTotal.toFixed(2)}</span>
+                                            <span>{Company.currency.symbol}{subTotal.toFixed(2)}</span>
                                         </div>
                                         {appliedTaxes?.map((tax, index) => (
                                             <div key={index} className="flex justify-between text-sm">
                                                 <span className="text-gray-600">
                                                     {tax.taxName} ({tax.percentage}%)
                                                 </span>
-                                                <span>₹{tax.amount.toFixed(2)}</span>
+                                                <span>{Company.currency.symbol}{tax.amount.toFixed(2)}</span>
                                             </div>
                                         ))}
 
@@ -843,14 +880,14 @@ export default function BillingComponent({
                                             <div className="flex justify-between text-sm border-t pt-2">
                                                 <span>Total Tax</span>
                                                 <span>
-                                                    ₹{appliedTaxes?.reduce((sum, tax) => sum + tax.amount, 0)?.toFixed(2)}
+                                                    {Company.currency.symbol}{appliedTaxes?.reduce((sum, tax) => sum + tax.amount, 0)?.toFixed(2)}
                                                 </span>
                                             </div>
                                         )}
 
                                         <div className="flex justify-between border-t pt-3 text-lg font-bold">
                                             <span>Grand Total</span>
-                                            <span>₹{grandTotal.toFixed(2)}</span>
+                                            <span>{Company.currency.symbol}{grandTotal.toFixed(2)}</span>
                                         </div>
                                     </div>
                                 )}
