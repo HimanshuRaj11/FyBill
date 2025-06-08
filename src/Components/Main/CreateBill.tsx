@@ -154,7 +154,7 @@ export default function BillingComponent({
         }
 
         setFilteredProducts(filtered);
-    }, []);
+    }, [productsList, selectedCategory]);
 
     const ClearSearch = useCallback(() => {
         setProductName("");
