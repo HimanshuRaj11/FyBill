@@ -514,7 +514,7 @@ export default function BillingComponent({
 
         window.addEventListener("keydown", handleKeyDown);
         return () => window.removeEventListener("keydown", handleKeyDown);
-    }, [highlightedIndex, products, filteredProducts]);
+    }, [highlightedIndex, products, filteredProducts, AddProduct]);
 
 
     return (
