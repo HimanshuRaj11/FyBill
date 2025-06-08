@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Dialog, DialogContent } from "../ui/dialog";
@@ -130,7 +130,7 @@ export default function BillingComponent({
         setGrandTotal(Number((newSubTotal + totalTaxAmount).toFixed(2)));
     }, [products, appliedTaxes]);
 
-    const AddProduct = (product: any) => {
+    const AddProduct = useCallback((product: any) => {
         if (products.find((p) => p.name === product.name)) {
             setProducts(
                 products.map((p) =>
@@ -162,7 +162,8 @@ export default function BillingComponent({
             hideProgressBar: true,
         });
         ClearSearch()
-    };
+    }, [])
+
 
     const handleDelete = (index: number) => {
         const deletedProduct = products[index];
