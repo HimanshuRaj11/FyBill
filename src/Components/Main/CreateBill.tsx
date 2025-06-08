@@ -130,6 +130,8 @@ export default function BillingComponent({
         const totalTaxAmount = appliedTaxes.reduce((sum, tax) => sum + tax.amount, 0);
         setGrandTotal(Number((newSubTotal + totalTaxAmount).toFixed(2)));
     }, [products, appliedTaxes]);
+
+
     const handleProductSearch = (searchTerm: string) => {
         setProductName(searchTerm);
 
@@ -526,6 +528,9 @@ export default function BillingComponent({
         return () => window.removeEventListener("keydown", handleKeyDown);
     }, [highlightedIndex, products, filteredProducts, AddProduct]);
 
+    useEffect(() => {
+        setHighlightedIndex(0)
+    }, [filteredProducts])
 
     return (
         <div className="container mx-auto pb-8">
