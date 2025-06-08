@@ -132,7 +132,7 @@ export default function BillingComponent({
     }, [products, appliedTaxes]);
 
 
-    const handleProductSearch = (searchTerm: string) => {
+    const handleProductSearch = useCallback((searchTerm: string) => {
         setProductName(searchTerm);
 
         let filtered = productsList;
@@ -154,7 +154,7 @@ export default function BillingComponent({
         }
 
         setFilteredProducts(filtered);
-    };
+    }, []);
 
     const ClearSearch = useCallback(() => {
         setProductName("");
