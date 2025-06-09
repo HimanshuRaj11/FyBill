@@ -5,8 +5,7 @@ import InvoiceModel from "@/Model/Invoice.model";
 import UserModel from "@/Model/User.model";
 import { NextResponse } from "next/server";
 import moment from "moment";
-const today = moment().utc().startOf("day").toDate();
-const tomorrow = moment().utc().startOf("day").add(1, "day").toDate();
+
 export async function GET() {
     try {
         const user_id = await verifyUser();
@@ -29,10 +28,7 @@ export async function GET() {
         if (User?.role == 'Owner') {
             invoices = await InvoiceModel.find({
                 companyId: companyId,
-                createdAt: {
-                    $gte: today,
-                    $lt: tomorrow
-                }, InvoiceStatus: "Hold"
+                InvoiceStatus: "Hold"
             }).populate({
                 path: 'branchId',
                 model: branchModel
@@ -40,10 +36,6 @@ export async function GET() {
         } else {
             invoices = await InvoiceModel.find({
                 createdBy: user_id,
-                createdAt: {
-                    $gte: today,
-                    $lt: tomorrow
-                },
                 InvoiceStatus: "Hold"
             }).populate({
                 path: 'branchId',
@@ -54,7 +46,6 @@ export async function GET() {
         return NextResponse.json({ invoices, success: true }, { status: 200 });
 
     } catch (error) {
-        console.log(error);
         return NextResponse.json({ message: "Internal server error", success: false }, { status: 500 });
     }
 }
