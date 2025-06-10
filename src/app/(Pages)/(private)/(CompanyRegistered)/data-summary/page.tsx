@@ -75,9 +75,6 @@ export default function Page() {
     const getProductData = useCallback(async () => {
         try {
             try {
-                if (User?.branchId) {
-                    setSelectedBranch(User.branchId._id)
-                }
                 setLoading(true)
                 const { data } = await axios.post(`${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/dataSummary/productSell`, { selectedBranch, startDate, endDate })
                 setProductsDataSummary(data.FinalList)

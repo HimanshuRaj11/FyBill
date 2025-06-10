@@ -28,6 +28,24 @@ export async function POST(request: Request) {
         }
         const { selectedBranch, startDate, endDate } = await request.json();
 
+
+        if (User.branchId) {
+            const Invoices = await InvoiceModel.find({
+                companyId: User.companyId,
+                createdAt: {
+                    $gte: startDate,
+                    $lt: endDate
+                },
+                branchId: User.branchId,
+                InvoiceStatus: "Done",
+                BillType: { $ne: "KOT" }
+            })
+
+            const FinalList = GetProductDataSummary(Invoices)
+            return NextResponse.json({ message: "", FinalList, success: true }, { status: 200 });
+        }
+
+
         const Invoices = await InvoiceModel.find({
             companyId: User.companyId,
             createdAt: {
@@ -41,7 +59,6 @@ export async function POST(request: Request) {
 
         const FinalList = GetProductDataSummary(Invoices)
         return NextResponse.json({ message: "", FinalList, success: true }, { status: 200 });
-
 
     } catch (error) {
         return NextResponse.json({ message: "Internal server error", error }, { status: 500 });

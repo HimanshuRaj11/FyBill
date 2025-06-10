@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
 const publicPaths = ['/Login', '/Register', '/forgot-password', '/reset-password']
-const privatePaths = ['/Dashboard', '/Profile', '/Setting', '/Invoice', '/Customers', '/Staff', '/Bills', '/Products']
+const privatePaths = ['/Dashboard', '/Profile', '/Setting', '/Invoice', '/Customers', '/Staff', '/Bills', '/Products', '/data-summary']
 const pathForStaff = [' / Profile', ' / Setting', ' / Invoice', ' / Customers', '/Bills']
 const isPublicPath = (path: string) => {
     return publicPaths.some(publicPath => path.startsWith(publicPath))
