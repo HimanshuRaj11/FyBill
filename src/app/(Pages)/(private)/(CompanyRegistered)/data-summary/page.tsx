@@ -90,8 +90,6 @@ export default function Page() {
         }
     }, [startDate, endDate, selectedBranch])
 
-
-
     useEffect(() => {
         getProductData()
     }, [getProductData])

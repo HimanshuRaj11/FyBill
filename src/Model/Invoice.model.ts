@@ -42,6 +42,7 @@ const ProductSchema: Schema = new Schema({
     rate: { type: Number, required: true },
     quantity: { type: Number, required: true },
     amount: { type: Number, required: true },
+    Specification: { type: String },
 });
 
 const TaxSchema: Schema = new Schema({

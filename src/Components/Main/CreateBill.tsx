@@ -20,7 +20,9 @@ import {
     Calendar,
     Phone,
     User as UserIcon,
-    Command
+    Command,
+    ArrowBigLeft,
+    ArrowRightIcon
 } from "lucide-react";
 import { useSelector } from "react-redux";
 import {
@@ -43,6 +45,7 @@ interface Product {
     rate: number;
     quantity: number;
     amount: number;
+    Specification: string;
 }
 
 const ComplementProduct = {
@@ -83,6 +86,8 @@ export default function BillingComponent({
     const [productCategories, setProductCategories] = useState<string[]>([]);
     const [selectedCategory, setSelectedCategory] = useState<string>("all");
     const [isProcessing, setIsProcessing] = useState(false);
+
+    // const [Specification, setSpecification] = useState<string>('')
 
     const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
     const [highlightedIndex, setHighlightedIndex] = useState<number>(0);
@@ -183,6 +188,7 @@ export default function BillingComponent({
                     rate: product.price,
                     quantity: 1,
                     amount: product.price,
+                    Specification: product.Specification
                 },
             ]);
         }
@@ -531,6 +537,7 @@ export default function BillingComponent({
         setHighlightedIndex(0)
     }, [filteredProducts])
 
+
     return (
         <div className="container mx-auto pb-8">
             {showInvoice && invoice && (
@@ -813,10 +820,14 @@ export default function BillingComponent({
                                     {products.map((product, index) => (
                                         <div
                                             key={index}
-                                            className="flex items-center justify-between border-b py-3"
+                                            className="flex items-center justify-between border-b py-3 h-auto relative"
                                         >
+
                                             <div className="flex-1">
                                                 <p className="font-medium">{product.name}</p>
+                                                {
+                                                    product?.Specification && <p className="text-sm">({product.Specification})</p>
+                                                }
                                                 {BillType !== "KOT" && (
                                                     <p className="text-sm text-gray-500">{Company.currency.symbol}{product.rate.toFixed(2)} each</p>
                                                 )}

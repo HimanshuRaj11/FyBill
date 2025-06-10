@@ -72,7 +72,11 @@ export default function PrintInvoiceFormate({ invoice }: { invoice: any }) {
                 <tbody>
                     {invoice.products.map((product: any, index: any) => (
                         <tr key={index} className="border-b border-gray-200">
-                            <td className="text-left py-1 mx-1 font-semibold">{product.name}</td>
+                            <td className="text-left py-1 mx-1 font-semibold">{product.name}
+                                {
+                                    product?.Specification && <p className="text-sm font-semibold">({product.Specification})</p>
+                                }
+                            </td>
                             <td className="text-right py-1 mx-1 font-semibold">{product.quantity}</td>
                             {
                                 invoice?.BillType != "KOT" &&
