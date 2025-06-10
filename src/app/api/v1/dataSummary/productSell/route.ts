@@ -28,7 +28,6 @@ export async function POST(request: Request) {
         }
         const { selectedBranch, startDate, endDate } = await request.json();
 
-
         if (User.branchId) {
             const Invoices = await InvoiceModel.find({
                 companyId: User.companyId,
@@ -44,7 +43,6 @@ export async function POST(request: Request) {
             const FinalList = GetProductDataSummary(Invoices)
             return NextResponse.json({ message: "", FinalList, success: true }, { status: 200 });
         }
-
 
         const Invoices = await InvoiceModel.find({
             companyId: User.companyId,
