@@ -506,8 +506,11 @@ export default function BillingComponent({
     }
 
 
+    console.log(highlightedIndex);
+
     // key selection
     useEffect(() => {
+
 
         const handleKeyDown = (e: KeyboardEvent) => {
             const el = itemRefs.current[highlightedIndex];
@@ -515,16 +518,20 @@ export default function BillingComponent({
                 el.scrollIntoView({ behavior: "smooth", block: "nearest" });
             }
             if (e.key === "ArrowDown") {
+
                 setHighlightedIndex((prev) =>
                     prev === filteredProducts.length - 1 ? 0 : prev + 1
                 );
             } else if (e.key === "ArrowUp") {
                 setHighlightedIndex((prev) =>
-                    prev === 0 ? filteredProducts.length - 1 : prev - 1
+                    prev === 0 ? 0 : prev - 1
                 );
             }
             else if (e.key === "Enter") {
-                const selected = filteredProducts[highlightedIndex];
+                if (highlightedIndex == 0) {
+                    return
+                }
+                const selected = filteredProducts[highlightedIndex - 1];
                 AddProduct(selected)
             }
         };
@@ -737,16 +744,10 @@ export default function BillingComponent({
                                     {filteredProducts?.map((product: any, index: any) => (
                                         <div
                                             onClick={() => AddProduct(product)}
-                                            ref={(el: any) => (itemRefs.current[index] = el)}
+                                            ref={(el: any) => (itemRefs.current[index + 1] = el)}
                                             key={index}
-                                            onKeyDown={(e) => {
-                                                if (e.key === "Enter") {
-                                                    console.log(product);
 
-                                                }
-                                            }}
-
-                                            className={`bg-white hover:bg-blue-50 border rounded-lg p-2 shadow-sm hover:shadow cursor-pointer transition-all ${index === highlightedIndex
+                                            className={`bg-white hover:bg-blue-50 border rounded-lg p-2 shadow-sm hover:shadow cursor-pointer transition-all ${index + 1 === highlightedIndex
                                                 ? "border-blue-600"
                                                 : "hover:bg-gray-100"
                                                 }`}
