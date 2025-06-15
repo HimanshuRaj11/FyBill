@@ -505,9 +505,6 @@ export default function BillingComponent({
         }
     }
 
-
-    console.log(highlightedIndex);
-
     // key selection
     useEffect(() => {
 
