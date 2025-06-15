@@ -520,7 +520,7 @@ export default function BillingComponent({
             if (e.key === "ArrowDown") {
 
                 setHighlightedIndex((prev) =>
-                    prev === filteredProducts.length - 1 ? 0 : prev + 1
+                    prev === filteredProducts.length ? 0 : prev + 1
                 );
             } else if (e.key === "ArrowUp") {
                 setHighlightedIndex((prev) =>
