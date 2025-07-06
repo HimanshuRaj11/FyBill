@@ -8,9 +8,10 @@ import { toast } from 'react-toastify';
 import { useSelector } from 'react-redux';
 import { Input } from '@/Components/ui/input';
 import { X } from 'lucide-react';
-import { useDebounce } from 'use-debounce'; // Optional: Install use-debounce for debouncing search
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/Components/ui/alert-dialog'; // Assuming a dialog component from your UI library
-import { Skeleton } from '@/Components/ui/skeleton'; // Assuming a skeleton component
+import { useDebounce } from 'use-debounce';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/Components/ui/alert-dialog';
+import { Skeleton } from '@/Components/ui/skeleton';
+import MultipleProductUpdate from '@/Components/Main/MultiProductEdit';
 
 // TypeScript interface for Product
 interface Product {
@@ -22,16 +23,19 @@ interface Product {
     branchId: any;
 }
 
+
 export default function ProductsPage() {
     const { Company } = useSelector((state: any) => state.Company);
     const [products, setProducts] = useState<Product[]>([]);
     const [productName, setProductName] = useState('');
-    const [debouncedProductName] = useDebounce(productName, 300); // Debounce search input
+    const [debouncedProductName] = useDebounce(productName, 300);
     const [loading, setLoading] = useState(true);
     const [selectedCategory, setSelectedCategory] = useState<string>('all');
     const [categories, setCategories] = useState<string[]>([]);
     const [filteredProductsList, setFilteredProductList] = useState<Product[]>([]);
     const [deletingId, setDeletingId] = useState<string | null>(null);
+
+    const [updateAllView, setUpdateAllView] = useState(false)
 
     // Fetch products
     const fetchProducts = useCallback(async () => {
@@ -139,10 +143,22 @@ export default function ProductsPage() {
             <div className="max-w-7xl mx-auto">
                 {/* Header with Add Product Button */}
                 <div className="flex justify-between items-center mb-6">
-                    <h1 className="text-2xl font-bold text-gray-800">Products</h1>
-                    <Button className="bg-blue-600 hover:bg-blue-700 text-white">
-                        <Link href="/Products/add">Add Product</Link>
-                    </Button>
+                    <h1 className="text-2xl font-bold text-gray-800 ">Products</h1>
+                    <div className="flex gap-2">
+                        <Button className="bg-blue-600 hover:bg-blue-900 text-white">
+                            <Link href="/Products/add">Add Product</Link>
+                        </Button>
+                        {
+                            updateAllView ?
+                                <Button className="bg-black hover:bg-gray-800 text-white" onClick={() => setUpdateAllView(false)}>
+                                    Back
+                                </Button>
+                                :
+                                <Button className="bg-green-600 hover:bg-green-900 text-white" onClick={() => setUpdateAllView(true)}>
+                                    <FiEdit2 /> Update Multiple
+                                </Button>
+                        }
+                    </div>
                 </div>
 
                 {/* Search and Category Filter */}
@@ -186,86 +202,91 @@ export default function ProductsPage() {
                 </div>
 
                 {/* Products Table */}
-                <div className="bg-white rounded-lg shadow-md overflow-hidden">
-                    <table className="min-w-full">
-                        <thead className="bg-gray-100 sticky top-0 z-10">
-                            <tr>
-                                <th className="p-4 text-left text-sm font-medium text-gray-600">Product Name</th>
-                                {Company?.branch.length > 0 && <th className="p-4 text-left text-sm font-medium text-gray-600">Branch</th>}
-                                <th className="p-4 text-left text-sm font-medium text-gray
-
--600">Category</th>
-                                <th className="p-4 text-left text-sm font-medium text-gray-600">Price</th>
-                                <th className="p-4 text-left text-sm font-medium text-gray-600">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {filteredProductsList.length === 0 ? (
-                                <tr>
-                                    <td colSpan={Company?.branch.length > 0 ? 5 : 4} className="p-4 text-center text-gray-500">
-                                        No products found. Try adjusting your search or filters.
-                                    </td>
-                                </tr>
-                            ) : (
-                                filteredProductsList.map((product) => (
-                                    <tr key={product._id} className="hover:bg-gray-50 border-b">
-                                        <td className="p-4 text-gray-800">{product.name}</td>
-                                        {Company?.branch.length > 0 && (
-                                            <td className="p-4 text-gray-600">{product?.branchId?.branchName}</td>
-                                        )}
-                                        <td className="p-4 text-gray-600">{product.category}</td>
-                                        <td className="p-4 text-blue-600 font-semibold">
-                                            {Company?.currency.symbol} {product.price.toFixed(2)}
-                                        </td>
-                                        <td className="p-4">
-                                            <div className="flex gap-2">
-                                                <Button
-                                                    variant="outline"
-                                                    className="flex items-center gap-2 border-blue-500 text-blue-500 hover:bg-blue-50"
-                                                    asChild
-                                                >
-                                                    <Link href={`/Products/edit/${product._id}`}>
-                                                        <FiEdit2 className="w-4 h-4" />
-                                                        Edit
-                                                    </Link>
-                                                </Button>
-                                                <AlertDialog>
-                                                    <AlertDialogTrigger asChild>
-                                                        <Button
-                                                            variant="destructive"
-                                                            className="flex items-center gap-2"
-                                                            disabled={deletingId === product._id}
-                                                        >
-                                                            <FiTrash2 className="w-4 h-4" />
-                                                            {deletingId === product._id ? 'Deleting...' : 'Delete'}
-                                                        </Button>
-                                                    </AlertDialogTrigger>
-                                                    <AlertDialogContent>
-                                                        <AlertDialogHeader>
-                                                            <AlertDialogTitle>Delete Product</AlertDialogTitle>
-                                                            <AlertDialogDescription>
-                                                                Are you sure you want to delete {product.name}? This action cannot be undone.
-                                                            </AlertDialogDescription>
-                                                        </AlertDialogHeader>
-                                                        <AlertDialogFooter>
-                                                            <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                                            <AlertDialogAction
-                                                                onClick={() => deleteProduct(product._id)}
-                                                                className="bg-red-600 hover:bg-red-700"
-                                                            >
-                                                                Delete
-                                                            </AlertDialogAction>
-                                                        </AlertDialogFooter>
-                                                    </AlertDialogContent>
-                                                </AlertDialog>
-                                            </div>
-                                        </td>
+                {
+                    updateAllView ? (
+                        <MultipleProductUpdate initialProducts={filteredProductsList} Company={Company} categories={categories} />
+                    ) : (
+                        <div className="bg-white rounded-lg shadow-md overflow-hidden">
+                            <table className="min-w-full">
+                                <thead className="bg-gray-100 sticky top-0 z-10">
+                                    <tr>
+                                        <th className="p-4 text-left text-sm font-medium text-gray-600">Product Name</th>
+                                        {Company?.branch.length > 0 && <th className="p-4 text-left text-sm font-medium text-gray-600">Branch</th>}
+                                        <th className="p-4 text-left text-sm font-medium text-gray-600">Category</th>
+                                        <th className="p-4 text-left text-sm font-medium text-gray-600">Price</th>
+                                        <th className="p-4 text-left text-sm font-medium text-gray-600">Actions</th>
                                     </tr>
-                                ))
-                            )}
-                        </tbody>
-                    </table>
-                </div>
+                                </thead>
+                                <tbody>
+                                    {filteredProductsList.length === 0 ? (
+                                        <tr>
+                                            <td colSpan={Company?.branch.length > 0 ? 5 : 4} className="p-4 text-center text-gray-500">
+                                                No products found. Try adjusting your search or filters.
+                                            </td>
+                                        </tr>
+                                    ) : (
+                                        filteredProductsList.map((product) => (
+                                            <tr key={product._id} className="hover:bg-gray-50 border-b">
+                                                <td className="p-4 text-gray-800">{product.name}</td>
+                                                {Company?.branch.length > 0 && (
+                                                    <td className="p-4 text-gray-600">{product?.branchId?.branchName}</td>
+                                                )}
+                                                <td className="p-4 text-gray-600">{product.category}</td>
+                                                <td className="p-4 text-blue-600 font-semibold">
+                                                    {Company?.currency.symbol} {product.price.toFixed(2)}
+                                                </td>
+                                                <td className="p-4">
+                                                    <div className="flex gap-2">
+                                                        <Button
+                                                            variant="outline"
+                                                            className="flex items-center gap-2 border-blue-500 text-blue-500 hover:bg-blue-50"
+                                                            asChild
+                                                        >
+                                                            <Link href={`/Products/edit/${product._id}`}>
+                                                                <FiEdit2 className="w-4 h-4" />
+                                                                Edit
+                                                            </Link>
+                                                        </Button>
+                                                        <AlertDialog>
+                                                            <AlertDialogTrigger asChild>
+                                                                <Button
+                                                                    variant="destructive"
+                                                                    className="flex items-center gap-2"
+                                                                    disabled={deletingId === product._id}
+                                                                >
+                                                                    <FiTrash2 className="w-4 h-4" />
+                                                                    {deletingId === product._id ? 'Deleting...' : 'Delete'}
+                                                                </Button>
+                                                            </AlertDialogTrigger>
+                                                            <AlertDialogContent>
+                                                                <AlertDialogHeader>
+                                                                    <AlertDialogTitle>Delete Product</AlertDialogTitle>
+                                                                    <AlertDialogDescription>
+                                                                        Are you sure you want to delete {product.name}? This action cannot be undone.
+                                                                    </AlertDialogDescription>
+                                                                </AlertDialogHeader>
+                                                                <AlertDialogFooter>
+                                                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                                                    <AlertDialogAction
+                                                                        onClick={() => deleteProduct(product._id)}
+                                                                        className="bg-red-600 hover:bg-red-700"
+                                                                    >
+                                                                        Delete
+                                                                    </AlertDialogAction>
+                                                                </AlertDialogFooter>
+                                                            </AlertDialogContent>
+                                                        </AlertDialog>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        ))
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
+                    )
+                }
+
             </div>
         </div>
     );
