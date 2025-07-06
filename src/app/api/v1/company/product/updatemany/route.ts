@@ -11,7 +11,6 @@ interface Product {
     description: string;
     price: number;
     category: string;
-    branchId: any;
 }
 export async function PUT(request: NextRequest) {
     try {

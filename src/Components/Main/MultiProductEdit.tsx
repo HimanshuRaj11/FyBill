@@ -146,9 +146,6 @@ const MultipleProductUpdate: React.FC<BulkUpdateTableProps> = ({
                     <thead className="bg-gray-50">
                         <tr>
                             <th className="p-4 text-left text-sm font-medium text-gray-600">Product Name</th>
-                            {Company?.branch.length > 0 && (
-                                <th className="p-4 text-left text-sm font-medium text-gray-600">Branch</th>
-                            )}
                             <th className="p-4 text-left text-sm font-medium text-gray-600">Category</th>
                             <th className="p-4 text-left text-sm font-medium text-gray-600">Price</th>
                             <th className="p-4 text-left text-sm font-medium text-gray-600">Actions</th>
@@ -172,29 +169,7 @@ const MultipleProductUpdate: React.FC<BulkUpdateTableProps> = ({
                                     )}
                                 </td>
 
-                                {/* Branch (if branches exist) */}
-                                {Company?.branch?.length > 0 && (
-                                    <td className="p-4">
-                                        <select
-                                            value={product.branchId._id || ''}
-                                            onChange={(e) => handleFieldChange(product._id, 'branchId', e.target.value)}
-                                            className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors[`${product._id}-branchId`] ? 'border-red-500' : 'border-gray-300'
-                                                }`}
-                                        >
-                                            <option value="">Select Branch</option>
-                                            {Company.branch.map((branch: any) => (
-                                                <option key={branch._id} value={branch._id}>
-                                                    <h1 className='text-black'>
-                                                        {branch.branchName}
-                                                    </h1>
-                                                </option>
-                                            ))}
-                                        </select>
-                                        {errors[`${product._id}-branchId`] && (
-                                            <p className="text-red-500 text-xs mt-1">{errors[`${product._id}-branchId`]}</p>
-                                        )}
-                                    </td>
-                                )}
+
 
                                 {/* Category */}
                                 <td className="p-4">
