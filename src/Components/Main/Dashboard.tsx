@@ -13,6 +13,7 @@ import { PieChartComponent } from '../Other/PaiChart'
 import DatePicker from 'react-datepicker'
 
 import "react-datepicker/dist/react-datepicker.css";
+import DownloadExcel from '../Other/DownloadExcel'
 
 export default function Dashboard() {
     const { User } = useSelector((state: any) => state.User);
@@ -295,6 +296,7 @@ export default function Dashboard() {
                         </div>
                         <div className=" p-2">
                             <h1 className="text-xl font-extrabold text-gray-800 mb-4">{dateRange} Invoice Data</h1>
+                            <DownloadExcel data={Invoice} fileName={'Invoices'} />
                         </div>
                     </>
                 )

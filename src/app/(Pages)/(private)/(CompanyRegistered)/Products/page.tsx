@@ -12,6 +12,7 @@ import { useDebounce } from 'use-debounce';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/Components/ui/alert-dialog';
 import { Skeleton } from '@/Components/ui/skeleton';
 import MultipleProductUpdate from '@/Components/Main/MultiProductEdit';
+import DownloadExcel from '@/Components/Other/DownloadExcel';
 
 // TypeScript interface for Product
 interface Product {
@@ -154,9 +155,12 @@ export default function ProductsPage() {
                                     Back
                                 </Button>
                                 :
-                                <Button className="bg-green-600 hover:bg-green-900 text-white" onClick={() => setUpdateAllView(true)}>
-                                    <FiEdit2 /> Update Multiple
-                                </Button>
+                                <>
+                                    <DownloadExcel data={filteredProductsList} fileName={'Products'} />
+                                    <Button className="bg-green-600 hover:bg-green-900 text-white" onClick={() => setUpdateAllView(true)}>
+                                        <FiEdit2 /> Update Multiple
+                                    </Button>
+                                </>
                         }
                     </div>
                 </div>
