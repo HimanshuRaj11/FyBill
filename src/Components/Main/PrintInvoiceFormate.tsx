@@ -1,17 +1,37 @@
 'use client'
+import axios from 'axios';
 import moment from 'moment'
-import React from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { useSelector } from 'react-redux';
 
 export default function PrintInvoiceFormate({ invoice }: { invoice: any }) {
     const { Company } = useSelector((state: any) => state.Company)
     const Branch = invoice?.branchId;
+    const [BranchData, setBranchData] = useState<any>(null);
 
     let Address;
     if (Branch?.address) {
         Address = Branch?.address?.street + " " + Branch?.address?.city + " " + Branch?.address?.state
     }
 
+    const getBranch = useCallback(async () => {
+        try {
+            const { data } = await axios.get(`/api/v1/company/branch/${Branch}`,)
+            console.log(data);
+
+            if (data.success) {
+                setBranchData(data.Branch);
+            } else {
+                console.error("Failed to fetch branch data:", data.message);
+            }
+        } catch (error) {
+            console.error("Error fetching branch data:", error);
+
+        }
+    }, [invoice]);
+    useEffect(() => {
+        getBranch()
+    }, [getBranch])
     return (
         <div className="w-[20rem] mx-auto p-2 text-black uppercase text-">
             <div className="flex justify-end">
@@ -36,9 +56,12 @@ export default function PrintInvoiceFormate({ invoice }: { invoice: any }) {
                         <p className="text-sm font-semibold">{invoice.companyAddress}</p>
 
                 }
-                <div className="text-center mb-2">
+                <div className="text-center mb-2 flex gap-1 justify-center">
                     <p className='text-sm font-semibold'>
-                        {Branch?.phone ? Branch.phone : Company?.phone}
+                        {BranchData?.CountryCode ? BranchData.CountryCode : Company?.CountryCode}
+                    </p>
+                    <p className='text-sm font-semibold'>
+                        {BranchData?.phone ? BranchData.phone : Company?.phone}
                     </p>
 
                 </div>

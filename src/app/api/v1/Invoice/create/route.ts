@@ -100,8 +100,6 @@ export async function POST(request: Request) {
         return Response.json({ message: "Invoice created successfully", invoice }, { status: 200 });
 
     } catch (error) {
-        console.log(error);
-
         return Response.json({ message: "Internal server error", error }, { status: 500 });
     }
 
