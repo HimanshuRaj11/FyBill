@@ -209,7 +209,7 @@ export default function ProfilePage() {
                                     <label className="text-sm font-medium text-gray-500">Phone</label>
                                     <div className="mt-1 flex flex-row gap-1">
                                         <p className="w-fill px-3 py-2 border rounded-md bg-gray-50 border-gray-200">
-                                            {company?.CountryCode}
+                                            {company?.countryCode}
                                         </p>
                                         <p className="w-full px-3 py-2 border rounded-md bg-gray-50 border-gray-200">
                                             {company?.phone}

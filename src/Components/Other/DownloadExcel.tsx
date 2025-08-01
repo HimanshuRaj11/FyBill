@@ -4,10 +4,8 @@ import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 
 export default function DownloadExcel({ data, fileName }: { data: any, fileName: string }) {
-    console.log(data[0]);
 
     const [dataToDownload, setDataToDownload] = useState([])
-    console.log(dataToDownload[0]);
     const handleInvoice = () => {
         const DownloadData = data.map((invoice: any) => {
             const productString = invoice.products

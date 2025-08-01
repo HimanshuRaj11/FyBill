@@ -20,7 +20,7 @@ const staffSchema = z.object({
     // .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
     // .regex(/[0-9]/, 'Password must contain at least one number'),
     confirmPassword: z.string(),
-    branchId: z.string()
+    branchId: z.string().or(z.literal(""))
 }).refine((data) => data.password === data.confirmPassword, {
     message: "Passwords don't match",
     path: ["confirmPassword"]
@@ -45,6 +45,7 @@ export default function AddStaff({ setShowAddStaffModal }: { setShowAddStaffModa
     const user = User
     const router = useRouter()
 
+
     const fetchBranch = async () => {
         try {
             const { data } = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/company/branch/fetch`)
@@ -65,16 +66,19 @@ export default function AddStaff({ setShowAddStaffModal }: { setShowAddStaffModa
     const onSubmit = async (Data: StaffFormData) => {
         try {
 
-            const { data } = await axios.post(`${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/Staff/Register`, Data)
+            const { data } = await axios.post(`${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/Staff/Register`, Data, { withCredentials: true })
             if (data.success) {
-                toast.success('Staff added successfully')
+                toast.success(data.message || 'Staff added successfully')
                 setShowAddStaffModal(false)
                 router.back()
+                reset()
             }
-            reset()
+            if (data.error) {
+                toast.error(data.message)
+            }
 
-        } catch (error) {
-            toast.error('Failed to add staff')
+        } catch (error: any) {
+            toast.error(error.response.data.message || 'Something went wrong')
             return
         }
     }

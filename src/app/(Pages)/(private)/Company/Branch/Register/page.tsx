@@ -25,6 +25,9 @@ const companySchema = z.object({
     contactEmail: z.string()
         .email('Invalid email address')
         .min(1, 'Contact email is required'),
+    CountryCode: z.string()
+        .regex(/^\+?[1-9]\d{0,4}$/, 'Invalid country code')
+        .optional(),
     contactPhone: z.string()
         .regex(/^\+?[1-9]\d{1,14}$/, 'Invalid phone number')
         .min(1, 'Contact phone is required'),
@@ -51,6 +54,7 @@ export default function CompanyRegistration() {
             country: '',
             zipCode: '',
             contactEmail: '',
+            CountryCode: '',
             contactPhone: '',
         },
     });
@@ -183,12 +187,22 @@ export default function CompanyRegistration() {
 
                                 <div className="space-y-2">
                                     <Label htmlFor="contactPhone">Contact Phone</Label>
-                                    <Input
-                                        id="contactPhone"
-                                        type="tel"
-                                        {...register('contactPhone')}
-                                        className={errors.contactPhone ? 'border-red-500' : ''}
-                                    />
+                                    <div className="flex items-center justify-between gap-2">
+
+                                        <Input
+                                            id="CountryCode"
+                                            type="text"
+                                            placeholder="+1"
+                                            {...register('CountryCode')}
+                                            className={` w-18 ${errors.CountryCode ? 'border-red-500' : ''}`}
+                                        />
+                                        <Input
+                                            id="contactPhone"
+                                            type="tel"
+                                            {...register('contactPhone')}
+                                            className={errors.contactPhone ? 'border-red-500' : ''}
+                                        />
+                                    </div>
                                     {errors.contactPhone && (
                                         <p className="text-sm text-red-500">{errors.contactPhone.message}</p>
                                     )}

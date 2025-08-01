@@ -89,10 +89,7 @@ export async function POST(request: Request) {
 
             })
             if (User.branchId || selectedBranch) {
-                invoice.branchId = User.branchId || selectedBranch;
-                const branch = await BranchModel.findById({ _id: User.branchId || selectedBranch })
-                invoice.branchName = branch?.branchName || "";
-
+                invoice.branchId = Branch;
             }
             await invoice.save();
         }

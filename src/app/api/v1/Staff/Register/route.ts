@@ -16,7 +16,7 @@ export async function POST(request: Request) {
         const User = await UserModel.findById({ _id: userId })
 
         if (!User) {
-            return NextResponse.json({ message: "User not found" });
+            return NextResponse.json({ message: "User not found", error: true });
         }
         const userCompanyId = User.companyId
 
@@ -28,7 +28,7 @@ export async function POST(request: Request) {
         // 2. Check if staff with email already exists
         const existing = await UserModel.findOne({ email });
         if (existing) {
-            return NextResponse.json({ message: "Staff with this email already exists", success: true });
+            return NextResponse.json({ message: "Staff with this email already exists", error: true });
         }
 
         // 3. Hash password
@@ -48,9 +48,9 @@ export async function POST(request: Request) {
         });
 
 
-        return NextResponse.json({ message: "Staff registered", });
+        return NextResponse.json({ message: "Staff registered", success: true });
     } catch (error) {
         console.error("Error registering staff:", error);
-        return NextResponse.json({ message: "Internal server error" });
+        return NextResponse.json({ message: "Internal server error", error: true }, { status: 500 });
     }
 }

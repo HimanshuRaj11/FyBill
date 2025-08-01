@@ -1,6 +1,7 @@
 import { verifyUser } from "@/lib/verifyUser";
 import CompanyModel from "@/Model/Company.model";
 import UserModel from "@/Model/User.model";
+import { error } from "console";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
@@ -9,12 +10,12 @@ export async function POST(req: Request) {
 
         const User = await UserModel.findById({ _id: User_id })
         if (!User) {
-            return NextResponse.json({ message: "User not found" });
+            return NextResponse.json({ message: "User not found", error: true }, { status: 404 });
         }
         const body = await req.json();
-        const { companyName, industry, website, companySize, street, description, city, state, country, zipCode, contactPhone, contactEmail } = body;
+        const { companyName, industry, website, companySize, street, description, city, state, country, zipCode, countryCode, contactPhone, contactEmail } = body;
         if (User.companyId) {
-            return NextResponse.json({ message: "Company already registered" });
+            return NextResponse.json({ message: "Company already registered", error: true }, { status: 400 });
         }
         const address = {
             street: street,
@@ -27,6 +28,7 @@ export async function POST(req: Request) {
             name: companyName,
             address: address,
             email: contactEmail,
+            countryCode: countryCode,
             phone: contactPhone,
             industry: industry,
             companySize: companySize,
@@ -36,10 +38,11 @@ export async function POST(req: Request) {
 
         });
         await UserModel.findByIdAndUpdate({ _id: User_id }, { $set: { companyId: Company._id } })
-        return NextResponse.json({ message: 'Company registered successfully' });
+
+        return NextResponse.json({ message: 'Company registered successfully', success: true, Company }, { status: 201 });
     } catch (error) {
         console.log(error);
 
-        return NextResponse.json({ message: 'Company registration failed' }, { status: 500 });
+        return NextResponse.json({ message: 'Company registration failed', error: true }, { status: 500 });
     }
 }

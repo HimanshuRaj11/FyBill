@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
+import jwt from 'jsonwebtoken'
+
 
 const publicPaths = ['/Login', '/Register', '/forgot-password', '/reset-password']
 const privatePaths = ['/Dashboard', '/Profile', '/Setting', '/Invoice', '/Customers', '/Staff', '/Bills', '/Products', '/data-summary']
@@ -26,8 +28,10 @@ const verifyToken = (request: NextRequest) => {
     return true
 }
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
     const { pathname } = request.nextUrl
+
+
 
     // Allow access to static files and API routes
     if (

@@ -11,14 +11,14 @@ export async function POST(req: Request) {
 
         const User = await UserModel.findById({ _id: User_id })
         if (!User) {
-            return NextResponse.json({ message: "User not found" });
+            return NextResponse.json({ message: "User not found", error: true });
         }
         const company = await CompanyModel.findById({ _id: User.companyId })
         if (!company) {
-            return NextResponse.json({ message: "Company not found" });
+            return NextResponse.json({ message: "Company not found", error: true });
         }
         const body = await req.json();
-        const { branchName, street, city, state, country, zipCode, contactPhone, contactEmail } = body;
+        const { branchName, street, city, state, country, zipCode, CountryCode, contactPhone, contactEmail } = body;
 
         const address = {
             street: street,
@@ -33,6 +33,7 @@ export async function POST(req: Request) {
             address: address,
             email: contactEmail,
             phone: contactPhone,
+            CountryCode: CountryCode,
             ownerId: User_id,
 
         });
@@ -42,6 +43,6 @@ export async function POST(req: Request) {
     } catch (error) {
         console.log(error);
 
-        return NextResponse.json({ message: 'Branch registration failed', success: false }, { status: 500 });
+        return NextResponse.json({ message: 'Branch registration failed', error: true }, { status: 500 });
     }
 }

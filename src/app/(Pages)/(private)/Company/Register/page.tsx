@@ -35,13 +35,16 @@ const companySchema = z.object({
     companySize: z.string().min(1, 'Company size is required'),
     website: z.string()
         .url('Invalid website URL')
-        .min(1, 'Website is required'),
+        .or(z.literal("")),
     description: z.string()
         .min(50, 'Description must be at least 50 characters')
-        .max(1000, 'Description must be less than 1000 characters'),
+        .max(2000, 'Description must be less than 1000 characters'),
     contactEmail: z.string()
         .email('Invalid email address')
         .min(1, 'Contact email is required'),
+    countryCode: z.string()
+        .regex(/^\+?[1-9]\d{0,4}$/, 'Invalid country code')
+        .optional(),
     contactPhone: z.string()
         .regex(/^\+?[1-9]\d{1,14}$/, 'Invalid phone number')
         .min(1, 'Contact phone is required'),
@@ -98,6 +101,7 @@ export default function CompanyRegistration() {
             website: '',
             description: '',
             contactEmail: '',
+            countryCode: '',
             contactPhone: '',
         },
     });
@@ -106,11 +110,14 @@ export default function CompanyRegistration() {
         try {
             const res = await axios.post(`${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/company/Register`, data);
             if (res.data.success) {
+                console.log(res.data);
                 router.push('/Dashboard');
                 toast.success('Company registered successfully!');
                 reset();
+                toast.success('Company registered successfully!');
             }
         } catch (error: any) {
+            console.error('Error registering company:', error);
             toast.error(error.response?.data?.message || 'Failed to register company');
         }
     };
@@ -132,7 +139,7 @@ export default function CompanyRegistration() {
                             <h3 className="text-lg font-medium text-gray-900">Company Information</h3>
                             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                                 <div className="space-y-2">
-                                    <Label htmlFor="companyName">Company Name</Label>
+                                    <Label htmlFor="companyName">Company Name <span className='text-red-600 font-bold'>*</span> </Label>
                                     <Input
                                         id="companyName"
                                         {...register('companyName')}
@@ -144,7 +151,7 @@ export default function CompanyRegistration() {
                                 </div>
 
                                 <div className="space-y-2">
-                                    <Label htmlFor="industry">Industry</Label>
+                                    <Label htmlFor="industry">Industry <span className='text-red-600 font-bold'>*</span></Label>
                                     <Select
                                         onValueChange={(value) => setValue('industry', value)}
                                     >
@@ -165,7 +172,7 @@ export default function CompanyRegistration() {
                                 </div>
 
                                 <div className="space-y-2">
-                                    <Label htmlFor="companySize">Company Size</Label>
+                                    <Label htmlFor="companySize">Company Size <span className='text-red-600 font-bold'>*</span></Label>
                                     <Select
                                         onValueChange={(value) => setValue('companySize', value)}
                                     >
@@ -189,6 +196,7 @@ export default function CompanyRegistration() {
                                     <Label htmlFor="website">Website</Label>
                                     <Input
                                         id="website"
+                                        required={false}
                                         {...register('website')}
                                         className={errors.website ? 'border-red-500' : ''}
                                     />
@@ -199,9 +207,10 @@ export default function CompanyRegistration() {
                             </div>
 
                             <div className="space-y-2">
-                                <Label htmlFor="description">Company Description</Label>
+                                <Label htmlFor="description">Company Description <span className='text-red-600 font-bold'>*</span></Label>
                                 <Textarea
                                     id="description"
+                                    placeholder="Describe your company in detail..."
                                     {...register('description')}
                                     className={errors.description ? 'border-red-500' : ''}
                                     rows={4}
@@ -214,10 +223,10 @@ export default function CompanyRegistration() {
 
                         {/* Address Information */}
                         <div className="space-y-4">
-                            <h3 className="text-lg font-medium text-gray-900">Address Information</h3>
+                            <h3 className="text-lg font-medium text-gray-900">Address Information <span className='text-red-600 font-bold'>*</span></h3>
                             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                                 <div className="space-y-2">
-                                    <Label htmlFor="street">Street Address</Label>
+                                    <Label htmlFor="street">Street</Label>
                                     <Input
                                         id="street"
                                         {...register('street')}
@@ -283,7 +292,7 @@ export default function CompanyRegistration() {
                             <h3 className="text-lg font-medium text-gray-900">Contact Information</h3>
                             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                                 <div className="space-y-2">
-                                    <Label htmlFor="contactEmail">Contact Email</Label>
+                                    <Label htmlFor="contactEmail">Contact Email <span className='text-red-600 font-bold'>*</span></Label>
                                     <Input
                                         id="contactEmail"
                                         type="email"
@@ -295,14 +304,24 @@ export default function CompanyRegistration() {
                                     )}
                                 </div>
 
-                                <div className="space-y-2">
-                                    <Label htmlFor="contactPhone">Contact Phone</Label>
-                                    <Input
-                                        id="contactPhone"
-                                        type="tel"
-                                        {...register('contactPhone')}
-                                        className={errors.contactPhone ? 'border-red-500' : ''}
-                                    />
+                                <div className="space-y-2 ">
+                                    <Label htmlFor="contactPhone">Contact Phone <span className='text-red-600 font-bold'>*</span></Label>
+                                    <div className="flex items-center justify-between gap-2">
+
+                                        <Input
+                                            id="CountryCode"
+                                            type="text"
+                                            placeholder="+1"
+                                            {...register('countryCode')}
+                                            className={` w-18 ${errors.countryCode ? 'border-red-500' : ''}`}
+                                        />
+                                        <Input
+                                            id="contactPhone"
+                                            type="tel"
+                                            {...register('contactPhone')}
+                                            className={errors.contactPhone ? 'border-red-500' : ''}
+                                        />
+                                    </div>
                                     {errors.contactPhone && (
                                         <p className="text-sm text-red-500">{errors.contactPhone.message}</p>
                                     )}
