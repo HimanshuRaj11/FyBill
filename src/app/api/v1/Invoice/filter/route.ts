@@ -53,7 +53,6 @@ export async function POST(request: Request) {
                 model: branchModel
             }).sort({ createdAt: -1 }).lean()
         }
-
         return NextResponse.json({ invoices, success: true }, { status: 200 });
 
     } catch (error) {

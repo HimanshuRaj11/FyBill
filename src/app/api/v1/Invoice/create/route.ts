@@ -90,6 +90,7 @@ export async function POST(request: Request) {
             })
             if (User.branchId || selectedBranch) {
                 invoice.branchId = Branch;
+                invoice.branchName = Branch.branchName;
             }
             await invoice.save();
         }

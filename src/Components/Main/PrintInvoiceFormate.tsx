@@ -1,7 +1,6 @@
 'use client'
-import axios from 'axios';
 import moment from 'moment'
-import React, { useCallback, useEffect, useState } from 'react'
+import React from 'react'
 import { useSelector } from 'react-redux';
 
 export default function PrintInvoiceFormate({ invoice }: { invoice: any }) {
@@ -39,10 +38,10 @@ export default function PrintInvoiceFormate({ invoice }: { invoice: any }) {
                 }
                 <div className="text-center mb-2 flex gap-1 justify-center">
                     <p className='text-sm font-semibold'>
-                        {Branch?.CountryCode ? Branch.CountryCode : Company?.CountryCode}
+                        {Branch ? Branch.CountryCode : Company?.CountryCode || ''}
                     </p>
                     <p className='text-sm font-semibold'>
-                        {Branch?.phone ? Branch.phone : Company?.phone}
+                        {Branch ? Branch.phone : Company?.phone}
                     </p>
 
                 </div>
