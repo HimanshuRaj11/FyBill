@@ -116,6 +116,7 @@ const MultipleProductUpdate: React.FC<BulkUpdateTableProps> = ({
         } catch (error: any) {
             toast.error('update error:', error);
         } finally {
+            setChangeProducts([]);
             setIsLoading(false);
         }
     };
@@ -141,7 +142,7 @@ const MultipleProductUpdate: React.FC<BulkUpdateTableProps> = ({
                 </div>
             </div>
 
-            <div className="overflow-x-auto">
+            <div className="overflow-x-scroll">
                 <table className="w-full">
                     <thead className="bg-gray-50">
                         <tr>
@@ -175,6 +176,7 @@ const MultipleProductUpdate: React.FC<BulkUpdateTableProps> = ({
                                 <td className="p-4">
                                     <select
                                         value={product.category}
+
                                         onChange={(e) => handleFieldChange(product._id, 'category', e.target.value)}
                                         className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors[`${product._id}-categoryId`] ? 'border-red-500' : 'border-gray-300'
                                             }`}
@@ -195,6 +197,7 @@ const MultipleProductUpdate: React.FC<BulkUpdateTableProps> = ({
                                 <td className="p-4">
                                     <input
                                         type="number"
+                                        onWheel={(e) => e.currentTarget.blur()}
                                         value={product.price}
                                         onChange={(e) => handleFieldChange(product._id, 'price', parseFloat(e.target.value))}
                                         className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors[`${product._id}-price`] ? 'border-red-500' : 'border-gray-300'

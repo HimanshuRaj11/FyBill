@@ -599,6 +599,7 @@ export default function BillingComponent({
                                 <div className="relative">
                                     <UserIcon className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                                     <Input
+                                        type="text"
                                         placeholder="Customer Name"
                                         value={clientName}
                                         onChange={(e) => setClientName(e.target.value)}
