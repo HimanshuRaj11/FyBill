@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react'
+'use client'
+import React, { useCallback, useEffect, useState } from 'react'
 import { Button } from '../ui/button'
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
@@ -6,7 +7,8 @@ import { saveAs } from "file-saver";
 export default function DownloadExcel({ data, fileName }: { data: any, fileName: string }) {
 
     const [dataToDownload, setDataToDownload] = useState([])
-    const handleInvoice = () => {
+
+    const handleInvoice = useCallback(() => {
         const DownloadData = data.map((invoice: any) => {
             const productString = invoice.products
                 .map((p: any) => `${p.name} -- ${p.quantity} X ${p.rate} = ${p.amount}`)
@@ -24,9 +26,9 @@ export default function DownloadExcel({ data, fileName }: { data: any, fileName:
             };
         });
         setDataToDownload(DownloadData)
-    }
+    }, [data])
 
-    const handleProduct = () => {
+    const handleProduct = useCallback(() => {
         const DownloadData = data.map((product: any) => {
             return {
                 "ID": product._id,
@@ -38,7 +40,9 @@ export default function DownloadExcel({ data, fileName }: { data: any, fileName:
             }
         })
         setDataToDownload(DownloadData)
-    }
+    }, [data])
+
+
     const handleDownload = () => {
 
         const worksheet = XLSX.utils.json_to_sheet(dataToDownload);
@@ -66,7 +70,7 @@ export default function DownloadExcel({ data, fileName }: { data: any, fileName:
             handleProduct()
         }
 
-    }, [data, fileName])
+    }, [handleInvoice, handleProduct])
 
     return (
         <Button onClick={handleDownload} className="px-4 py-2 bg-green-600 text-white rounded">
