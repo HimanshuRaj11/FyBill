@@ -3,6 +3,7 @@ import InvoiceModel from "@/Model/Invoice.model";
 import UserModel from "@/Model/User.model";
 import CompanyModel from "@/Model/Company.model";
 import BranchModel from "@/Model/branch.model";
+import { log } from "console";
 
 
 export async function POST(request: Request) {
@@ -94,8 +95,9 @@ export async function POST(request: Request) {
             }
             await invoice.save();
         }
+        log("Invoice created/updated successfully", invoice);
 
-        return Response.json({ message: "Invoice created successfully", invoice }, { status: 200 });
+        return Response.json({ message: "Invoice created successfully", invoice, success: true }, { status: 200 });
 
     } catch (error) {
         return Response.json({ message: "Internal server error", error }, { status: 500 });
