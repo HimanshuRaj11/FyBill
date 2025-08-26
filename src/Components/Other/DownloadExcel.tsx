@@ -43,6 +43,19 @@ export default function DownloadExcel({ data, fileName }: { data: any, fileName:
     }, [data])
 
 
+    const handleProductSummary = useCallback(() => {
+        const DownloadData = data.map((product: any) => {
+            return {
+                "Name": product.name,
+                "Rate": product.rate,
+                "Quantity": product.quantity,
+                "price": product.amount,
+            }
+        })
+        setDataToDownload(DownloadData)
+    }, [data])
+
+
     const handleDownload = () => {
 
         const worksheet = XLSX.utils.json_to_sheet(dataToDownload);
@@ -68,6 +81,9 @@ export default function DownloadExcel({ data, fileName }: { data: any, fileName:
         }
         if (fileName == 'Products') {
             handleProduct()
+        }
+        if (fileName.startsWith('ProductsSummary')) {
+            handleProductSummary()
         }
 
     }, [handleInvoice, handleProduct])

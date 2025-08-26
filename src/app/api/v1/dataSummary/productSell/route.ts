@@ -71,15 +71,16 @@ function GetProductDataSummary(Invoices: any[]) {
     Invoices.map((invoice) => {
         const productList = invoice.products
         productList.forEach((product: IProduct) => {
+
             products.push(product)
         });
-
     })
 
-    const newProjectList: IProduct[] = [];
+    const newProductList: IProduct[] = [];
+
 
     products.forEach((product: IProduct) => {
-        const existingProduct = newProjectList.find(item => item.name === product.name);
+        const existingProduct = newProductList.find(item => item.name === product.name);
 
         if (existingProduct) {
             existingProduct.quantity += product.quantity;
@@ -88,8 +89,9 @@ function GetProductDataSummary(Invoices: any[]) {
                 existingProduct.rate = 0
             }
         } else {
-            newProjectList.push(product);
+            newProductList.push(product);
         }
     });
-    return newProjectList;
+    console.log(newProductList[0]);
+    return newProductList;
 }

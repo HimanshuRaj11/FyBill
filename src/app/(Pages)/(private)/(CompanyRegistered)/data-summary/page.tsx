@@ -8,7 +8,8 @@ import DatePicker from 'react-datepicker'
 
 import "react-datepicker/dist/react-datepicker.css";
 import { Button } from '@/Components/ui/button';
-import { ChevronDown, Filter } from 'lucide-react';
+import { ChevronDown, Filter, Search, X } from 'lucide-react';
+import DownloadExcel from '@/Components/Other/DownloadExcel';
 
 interface IProduct {
     name: string;
@@ -21,8 +22,8 @@ export default function Page() {
     const { Company } = useSelector((state: any) => state.Company)
     const { User } = useSelector((state: any) => state.User)
 
-
     const [ProductsDataSummary, setProductsDataSummary] = useState<IProduct[]>([])
+    const [filteredProducts, setFilteredProducts] = useState<IProduct[]>([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
 
@@ -35,6 +36,8 @@ export default function Page() {
     const [startDate, setStartDate] = useState(moment().startOf('day').toDate())
     const [endDate, setEndDate] = useState(moment().endOf('day').toDate())
 
+    // Search state
+    const [searchTerm, setSearchTerm] = useState('')
 
     const HandleDateRange = (dateRange: string) => {
         setDateRange(dateRange);
@@ -78,6 +81,7 @@ export default function Page() {
                 setLoading(true)
                 const { data } = await axios.post(`${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/dataSummary/productSell`, { selectedBranch, startDate, endDate })
                 setProductsDataSummary(data.FinalList)
+                setFilteredProducts(data.FinalList) // Initialize filtered products
                 setError(null)
             } catch (err) {
                 setError('Failed to fetch product data')
@@ -90,12 +94,33 @@ export default function Page() {
         }
     }, [startDate, endDate, selectedBranch])
 
+    // Search functionality
+    useEffect(() => {
+        if (searchTerm.trim() === '') {
+            setFilteredProducts(ProductsDataSummary)
+        } else {
+            const filtered = ProductsDataSummary.filter(product =>
+                product.name.toLowerCase().includes(searchTerm.toLowerCase())
+            )
+            setFilteredProducts(filtered)
+        }
+    }, [searchTerm, ProductsDataSummary])
+
     useEffect(() => {
         getProductData()
     }, [getProductData])
 
-    const totalQuantity = ProductsDataSummary.reduce((sum, product) => sum + product.quantity, 0)
+    const totalQuantity = filteredProducts.reduce((sum, product) => sum + product.quantity, 0)
+    const totalAmount = filteredProducts.reduce((sum, product) => sum + product.amount, 0)
 
+    // Clear search
+    const clearSearch = () => {
+        setSearchTerm('')
+    }
+
+    const handleExcelDownload = () => {
+
+    }
 
     if (error) {
         return (
@@ -199,10 +224,30 @@ export default function Page() {
                 )
             }
 
-
             {/* Search and Filter */}
+            <div className="flex justify-between flex-col sm:flex-row gap-3 mb-6">
+                {/* Search Bar */}
+                <div className="relative flex-1 max-w-md">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <Search className="h-5 w-5 text-gray-400" />
+                    </div>
+                    <input
+                        type="text"
+                        placeholder="Search products..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="block w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm"
+                    />
+                    {searchTerm && (
+                        <button
+                            onClick={clearSearch}
+                            className="absolute inset-y-0 right-0 pr-3 flex items-center hover:text-gray-600 transition-colors"
+                        >
+                            <X className="h-4 w-4 text-gray-400" />
+                        </button>
+                    )}
+                </div>
 
-            <div className="flex justify-end flex-col sm:flex-row gap-3 mb-6">
 
                 <div className="relative">
                     <Button
@@ -318,9 +363,18 @@ export default function Page() {
                     )}
                 </div>
             </div>
+
             <div className=" p-2">
-                <h1 className="text-xl font-extrabold text-gray-800 mb-4"> {dateRange} Sales Data</h1>
+                <h1 className="text-xl font-extrabold text-gray-800 mb-4">
+                    {dateRange} Sales Data
+                    {searchTerm && (
+                        <span className="text-sm font-normal text-gray-600 ml-2">
+                            - Showing results for "{searchTerm}"
+                        </span>
+                    )}
+                </h1>
             </div>
+            <DownloadExcel data={ProductsDataSummary} fileName={`ProductsSummary`} />
 
             {
                 loading ? <WebLoader /> : (
@@ -330,8 +384,15 @@ export default function Page() {
                             <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100 hover:shadow-xl transition-shadow duration-300">
                                 <div className="flex items-center justify-between">
                                     <div>
-                                        <p className="text-sm font-medium text-gray-600">Total Products</p>
-                                        <p className="text-3xl font-bold text-gray-900">{ProductsDataSummary.length}</p>
+                                        <p className="text-sm font-medium text-gray-600">
+                                            {searchTerm ? 'Filtered Products' : 'Total Products'}
+                                        </p>
+                                        <p className="text-3xl font-bold text-gray-900">{filteredProducts.length}</p>
+                                        {searchTerm && ProductsDataSummary.length !== filteredProducts.length && (
+                                            <p className="text-xs text-gray-500 mt-1">
+                                                of {ProductsDataSummary.length} total
+                                            </p>
+                                        )}
                                     </div>
                                     <div className="bg-blue-100 p-3 rounded-full">
                                         <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -344,7 +405,9 @@ export default function Page() {
                             <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100 hover:shadow-xl transition-shadow duration-300">
                                 <div className="flex items-center justify-between">
                                     <div>
-                                        <p className="text-sm font-medium text-gray-600">Total Quantity</p>
+                                        <p className="text-sm font-medium text-gray-600">
+                                            {searchTerm ? 'Filtered Quantity' : 'Total Quantity'}
+                                        </p>
                                         <p className="text-3xl font-bold text-gray-900">{totalQuantity.toLocaleString()}</p>
                                     </div>
                                     <div className="bg-green-100 p-3 rounded-full">
@@ -355,17 +418,51 @@ export default function Page() {
                                 </div>
                             </div>
 
-
+                            <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100 hover:shadow-xl transition-shadow duration-300">
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <p className="text-sm font-medium text-gray-600">
+                                            {searchTerm ? 'Filtered Amount' : 'Total Amount'}
+                                        </p>
+                                        <p className="text-3xl font-bold text-gray-900">{Company?.currency?.symbol}{totalAmount.toLocaleString()}</p>
+                                    </div>
+                                    <div className="bg-purple-100 p-3 rounded-full">
+                                        <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+                                        </svg>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
+
+
                         {/* Products Grid */}
-                        {ProductsDataSummary.length === 0 ? (
+                        {filteredProducts.length === 0 ? (
                             <div className="bg-white rounded-2xl shadow-lg p-12 text-center border border-gray-100">
-                                <svg className="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
-                                </svg>
-                                <h3 className="text-xl font-semibold text-gray-900 mb-2">No Products Found</h3>
-                                <p className="text-gray-600">There are no products to display at the moment.</p>
+                                {searchTerm ? (
+                                    <>
+                                        <Search className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                                        <h3 className="text-xl font-semibold text-gray-900 mb-2">No products found</h3>
+                                        <p className="text-gray-600 mb-4">
+                                            We couldn't find any products matching "{searchTerm}".
+                                        </p>
+                                        <button
+                                            onClick={clearSearch}
+                                            className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200"
+                                        >
+                                            Show all products
+                                        </button>
+                                    </>
+                                ) : (
+                                    <>
+                                        <svg className="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+                                        </svg>
+                                        <h3 className="text-xl font-semibold text-gray-900 mb-2">No Products Found</h3>
+                                        <p className="text-gray-600">There are no products to display at the moment.</p>
+                                    </>
+                                )}
                             </div>
                         ) : (
                             <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
@@ -383,7 +480,7 @@ export default function Page() {
                                             </tr>
                                         </thead>
                                         <tbody className="divide-y divide-gray-200">
-                                            {ProductsDataSummary.map((product, index) => (
+                                            {filteredProducts.map((product, index) => (
                                                 <tr key={index} className="hover:bg-gray-50 transition-colors duration-150">
                                                     <td className="px-6 py-4 whitespace-nowrap">
                                                         <div className="flex items-center">
@@ -406,7 +503,7 @@ export default function Page() {
 
                                 {/* Mobile Cards */}
                                 <div className="md:hidden divide-y divide-gray-200">
-                                    {ProductsDataSummary.map((product, index) => (
+                                    {filteredProducts.map((product, index) => (
                                         <div key={index} className="p-6 hover:bg-gray-50 transition-colors duration-150">
                                             <div className="flex items-center mb-4">
                                                 <div className="bg-gradient-to-r from-blue-500 to-purple-600 w-12 h-12 rounded-full flex items-center justify-center text-white font-bold mr-4">
