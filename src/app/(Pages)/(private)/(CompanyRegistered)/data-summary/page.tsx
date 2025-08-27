@@ -369,7 +369,7 @@ export default function Page() {
                     {dateRange} Sales Data
                     {searchTerm && (
                         <span className="text-sm font-normal text-gray-600 ml-2">
-                            - Showing results for "{searchTerm}"
+                            - Showing results for - {searchTerm}
                         </span>
                     )}
                 </h1>
@@ -445,7 +445,7 @@ export default function Page() {
                                         <Search className="w-16 h-16 text-gray-400 mx-auto mb-4" />
                                         <h3 className="text-xl font-semibold text-gray-900 mb-2">No products found</h3>
                                         <p className="text-gray-600 mb-4">
-                                            We couldn't find any products matching "{searchTerm}".
+                                            We couldn{"`"}t find any products matching {searchTerm}.
                                         </p>
                                         <button
                                             onClick={clearSearch}
