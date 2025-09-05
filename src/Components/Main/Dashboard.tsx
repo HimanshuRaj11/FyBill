@@ -1,5 +1,5 @@
 "use client"
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState, useMemo } from 'react'
 import { Button } from '../ui/button'
 import { Download, ChevronDown, Filter, Search, RefreshCw } from 'lucide-react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card'
@@ -31,6 +31,18 @@ export default function Dashboard() {
     const [startDate, setStartDate] = useState(moment().startOf('day').toDate())
     const [endDate, setEndDate] = useState(moment().endOf('day').toDate())
 
+    // Filter invoices based on search query
+    const filteredInvoices = useMemo(() => {
+        if (!searchQuery.trim()) return Invoice;
+
+        return Invoice.filter((invoice: any) =>
+            invoice.invoiceId?.toString().toLowerCase().includes(searchQuery.toLowerCase()) ||
+            invoice.clientName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            invoice.branchId?.branchName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            invoice.paymentMode?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            invoice.grandTotal?.toString().includes(searchQuery)
+        );
+    }, [Invoice, searchQuery]);
 
     const HandleDateRange = (dateRange: string) => {
         setDateRange(dateRange);
@@ -75,10 +87,9 @@ export default function Dashboard() {
             setInvoice(data.invoices)
             setIsLoading(false)
         } catch (error) {
-
+            setIsLoading(false)
         }
     }, [startDate, endDate, selectedBranch])
-
 
     useEffect(() => {
         setDateRange("Today");
@@ -92,7 +103,13 @@ export default function Dashboard() {
         FilterInvoice()
     }
 
+    const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setSearchQuery(e.target.value);
+    }
 
+    const clearSearch = () => {
+        setSearchQuery('');
+    }
 
     return (
         <div className="p-4 md:p-6 max-w-7xl mx-auto">
@@ -113,9 +130,9 @@ export default function Dashboard() {
                         <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
                         Refresh
                     </Button>
-
                 </div>
             </div>
+
             {
                 User?.role === "Owner" && (
                     <div className="flex flex-row justify-start mb-2.5 gap-2 flex-wrap">
@@ -173,12 +190,32 @@ export default function Dashboard() {
                 )
             }
 
-
             {/* Search and Filter */}
             {
                 (User?.role == "Owner" || User?.role == "admin") && (
                     <>
-                        <div className="flex justify-end flex-col sm:flex-row gap-3 mb-6">
+                        <div className="flex justify-between flex-col sm:flex-row gap-3 mb-6">
+                            {/* Search Input */}
+                            <div className="relative flex-1 max-w-md">
+                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <Search className="h-4 w-4 text-gray-400" />
+                                </div>
+                                <input
+                                    type="text"
+                                    placeholder="Search invoices..."
+                                    value={searchQuery}
+                                    onChange={handleSearchChange}
+                                    className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                                />
+                                {searchQuery && (
+                                    <button
+                                        onClick={clearSearch}
+                                        className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
+                                    >
+                                        <span className="text-lg">&times;</span>
+                                    </button>
+                                )}
+                            </div>
 
                             <div className="relative">
                                 <Button
@@ -296,31 +333,36 @@ export default function Dashboard() {
                         </div>
                         <div className=" p-2">
                             <h1 className="text-xl font-extrabold text-gray-800 mb-4">{dateRange} Invoice Data</h1>
-                            <DownloadExcel data={Invoice} fileName={'Invoices'} />
+                            <DownloadExcel data={filteredInvoices} fileName={'Invoices'} />
                         </div>
                     </>
                 )
             }
 
-
-
             {/* Stats Cards */}
             <DashboardTopCards Invoice={Invoice} />
 
-
             {/* Charts */}
             {/* <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 mb-6">
-
-
                 <BarChartComponent Invoice={Invoice} dateRange={dateRange} />
                 <PieChartComponent Invoice={Invoice} dateRange={dateRange} />
-
             </div> */}
 
             {/* Recent Activity */}
             <Card className="hover:shadow-md transition-shadow duration-200">
-
                 <CardContent>
+                    {searchQuery && (
+                        <div className="mb-4 p-2 bg-blue-50 rounded-lg">
+                            <p className="text-sm text-blue-700">
+                                Showing {filteredInvoices.length} result(s) for "{searchQuery}"
+                                {filteredInvoices.length !== Invoice.length && (
+                                    <span className="ml-2 text-gray-500">
+                                        (filtered from {Invoice.length} total)
+                                    </span>
+                                )}
+                            </p>
+                        </div>
+                    )}
                     <div className="overflow-x-auto">
                         <table className="min-w-full divide-y divide-gray-200">
                             <thead className="bg-gray-50">
@@ -339,27 +381,38 @@ export default function Dashboard() {
                                 </tr>
                             </thead>
                             <tbody className="bg-white divide-y divide-gray-200 ">
-                                {Invoice?.map((invoice: any) => (
-                                    <tr key={invoice.invoiceId} className="hover:bg-gray-50">
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium ">
-                                            <Link href={`/Invoice/${invoice._id}`} className='text-blue-500'>
-                                                #{invoice.invoiceId}
-                                            </Link>
-                                        </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500"> {invoice.clientName}</td>
-                                        {
-                                            Company?.branch?.length > 0 && (
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{invoice?.branchId?.branchName}</td>
-                                            )
-                                        }
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{invoice.currency}{invoice.grandTotal}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 ">{invoice.paymentMode} </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{moment(invoice.createdAt).format('MMM DD, YYYY')}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                            <Link href={`/Invoice/${invoice._id}`} className='text-blue-500'>View</Link>
+                                {filteredInvoices?.length > 0 ? (
+                                    filteredInvoices.map((invoice: any) => (
+                                        <tr key={invoice.invoiceId} className="hover:bg-gray-50">
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium ">
+                                                <Link href={`/Invoice/${invoice._id}`} className='text-blue-500'>
+                                                    #{invoice.invoiceId}
+                                                </Link>
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500"> {invoice.clientName}</td>
+                                            {
+                                                Company?.branch?.length > 0 && (
+                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{invoice?.branchId?.branchName}</td>
+                                                )
+                                            }
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{invoice.currency}{invoice.grandTotal}</td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 ">{invoice.paymentMode} </td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{moment(invoice.createdAt).format('MMM DD, YYYY')}</td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                <Link href={`/Invoice/${invoice._id}`} className='text-blue-500'>View</Link>
+                                            </td>
+                                        </tr>
+                                    ))
+                                ) : (
+                                    <tr>
+                                        <td colSpan={Company?.branch?.length > 0 ? 7 : 6} className="px-6 py-8 text-center text-sm text-gray-500">
+                                            {searchQuery ?
+                                                `No invoices found matching "${searchQuery}"` :
+                                                'No invoices found'
+                                            }
                                         </td>
                                     </tr>
-                                ))}
+                                )}
                             </tbody>
                         </table>
                     </div>
@@ -368,4 +421,3 @@ export default function Dashboard() {
         </div>
     )
 }
-

@@ -38,7 +38,7 @@ export default function PrintInvoiceFormate({ invoice }: { invoice: any }) {
                 }
                 <div className="text-center mb-2 flex gap-1 justify-center">
 
-                    <p className='text-sm font-semibold'>
+                    <p className='text-sm font-semibold w-[15rem]'>
                         {Company?.phone}
                     </p>
 
