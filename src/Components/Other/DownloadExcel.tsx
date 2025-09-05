@@ -86,7 +86,7 @@ export default function DownloadExcel({ data, fileName }: { data: any, fileName:
             handleProductSummary()
         }
 
-    }, [handleInvoice, handleProduct, handleProductSummary])
+    }, [handleInvoice, handleProduct, handleProductSummary, fileName])
 
     return (
         <Button onClick={handleDownload} className="px-4 py-2 bg-green-600 text-white rounded">
