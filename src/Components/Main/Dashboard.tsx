@@ -354,7 +354,7 @@ export default function Dashboard() {
                     {searchQuery && (
                         <div className="mb-4 p-2 bg-blue-50 rounded-lg">
                             <p className="text-sm text-blue-700">
-                                Showing {filteredInvoices.length} result(s) for "{searchQuery}"
+                                Showing {filteredInvoices.length} result(s) for {searchQuery}
                                 {filteredInvoices.length !== Invoice.length && (
                                     <span className="ml-2 text-gray-500">
                                         (filtered from {Invoice.length} total)
