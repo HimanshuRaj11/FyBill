@@ -24,11 +24,14 @@ export default function Page() {
         const res = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/company/product/fetch`);
         const data = res.data;
         setProducts(data.products);
+
         setLoading(false)
     }
+
     useEffect(() => {
         fetchProducts();
     }, []);
+
 
     const FetchHoldInvoices = async () => {
         try {

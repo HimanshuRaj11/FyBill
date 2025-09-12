@@ -442,6 +442,14 @@ export default function BillingComponent({
         }
     };
 
+    const handleKotSave = (Invoice: any) => {
+        try {
+            axios.post(`${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/kot/save`, { Invoice }, { withCredentials: true })
+        } catch (error) {
+            return error
+        }
+    }
+
     const HandleKOT = async () => {
         try {
             if (clientName === "") {
@@ -483,6 +491,7 @@ export default function BillingComponent({
             );
 
             if (data.invoice) {
+
                 setInvoice(data.invoice);
                 setShowInvoice(true);
 
@@ -497,6 +506,7 @@ export default function BillingComponent({
                 setGrandTotal(0);
                 setPaymentMode("");
                 toast.success("KOT Invoice Created", { position: "bottom-right" });
+                handleKotSave(data.invoice)
             }
         } catch (error) {
             toast.error("Something went wrong");

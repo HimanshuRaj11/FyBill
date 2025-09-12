@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { X, Clock, ChevronUp, ChevronDown, Edit2, Printer } from 'lucide-react';
 import moment from 'moment';
 import { Button } from '../ui/button';
+import axios from 'axios';
 
 const HeldInvoices = ({ HoldInvoices, setHoldInvoiceUpdate, setShowInvoice, setInvoice }: { setInvoice: any, setShowInvoice: any, HoldInvoices: any, setHoldInvoiceUpdate: any }) => {
     const [isExpanded, setIsExpanded] = useState(false);
@@ -11,8 +12,16 @@ const HeldInvoices = ({ HoldInvoices, setHoldInvoiceUpdate, setShowInvoice, setI
         setHoldInvoiceUpdate(invoice)
         setIsExpanded(false)
     }
+    const handleKotSave = (Invoice: any) => {
+        try {
+            axios.post(`${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/kot/save`, { Invoice }, { withCredentials: true })
+        } catch (error) {
+            return error
+        }
+    }
     const HandlePrintKOT = async (Invoice: any) => {
         try {
+            handleKotSave(Invoice)
             setInvoice(Invoice)
             setShowInvoice(true)
         } catch (error) {

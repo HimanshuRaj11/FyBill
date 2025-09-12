@@ -378,6 +378,11 @@ export default function Dashboard() {
                                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Mode of Payment</th>
                                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
                                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                                    {
+                                        (User?.role == "Owner" || User?.role == "admin") &&
+
+                                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">View Saved KOT</th>
+                                    }
                                 </tr>
                             </thead>
                             <tbody className="bg-white divide-y divide-gray-200 ">
@@ -401,6 +406,12 @@ export default function Dashboard() {
                                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                                 <Link href={`/Invoice/${invoice._id}`} className='text-blue-500'>View</Link>
                                             </td>
+                                            {
+                                                (User?.role == "Owner" || User?.role == "admin") &&
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                    <Link href={`/Invoice/saved-KOT/${invoice._id}`} className='text-blue-500'>view</Link>
+                                                </td>
+                                            }
                                         </tr>
                                     ))
                                 ) : (
