@@ -32,6 +32,7 @@ export default function Dashboard() {
     const [endDate, setEndDate] = useState(moment().endOf('day').toDate())
 
     // Filter invoices based on search query
+
     const filteredInvoices = useMemo(() => {
         if (!searchQuery.trim()) return Invoice;
 

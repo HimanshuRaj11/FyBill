@@ -35,6 +35,8 @@ export async function POST(request: Request) {
 
         return NextResponse.json({ success: true, message: "Tax created successfully", tax });
     } catch (error) {
+        console.log(error);
+
         return NextResponse.json({ success: false, message: "Failed to create tax", error: error as Error }, { status: 500 });
     }
 }

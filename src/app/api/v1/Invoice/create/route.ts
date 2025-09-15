@@ -32,7 +32,9 @@ export async function POST(request: Request) {
             paymentMode,
             selectedBranch,
             InvoiceStatus,
-            HoldedInvoice
+            HoldedInvoice,
+            discountValue,
+            discountType,
         } = await request.json();
         let invoice
 
@@ -86,6 +88,8 @@ export async function POST(request: Request) {
                 InvoiceStatus,
                 currency: Company.currency.symbol,
                 createdBy: User._id,
+                discountValue,
+                discountType,
 
             })
             if (User.branchId || selectedBranch) {

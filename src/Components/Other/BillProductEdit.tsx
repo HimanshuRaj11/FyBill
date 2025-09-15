@@ -12,6 +12,10 @@ const ProductSpecification = [
     "Dry",
     "Semi Gravy",
     "Extra Roasted",
+    "no pepper",
+    "less oil",
+    "takeaway"
+
 ]
 
 export default function BillProductEdit({ setEditProductPopUp, editProduct, setProducts, }: { setEditProductPopUp: any, editProduct: any, setProducts: any }) {

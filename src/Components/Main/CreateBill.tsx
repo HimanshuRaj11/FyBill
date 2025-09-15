@@ -5,6 +5,8 @@ import { Input } from "../ui/input";
 import { Dialog, DialogContent } from "../ui/dialog";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { Percent } from "lucide-react";
+
 import {
     Edit,
     Minus,
@@ -76,7 +78,7 @@ export default function BillingComponent({
     const [productsList, setProductsList] = useState<any[]>([]);
     const [subTotal, setSubTotal] = useState<number>(0);
     const [grandTotal, setGrandTotal] = useState<number>(0);
-    const [paymentMode, setPaymentMode] = useState<string>("");
+    const [paymentMode, setPaymentMode] = useState<string>("cash");
     const [appliedTaxes, setAppliedTaxes] = useState<any[]>([]);
     const [selectedBranch, setSelectedBranch] = useState("");
     const [editProductPopUp, setEditProductPopUp] = useState(false);
@@ -87,7 +89,10 @@ export default function BillingComponent({
     const [selectedCategory, setSelectedCategory] = useState<string>("all");
     const [isProcessing, setIsProcessing] = useState(false);
 
-    // const [Specification, setSpecification] = useState<string>('')
+
+    const [discountType, setDiscountType] = useState("percentage");
+    const [discountValue, setDiscountValue] = useState<number | "">("");
+
 
     const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
     const [highlightedIndex, setHighlightedIndex] = useState<number>(0);
@@ -133,8 +138,25 @@ export default function BillingComponent({
         const newSubTotal = products.reduce((sum, product) => sum + product.amount, 0);
         setSubTotal(newSubTotal);
         const totalTaxAmount = appliedTaxes.reduce((sum, tax) => sum + tax.amount, 0);
+
+
         setGrandTotal(Number((newSubTotal + totalTaxAmount).toFixed(2)));
-    }, [products, appliedTaxes]);
+
+        if (discountValue && discountValue > 0) {
+            if (discountType == "percentage") {
+                setGrandTotal((prev: number) => {
+                    const value = prev - (prev * discountValue / 100)
+                    return value;
+                })
+            } else {
+                setGrandTotal((prev: number) => {
+                    return prev - discountValue;
+                })
+            }
+        }
+
+
+    }, [products, appliedTaxes, discountValue, discountType]);
 
 
     const handleProductSearch = useCallback((searchTerm: string) => {
@@ -370,6 +392,8 @@ export default function BillingComponent({
                     selectedBranch,
                     HoldedInvoice,
                     InvoiceStatus: "Done",
+                    discountValue,
+                    discountType,
                 }
             );
 
@@ -421,6 +445,8 @@ export default function BillingComponent({
                     BillType,
                     selectedBranch,
                     InvoiceStatus: "Hold",
+                    discountValue,
+                    discountType,
                 }
             );
 
@@ -442,13 +468,6 @@ export default function BillingComponent({
         }
     };
 
-    const handleKotSave = (Invoice: any) => {
-        try {
-            axios.post(`${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/kot/save`, { Invoice }, { withCredentials: true })
-        } catch (error) {
-            return error
-        }
-    }
 
     const HandleKOT = async () => {
         try {
@@ -487,6 +506,8 @@ export default function BillingComponent({
                     selectedBranch,
                     HoldedInvoice,
                     InvoiceStatus: "Hold",
+                    discountValue,
+                    discountType,
                 }
             );
 
@@ -514,6 +535,14 @@ export default function BillingComponent({
             setIsProcessing(false);
         }
     }
+    const handleKotSave = (Invoice: any) => {
+        try {
+            axios.post(`${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/kot/save`, { Invoice }, { withCredentials: true })
+        } catch (error) {
+            return error
+        }
+    }
+
 
     // key selection
     useEffect(() => {
@@ -689,9 +718,6 @@ export default function BillingComponent({
                                             onChange={(e) => setPaymentMode(e.target.value)}
                                             value={paymentMode}
                                         >
-                                            <option value="" disabled>
-                                                Select Payment Mode
-                                            </option>
                                             <option value="cash">Cash</option>
                                             <option value="upi">UPI</option>
                                             <option value="card">Card</option>
@@ -700,6 +726,83 @@ export default function BillingComponent({
                                     </div>
                                 </div>
                             )}
+
+                            {/* Discount Section */}
+                            <div className="space-y-3 pt-4 border-t border-gray-200">
+                                <label className="text-sm font-medium flex items-center gap-2">
+                                    <Percent className="h-4 w-4" />
+                                    Discount
+                                </label>
+
+                                <div className="space-y-3">
+                                    <div className="space-y-1">
+                                        <label className="text-xs text-gray-600">Discount Type</label>
+                                        <div className="flex gap-4">
+                                            <div className="flex items-center">
+                                                <input
+                                                    type="radio"
+                                                    id="discount-type-percentage"
+                                                    name="discountType"
+                                                    value="percentage"
+                                                    checked={discountType === "percentage"}
+                                                    onChange={(e) => setDiscountType(e.target.value)}
+                                                    className="mr-2"
+                                                />
+                                                <label htmlFor="discount-type-percentage" className="text-sm">Percentage (%)</label>
+                                            </div>
+                                            <div className="flex items-center">
+                                                <input
+                                                    type="radio"
+                                                    id="discount-type-value"
+                                                    name="discountType"
+                                                    value="value"
+                                                    checked={discountType === "value"}
+                                                    onChange={(e) => setDiscountType(e.target.value)}
+                                                    className="mr-2"
+                                                />
+                                                <label htmlFor="discount-type-value" className="text-sm">Fixed Value</label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="space-y-1">
+                                        <label className="text-xs text-gray-600">
+                                            Discount {discountType === "percentage" ? "Percentage" : "Amount"}
+                                        </label>
+                                        <div className="relative">
+                                            {discountType === "percentage" ? (
+                                                <Percent className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                                            ) : (
+                                                <span className="absolute left-3 top-3 text-sm text-gray-400">{Company?.currency?.symbol}</span>
+                                            )}
+                                            <Input
+                                                type="number"
+                                                placeholder={
+                                                    discountType === "percentage"
+                                                        ? "Enter percentage (0-100)"
+                                                        : "Enter discount amount"
+                                                }
+                                                value={discountValue}
+                                                onChange={(e) => {
+                                                    const raw = e.target.value;
+
+                                                    let value: number | "" = raw === "" ? "" : Number(raw);
+
+                                                    if (discountType === "percentage" && value !== "") {
+                                                        if (value > 100) value = 100;
+                                                        if (value < 0) value = 0;
+                                                    }
+                                                    setDiscountValue(value);
+                                                }}
+                                                className="pl-10"
+                                                min={0}
+                                                max={discountType === "percentage" ? 100 : undefined}
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
                         </div>
                     </CardContent>
                 </Card>
@@ -915,8 +1018,24 @@ export default function BillingComponent({
                                             <div className="flex justify-between text-sm border-t pt-2">
                                                 <span>Total Tax</span>
                                                 <span>
-                                                    {Company.currency.symbol}{appliedTaxes?.reduce((sum, tax) => sum + tax.amount, 0)?.toFixed(2)}
+                                                    +{Company.currency.symbol}{appliedTaxes?.reduce((sum, tax) => sum + tax.amount, 0)?.toFixed(2)}
                                                 </span>
+                                            </div>
+                                        )}
+                                        {discountValue && discountValue > 0 && (
+                                            <div className="flex justify-between text-sm border-t pt-2">
+                                                <span>Discount</span>
+                                                {
+                                                    discountType == "percentage" ?
+                                                        <span>
+                                                            - {discountValue.toFixed(2)}&#37;
+                                                        </span>
+                                                        :
+                                                        <span>
+                                                            -{Company.currency.symbol}{discountValue.toFixed(2)}
+                                                        </span>
+
+                                                }
                                             </div>
                                         )}
 

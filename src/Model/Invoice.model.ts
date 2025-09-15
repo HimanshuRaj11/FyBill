@@ -34,7 +34,9 @@ export interface IInvoice extends Document {
     createdAt: Date;
     updatedAt: Date;
     currency: string;
-    InvoiceStatus: string
+    InvoiceStatus: string;
+    discountValue: number;
+    discountType: string;
 }
 
 const ProductSchema: Schema = new Schema({
@@ -77,6 +79,8 @@ const InvoiceSchema: Schema = new Schema<IInvoice>(
         },
         currency: { type: String, required: true },
         notes: { type: String },
+        discountType: { type: String },
+        discountValue: { type: Number, default: 0 },
     },
     {
         timestamps: true,
