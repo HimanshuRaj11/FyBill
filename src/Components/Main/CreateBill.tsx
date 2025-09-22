@@ -66,6 +66,9 @@ export default function BillingComponent({
 }) {
     const { User } = useSelector((state: any) => state.User);
     const { Company } = useSelector((state: any) => state.Company);
+
+    const { Products } = useSelector((state: any) => state.Products);
+
     const [invoice, setInvoice] = useState<any>(null);
     const [showInvoice, setShowInvoice] = useState(false);
     const [BillType, setBillType] = useState("BILL");

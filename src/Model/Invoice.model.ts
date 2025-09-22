@@ -73,10 +73,7 @@ const InvoiceSchema: Schema = new Schema<IInvoice>(
         createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
         BillType: { type: String, default: "" },
         InvoiceStatus: { type: String, default: "", enum: ['Done', 'Hold', 'Cancel'] },
-        paymentMode: {
-            type: String,
-            default: "CASH",
-        },
+        paymentMode: { type: String, default: "CASH", },
         currency: { type: String, required: true },
         notes: { type: String },
         discountType: { type: String },

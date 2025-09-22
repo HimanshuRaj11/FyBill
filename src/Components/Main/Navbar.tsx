@@ -11,6 +11,7 @@ import { FetchUser, LogoutUser } from '@/app/Redux/Slice/User.slice'
 import { useDispatch, useSelector } from 'react-redux'
 import { useRouter } from 'next/navigation'
 import { FetchCompany } from '@/app/Redux/Slice/Company.slice'
+import { FetchProductsList } from '@/app/Redux/Slice/Products.slice'
 
 const base_url = process.env.NEXT_PUBLIC_BASE_URL
 
@@ -45,8 +46,14 @@ export default function Navbar() {
 
     useEffect(() => {
         ConnectDb();
+        if (user && company) {
+            return
+        }
+
         dispatch(FetchUser() as any);
+        dispatch(FetchProductsList() as any);
         dispatch(FetchCompany() as any);
+
     }, [dispatch])
 
     return (

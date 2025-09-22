@@ -2,6 +2,7 @@ import { verifyUser } from "@/lib/verifyUser";
 import branchModel from "@/Model/branch.model";
 import CompanyModel from "@/Model/Company.model";
 import InvoiceModel from "@/Model/Invoice.model";
+import KOTModel from "@/Model/KOT.model";
 import UserModel from "@/Model/User.model";
 import { NextResponse } from "next/server";
 
@@ -53,10 +54,25 @@ export async function POST(request: Request) {
                 model: branchModel
             }).sort({ createdAt: -1 }).lean()
         }
+        invoices = await InvoiceKot(invoices);
         return NextResponse.json({ invoices, success: true }, { status: 200 });
 
     } catch (error) {
-        console.log(error);
         return NextResponse.json({ message: "Internal server error", success: false }, { status: 500 });
     }
+}
+
+// find NUMBER of KOTs of Invoices
+
+const InvoiceKot = async (invoices: any[]) => {
+    if (!invoices || invoices.length === 0) return invoices;
+
+    const updatedInvoices = await Promise.all(
+        invoices.map(async (inv) => {
+            const kotCount = await KOTModel.find({ invoiceMongoId: inv._id }).countDocuments();
+            return { ...inv, kotCount };
+        })
+    );
+
+    return updatedInvoices;
 }

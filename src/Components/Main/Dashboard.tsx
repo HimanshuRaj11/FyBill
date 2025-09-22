@@ -1,12 +1,12 @@
 "use client"
-import React, { useCallback, useEffect, useState, useMemo } from 'react'
+import React, { useCallback, useEffect, useState, useMemo, useContext } from 'react'
 import { Button } from '../ui/button'
 import { Download, ChevronDown, Filter, Search, RefreshCw } from 'lucide-react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card'
 import axios from 'axios'
 import moment from 'moment'
 import Link from 'next/link'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import DashboardTopCards from '../Other/DashboardTopCards'
 import { BarChartComponent } from '../Other/BarChart'
 import { PieChartComponent } from '../Other/PaiChart'
@@ -14,24 +14,33 @@ import DatePicker from 'react-datepicker'
 
 import "react-datepicker/dist/react-datepicker.css";
 import DownloadExcel from '../Other/DownloadExcel'
+import { FetchInvoicesList } from '@/app/Redux/Slice/Invoice.slice'
+import { useGlobalContext } from '@/context/contextProvider'
 
 export default function Dashboard() {
+    const dispatch = useDispatch();
     const { User } = useSelector((state: any) => state.User);
     const { Company } = useSelector((state: any) => state.Company)
+    const { Invoices } = useSelector((state: any) => state.Invoices)
     const [isLoading, setIsLoading] = useState(false)
+    const {
+        selectedBranch,
+        setSelectedBranch,
+        dateRange,
+        setDateRange,
+        startDate,
+        setStartDate,
+        endDate,
+        setEndDate,
+    }
+        = useGlobalContext();
 
-    const [Invoice, setInvoice] = useState([])
+    const Invoice = Invoices || []
     const [searchQuery, setSearchQuery] = useState('')
 
-    const [selectedBranch, setSelectedBranch] = useState("All");
     const [isFilterOpen, setIsFilterOpen] = useState(false)
 
-    const [dateRange, setDateRange] = useState('')
 
-    const [startDate, setStartDate] = useState(moment().startOf('day').toDate())
-    const [endDate, setEndDate] = useState(moment().endOf('day').toDate())
-
-    // Filter invoices based on search query
 
     const filteredInvoices = useMemo(() => {
         if (!searchQuery.trim()) return Invoice;
@@ -84,8 +93,7 @@ export default function Dashboard() {
     const FilterInvoice = useCallback(async () => {
         try {
             setIsLoading(true)
-            const { data } = await axios.post(`${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/Invoice/filter`, { selectedBranch, startDate, endDate })
-            setInvoice(data.invoices)
+            dispatch(FetchInvoicesList({ selectedBranch, startDate, endDate }) as any)
             setIsLoading(false)
         } catch (error) {
             setIsLoading(false)
@@ -93,12 +101,8 @@ export default function Dashboard() {
     }, [startDate, endDate, selectedBranch])
 
     useEffect(() => {
-        setDateRange("Today");
-    }, [])
-
-    useEffect(() => {
         FilterInvoice()
-    }, [dateRange, FilterInvoice])
+    }, [FilterInvoice])
 
     const handleRefresh = () => {
         FilterInvoice()
@@ -389,7 +393,7 @@ export default function Dashboard() {
                             <tbody className="bg-white divide-y divide-gray-200 ">
                                 {filteredInvoices?.length > 0 ? (
                                     filteredInvoices.map((invoice: any) => (
-                                        <tr key={invoice.invoiceId} className="hover:bg-gray-50">
+                                        <tr key={invoice._id} className="hover:bg-gray-50">
                                             <td className="px-6 py-4 whitespace-nowrap text-sm font-medium ">
                                                 <Link href={`/Invoice/${invoice._id}`} className='text-blue-500'>
                                                     #{invoice.invoiceId}
@@ -410,7 +414,9 @@ export default function Dashboard() {
                                             {
                                                 (User?.role == "Owner" || User?.role == "admin") &&
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                    <Link href={`/Invoice/saved-KOT/${invoice._id}`} className='text-blue-500'>view</Link>
+                                                    <Link href={`/Invoice/saved-KOT/${invoice._id}`} className='text-blue-500'>
+                                                        {invoice?.kotCount} kot saved
+                                                    </Link>
                                                 </td>
                                             }
                                         </tr>

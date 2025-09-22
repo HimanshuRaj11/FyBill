@@ -4,6 +4,7 @@ import "./globals.css";
 import Navbar from "@/Components/Main/Navbar";
 import { ToastContainer } from "react-toastify";
 import Providers from "./Redux/ReduxProvider";
+import { GlobalContextProvider } from "@/context/contextProvider";
 
 
 const geistSans = Geist({
@@ -29,18 +30,19 @@ export default function RootLayout({
 
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-neutral-200 dark:bg-[#09090B]`}
-      >
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-neutral-200 dark:bg-[#09090B]`}>
         <Providers>
+          <GlobalContextProvider>
 
-          <ToastContainer />
-          <Navbar />
-          <div className="mt-20">
-            <div className="sm:px-4 pb-4">
-              {children}
+            <ToastContainer />
+            <Navbar />
+            <div className="mt-20">
+              <div className="sm:px-4 pb-4">
+                {children}
+              </div>
             </div>
-          </div>
+
+          </GlobalContextProvider>
         </Providers>
       </body>
     </html>
