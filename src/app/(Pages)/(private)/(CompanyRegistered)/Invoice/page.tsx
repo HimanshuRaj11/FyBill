@@ -1,28 +1,32 @@
 "use client"
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { Button } from '@/Components/ui/button'
 import { Download, ChevronDown, Filter, Search, RefreshCw } from 'lucide-react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/Components/ui/card"
 import axios from 'axios'
 import moment from 'moment'
 import Link from 'next/link'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 
 import DatePicker from 'react-datepicker'
 
 import "react-datepicker/dist/react-datepicker.css";
+import { FetchInvoicesList } from '@/app/Redux/Slice/Invoice.slice'
+import DownloadExcel from '@/Components/Other/DownloadExcel'
 
 export default function Dashboard() {
+    const dispatch = useDispatch();
     const { User } = useSelector((state: any) => state.User);
     const { Company } = useSelector((state: any) => state.Company)
+    const { Invoices } = useSelector((state: any) => state.Invoices)
     const [isLoading, setIsLoading] = useState(false)
 
-    const [Invoice, setInvoice] = useState([])
+
     const [selectedBranch, setSelectedBranch] = useState("All");
 
     const [searchQuery, setSearchQuery] = useState('')
-    const [isFilterOpen, setIsFilterOpen] = useState(false)
 
+    const [isFilterOpen, setIsFilterOpen] = useState(false)
 
     const [dateRange, setDateRange] = useState('Today')
 
@@ -65,177 +69,214 @@ export default function Dashboard() {
             setEndDate(moment().endOf('day').toDate())
         }
     }
-
+    const Invoice = Invoices || []
     const FilterInvoice = useCallback(async () => {
-        const { data } = await axios.post(`${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/Invoice/filter`, { selectedBranch, startDate, endDate })
-        setInvoice(data.invoices)
-    }, [startDate, endDate, selectedBranch])
-
-
-
-
-
-    const FetchInvoice: () => Promise<void> = async () => {
         try {
             setIsLoading(true)
-            const { data } = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/Invoice/fetch?sort=-createdAt`)
-            setInvoice(data.invoices)
-
+            dispatch(FetchInvoicesList({ selectedBranch, startDate, endDate }) as any)
             setIsLoading(false)
         } catch (error) {
             setIsLoading(false)
         }
-    }
+    }, [startDate, endDate, selectedBranch])
+    const filteredInvoices = useMemo(() => {
+        if (!searchQuery.trim()) return Invoice;
 
-    useEffect(() => {
-        setDateRange("Today");
-        FetchInvoice()
-    }, [])
+        return Invoice.filter((invoice: any) =>
+            invoice.invoiceId?.toString().toLowerCase().includes(searchQuery.toLowerCase()) ||
+            invoice.clientName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            invoice.branchId?.branchName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            invoice.paymentMode?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            invoice.grandTotal?.toString().includes(searchQuery)
+        );
+    }, [Invoice, searchQuery]);
 
     useEffect(() => {
         FilterInvoice()
-    }, [dateRange, FilterInvoice])
+    }, [FilterInvoice])
 
     const handleRefresh = () => {
-        FetchInvoice()
+        FilterInvoice()
     }
 
+    const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setSearchQuery(e.target.value);
+    }
 
-
+    const clearSearch = () => {
+        setSearchQuery('');
+    }
     return (
         <div className="p-4 md:p-6 max-w-7xl mx-auto">
 
-            <div className="flex justify-start">
+            <div className="flex justify-start mb-1">
                 <h1 className='text-2xl font-bold uppercase rounded-2xl p-3 shadow bg-white'>Your Invoices</h1>
             </div>
+
             {/* Search and Filter */}
-
-            <div className="flex justify-end flex-col sm:flex-row gap-3 mb-6">
-
-                <div className="relative">
-                    <Button
-                        variant="outline"
-                        className="!rounded-lg whitespace-nowrap flex items-center gap-2"
-                        onClick={() => setIsFilterOpen(!isFilterOpen)}
-                    >
-                        <Filter className="h-4 w-4" />
-                        Filter
-                        <ChevronDown className={`h-4 w-4 transition-transform ${isFilterOpen ? 'rotate-180' : ''}`} />
-                    </Button>
-                    {isFilterOpen && (
-                        <div className="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-lg border border-gray-200 p-4 z-10">
-                            <h3 className="font-medium mb-4 text-gray-800">Filter Options</h3>
-                            <div className="space-y-4">
-                                {/* Date Range Selector */}
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">Date Range</label>
-                                    <select
-                                        value={dateRange}
-                                        onChange={(e) => { HandleDateRange(e.target.value) }}
-                                        className="w-full border border-gray-300 rounded-md p-2.5 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                                    >
-                                        <option value="Today">Today</option>
-                                        <option value="Yesterday">Yesterday</option>
-                                        <option value="Last 7 days">Last 7 days</option>
-                                        <option value="Last 30 days">Last 30 days</option>
-                                        <option value="Last 90 days">Last 90 days</option>
-                                        <option value="Last 6 Months">Last 6 Months</option>
-                                        <option value="Last 1 Year">Last 1 Year</option>
-                                        <option value="Custom">Custom Range</option>
-                                    </select>
+            {
+                (User?.role == "Owner" || User?.role == "admin") && (
+                    <>
+                        <div className="flex justify-between flex-col sm:flex-row gap-3 mb-6">
+                            {/* Search Input */}
+                            <div className="relative flex-1 max-w-md">
+                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <Search className="h-4 w-4 text-gray-400" />
                                 </div>
+                                <input
+                                    type="text"
+                                    placeholder="Search invoices..."
+                                    value={searchQuery}
+                                    onChange={handleSearchChange}
+                                    className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                                />
+                                {searchQuery && (
+                                    <button
+                                        onClick={clearSearch}
+                                        className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
+                                    >
+                                        <span className="text-lg">&times;</span>
+                                    </button>
+                                )}
+                            </div>
 
-                                {/* Custom Date Range Section */}
-                                {dateRange === 'Custom' && (
-                                    <div className="bg-gray-50 rounded-lg p-3 border border-gray-200">
-                                        <h4 className="text-sm font-medium text-gray-700 mb-3">Custom Date Range</h4>
-
-                                        {/* Date Range Inputs */}
-                                        <div className="grid grid-cols-1 gap-3">
-                                            {/* Start Date */}
+                            <div className="relative">
+                                <Button
+                                    variant="outline"
+                                    className="!rounded-lg whitespace-nowrap flex items-center gap-2"
+                                    onClick={() => setIsFilterOpen(!isFilterOpen)}
+                                >
+                                    <Filter className="h-4 w-4" />
+                                    Filter
+                                    <ChevronDown className={`h-4 w-4 transition-transform ${isFilterOpen ? 'rotate-180' : ''}`} />
+                                </Button>
+                                {isFilterOpen && (
+                                    <div className="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-lg border border-gray-200 p-4 z-10">
+                                        <h3 className="font-medium mb-4 text-gray-800">Filter Options</h3>
+                                        <div className="space-y-4">
+                                            {/* Date Range Selector */}
                                             <div>
-                                                <label className="block text-xs font-medium text-gray-600 mb-1">Start Date</label>
-                                                <div className="relative">
-                                                    <DatePicker
-                                                        selected={startDate}
-                                                        onChange={(date: any) => setStartDate(date)}
-                                                        selectsStart
-                                                        startDate={startDate}
-                                                        endDate={endDate}
-                                                        maxDate={new Date()}
-                                                        placeholderText="Select start date"
-                                                        className="w-full border border-gray-300 rounded-md p-2.5 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors pr-10"
-                                                        dateFormat="MM/dd/yyyy"
-                                                        showPopperArrow={false}
-                                                        popperClassName="custom-datepicker-popper"
-                                                    />
-                                                    <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                                                        <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                                        </svg>
-                                                    </div>
-                                                </div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-2">Date Range</label>
+                                                <select
+                                                    value={dateRange}
+                                                    onChange={(e) => { HandleDateRange(e.target.value) }}
+                                                    className="w-full border border-gray-300 rounded-md p-2.5 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                                                >
+                                                    <option value="Today">Today</option>
+                                                    <option value="Yesterday">Yesterday</option>
+                                                    <option value="Last 7 days">Last 7 days</option>
+                                                    <option value="Last 30 days">Last 30 days</option>
+                                                    <option value="Last 90 days">Last 90 days</option>
+                                                    <option value="Last 6 Months">Last 6 Months</option>
+                                                    <option value="Last 1 Year">Last 1 Year</option>
+                                                    <option value="Custom">Custom Range</option>
+                                                </select>
                                             </div>
 
-                                            {/* End Date */}
-                                            <div>
-                                                <label className="block text-xs font-medium text-gray-600 mb-1">End Date</label>
-                                                <div className="relative">
-                                                    <DatePicker
-                                                        selected={endDate}
-                                                        onChange={(date: any) => setEndDate(date)}
-                                                        selectsEnd
-                                                        startDate={startDate}
-                                                        endDate={endDate}
-                                                        minDate={startDate}
-                                                        maxDate={new Date()}
-                                                        placeholderText="Select end date"
-                                                        className="w-full border border-gray-300 rounded-md p-2.5 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors pr-10"
-                                                        dateFormat="MM/dd/yyyy"
-                                                        showPopperArrow={false}
-                                                        popperClassName="custom-datepicker-popper"
-                                                    />
-                                                    <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                                                        <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                                        </svg>
+                                            {/* Custom Date Range Section */}
+                                            {dateRange === 'Custom' && (
+                                                <div className="bg-gray-50 rounded-lg p-3 border border-gray-200">
+                                                    <h4 className="text-sm font-medium text-gray-700 mb-3">Custom Date Range</h4>
+
+                                                    {/* Date Range Inputs */}
+                                                    <div className="grid grid-cols-1 gap-3">
+                                                        {/* Start Date */}
+                                                        <div>
+                                                            <label className="block text-xs font-medium text-gray-600 mb-1">Start Date</label>
+                                                            <div className="relative">
+                                                                <DatePicker
+                                                                    selected={startDate}
+                                                                    onChange={(date: any) => setStartDate(date)}
+                                                                    selectsStart
+                                                                    startDate={startDate}
+                                                                    endDate={endDate}
+                                                                    maxDate={new Date()}
+                                                                    placeholderText="Select start date"
+                                                                    className="w-full border border-gray-300 rounded-md p-2.5 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors pr-10"
+                                                                    dateFormat="MM/dd/yyyy"
+                                                                    showPopperArrow={false}
+                                                                    popperClassName="custom-datepicker-popper"
+                                                                />
+                                                                <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                                                                    <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                                                    </svg>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        {/* End Date */}
+                                                        <div>
+                                                            <label className="block text-xs font-medium text-gray-600 mb-1">End Date</label>
+                                                            <div className="relative">
+                                                                <DatePicker
+                                                                    selected={endDate}
+                                                                    onChange={(date: any) => setEndDate(date)}
+                                                                    selectsEnd
+                                                                    startDate={startDate}
+                                                                    endDate={endDate}
+                                                                    minDate={startDate}
+                                                                    maxDate={new Date()}
+                                                                    placeholderText="Select end date"
+                                                                    className="w-full border border-gray-300 rounded-md p-2.5 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors pr-10"
+                                                                    dateFormat="MM/dd/yyyy"
+                                                                    showPopperArrow={false}
+                                                                    popperClassName="custom-datepicker-popper"
+                                                                />
+                                                                <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                                                                    <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                                                    </svg>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    {/* Clear Dates Button */}
+                                                    <div className="mt-3 pt-2 border-t border-gray-200">
+                                                        <button
+                                                            onClick={() => {
+                                                                const today = new Date();
+                                                                setStartDate(today);
+                                                                setEndDate(today);
+                                                            }}
+                                                            className="text-xs text-red-600 hover:text-red-700 focus:outline-none focus:underline transition-colors"
+                                                        >
+                                                            Clear dates
+                                                        </button>
                                                     </div>
                                                 </div>
-                                            </div>
-                                        </div>
+                                            )}
 
-                                        {/* Clear Dates Button */}
-                                        <div className="mt-3 pt-2 border-t border-gray-200">
-                                            <button
-                                                onClick={() => {
-                                                    const today = new Date();
-                                                    setStartDate(today);
-                                                    setEndDate(today);
-                                                }}
-                                                className="text-xs text-red-600 hover:text-red-700 focus:outline-none focus:underline transition-colors"
-                                            >
-                                                Clear dates
-                                            </button>
                                         </div>
                                     </div>
-                                )}
 
+                                )}
                             </div>
                         </div>
+                        <div className=" p-2">
+                            <h1 className="text-xl font-extrabold text-gray-800 mb-4">{dateRange} Invoice Data</h1>
+                            <DownloadExcel data={filteredInvoices} fileName={'Invoices'} />
+                        </div>
+                    </>
+                )
+            }
 
-                    )}
-                </div>
-            </div>
-            <div className=" p-2">
-                <h1 className="text-xl font-extrabold text-gray-800 mb-4">{dateRange} Invoice Data</h1>
-            </div>
 
-
-
-            {/* Recent Activity */}
             <Card className="hover:shadow-md transition-shadow duration-200">
-
                 <CardContent>
+                    {searchQuery && (
+                        <div className="mb-4 p-2 bg-blue-50 rounded-lg">
+                            <p className="text-sm text-blue-700">
+                                Showing {filteredInvoices.length} result(s) for {searchQuery}
+                                {filteredInvoices.length !== Invoice.length && (
+                                    <span className="ml-2 text-gray-500">
+                                        (filtered from {Invoice.length} total)
+                                    </span>
+                                )}
+                            </p>
+                        </div>
+                    )}
                     <div className="overflow-x-auto">
                         <table className="min-w-full divide-y divide-gray-200">
                             <thead className="bg-gray-50">
@@ -251,30 +292,54 @@ export default function Dashboard() {
                                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Mode of Payment</th>
                                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
                                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                                    {
+                                        (User?.role == "Owner" || User?.role == "admin") &&
+
+                                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">View Saved KOT</th>
+                                    }
                                 </tr>
                             </thead>
                             <tbody className="bg-white divide-y divide-gray-200 ">
-                                {Invoice?.map((invoice: any) => (
-                                    <tr key={invoice.invoiceId} className="hover:bg-gray-50">
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium ">
-                                            <Link href={`/Invoice/${invoice.invoiceId}`} className='text-blue-500'>
-                                                #{invoice.invoiceId}
-                                            </Link>
-                                        </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500"> {invoice.clientName}</td>
-                                        {
-                                            Company?.branch?.length > 0 && (
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{invoice?.branchId?.branchName}</td>
-                                            )
-                                        }
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{invoice.currency}{invoice.grandTotal}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 ">{invoice.paymentMode} </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{moment(invoice.createdAt).format('MMM DD, YYYY')}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                            <Link href={`/Invoice/${invoice._id}`} className='text-blue-500'>View</Link>
+                                {filteredInvoices?.length > 0 ? (
+                                    filteredInvoices.map((invoice: any) => (
+                                        <tr key={invoice._id} className="hover:bg-gray-50">
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium ">
+                                                <Link href={`/Invoice/${invoice._id}`} className='text-blue-500'>
+                                                    #{invoice.invoiceId}
+                                                </Link>
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500"> {invoice.clientName}</td>
+                                            {
+                                                Company?.branch?.length > 0 && (
+                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{invoice?.branchId?.branchName}</td>
+                                                )
+                                            }
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{invoice.currency}{invoice.grandTotal}</td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 ">{invoice.paymentMode} </td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{moment(invoice.createdAt).format('MMM DD, YYYY')}</td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                <Link href={`/Invoice/${invoice._id}`} className='text-blue-500'>View</Link>
+                                            </td>
+                                            {
+                                                (User?.role == "Owner" || User?.role == "admin") &&
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                    <Link href={`/Invoice/saved-KOT/${invoice._id}`} className='text-blue-500'>
+                                                        {invoice?.kotCount} kot saved
+                                                    </Link>
+                                                </td>
+                                            }
+                                        </tr>
+                                    ))
+                                ) : (
+                                    <tr>
+                                        <td colSpan={Company?.branch?.length > 0 ? 7 : 6} className="px-6 py-8 text-center text-sm text-gray-500">
+                                            {searchQuery ?
+                                                `No invoices found matching "${searchQuery}"` :
+                                                'No invoices found'
+                                            }
                                         </td>
                                     </tr>
-                                ))}
+                                )}
                             </tbody>
                         </table>
                     </div>

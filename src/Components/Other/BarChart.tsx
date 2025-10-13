@@ -17,22 +17,33 @@ import {
     ChartTooltip,
     ChartTooltipContent,
 } from "@/Components/ui/chart"
-import { useCallback, useState } from "react"
+import { use, useEffect, useState } from "react"
 
 
 
-export function BarChartComponent({ Invoice, dateRange }: { Invoice: any, dateRange: string }) {
-    const [chartData, setChartData] = useState([])
-    const HandleChangeDateRange = useCallback(() => {
-        if (dateRange == "Last 7 days") {
+export function BarChartComponent({ Invoice, dateRange, DaysDiff }: { Invoice: any, dateRange: string, DaysDiff: number }) {
+    // let chartData: { Days: string; Total_Revenue: number }[] = [];
+    const [chartData, setChartData] = useState([] as { Days: string; Total_Revenue: number }[]);
 
-            const chartData = [
-                { Day: "Monday", Total_Revenue: 186, NumberOfInvoices: 80 },
+    const ArrangeByDay = (Invoice: any[]) => {
+        const dayMap = new Map<string, number>();
 
-            ]
-            setChartData(Invoice)
-        }
-    }, [dateRange, Invoice])
+        Invoice.forEach((invoice) => {
+            const date = new Date(invoice.createdAt);
+            const dayName = date.toLocaleDateString("en-US", { weekday: "long" });
+
+            const currentTotal = dayMap.get(dayName) || 0;
+            dayMap.set(dayName, currentTotal + (invoice.grandTotal || 0));
+        });
+
+        // convert Map to array of objects
+        const Data = Array.from(dayMap, ([Days, Total_Revenue]) => ({
+            Days,
+            Total_Revenue,
+        }));
+
+        return Data;
+    };
 
 
     const chartConfig = {
@@ -40,26 +51,26 @@ export function BarChartComponent({ Invoice, dateRange }: { Invoice: any, dateRa
             label: "Total Revenue",
             color: "hsl(var(--chart-1))",
         },
-        mobile: {
-            label: "Mobile",
-            color: "hsl(var(--chart-2))",
-        },
+
     } satisfies ChartConfig
 
-
+    useEffect(() => {
+        const data = ArrangeByDay(Invoice)
+        setChartData(data);
+    }, [Invoice]);
 
     return (
         <Card className="flex flex-col">
             <CardHeader>
-                <CardTitle>Bar Chart - Multiple</CardTitle>
-                <CardDescription>January - June 2024</CardDescription>
+                <CardTitle>Sales</CardTitle>
+                <CardDescription>{dateRange}</CardDescription>
             </CardHeader>
             <CardContent>
                 <ChartContainer config={chartConfig}>
                     <BarChart accessibilityLayer data={chartData}>
                         <CartesianGrid vertical={false} />
                         <XAxis
-                            dataKey="month"
+                            dataKey="Days"
                             tickLine={false}
                             tickMargin={10}
                             axisLine={false}
@@ -75,11 +86,11 @@ export function BarChartComponent({ Invoice, dateRange }: { Invoice: any, dateRa
                 </ChartContainer>
             </CardContent>
             <CardFooter className="flex-col items-start gap-2 text-sm">
-                <div className="flex gap-2 font-medium leading-none">
+                {/* <div className="flex gap-2 font-medium leading-none">
                     Trending up by 5.2% this month <TrendingUp className="h-4 w-4" />
-                </div>
+                </div> */}
                 <div className="leading-none text-muted-foreground">
-                    Showing total visitors for the last 6 months
+                    Showing total Invoices for the {dateRange}
                 </div>
             </CardFooter>
         </Card>

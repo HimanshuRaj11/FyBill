@@ -16,12 +16,15 @@ import "react-datepicker/dist/react-datepicker.css";
 import DownloadExcel from '../Other/DownloadExcel'
 import { FetchInvoicesList } from '@/app/Redux/Slice/Invoice.slice'
 import { useGlobalContext } from '@/context/contextProvider'
+import { start } from 'node:repl'
+import { ChartLineLinear } from '../Other/LineChart'
+import InvoiceTableSkeleton from '../Skeleton/InvoiceTableSkeleton'
 
 export default function Dashboard() {
     const dispatch = useDispatch();
     const { User } = useSelector((state: any) => state.User);
     const { Company } = useSelector((state: any) => state.Company)
-    const { Invoices } = useSelector((state: any) => state.Invoices)
+    const { Invoices, loading } = useSelector((state: any) => state.Invoices)
     const [isLoading, setIsLoading] = useState(false)
     const {
         selectedBranch,
@@ -32,15 +35,12 @@ export default function Dashboard() {
         setStartDate,
         endDate,
         setEndDate,
-    }
-        = useGlobalContext();
+    } = useGlobalContext();
 
     const Invoice = Invoices || []
     const [searchQuery, setSearchQuery] = useState('')
 
     const [isFilterOpen, setIsFilterOpen] = useState(false)
-
-
 
     const filteredInvoices = useMemo(() => {
         if (!searchQuery.trim()) return Invoice;
@@ -115,6 +115,28 @@ export default function Dashboard() {
     const clearSearch = () => {
         setSearchQuery('');
     }
+
+    const [DaysDiff, setDaysDiff] = useState(0)
+    const TimeDifference = () => {
+        // Difference in milliseconds
+        const diffMs = endDate.getTime() - startDate.getTime();
+
+        // Convert to seconds, minutes, hours, or days
+        const diffSeconds = diffMs / 1000;
+        const diffMinutes = diffMs / (1000 * 60);
+        const diffHours = diffMs / (1000 * 60 * 60);
+        const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+        setDaysDiff(diffDays)
+        console.log(diffDays);
+
+    }
+    useEffect(() => {
+        if (startDate && endDate) {
+            TimeDifference()
+        }
+    }, [startDate, endDate])
+
+
 
     return (
         <div className="p-4 md:p-6 max-w-7xl mx-auto">
@@ -345,13 +367,30 @@ export default function Dashboard() {
             }
 
             {/* Stats Cards */}
-            <DashboardTopCards Invoice={Invoice} />
+            <DashboardTopCards Invoice={Invoice} loading={loading} />
 
             {/* Charts */}
-            {/* <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 mb-6">
-                <BarChartComponent Invoice={Invoice} dateRange={dateRange} />
-                <PieChartComponent Invoice={Invoice} dateRange={dateRange} />
+
+            {/* <div className="">
+
+                {
+                    DaysDiff == 7 && (
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 mb-6">
+                            <BarChartComponent Invoice={Invoice} dateRange={dateRange} DaysDiff={DaysDiff} />
+                           // <PieChartComponent Invoice={Invoice} dateRange={dateRange} />
+                        </div>
+                    )
+                }
+                {
+                    DaysDiff == 0 && (
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 mb-6">
+                            <ChartLineLinear Invoice={Invoice} dateRange={dateRange} DaysDiff={DaysDiff} />
+                           // <PieChartComponent Invoice={Invoice} dateRange={dateRange} />
+                        </div>
+                    )
+                }
             </div> */}
+
 
             {/* Recent Activity */}
             <Card className="hover:shadow-md transition-shadow duration-200">
@@ -368,72 +407,79 @@ export default function Dashboard() {
                             </p>
                         </div>
                     )}
-                    <div className="overflow-x-auto">
-                        <table className="min-w-full divide-y divide-gray-200">
-                            <thead className="bg-gray-50">
-                                <tr>
-                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Invoice</th>
-                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer</th>
-                                    {
-                                        Company?.branch?.length > 0 && (
-                                            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Branch</th>
-                                        )
-                                    }
-                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
-                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Mode of Payment</th>
-                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                                    {
-                                        (User?.role == "Owner" || User?.role == "admin") &&
+                    {
+                        loading ? (
+                            <InvoiceTableSkeleton />
+                        ) : (
 
-                                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">View Saved KOT</th>
-                                    }
-                                </tr>
-                            </thead>
-                            <tbody className="bg-white divide-y divide-gray-200 ">
-                                {filteredInvoices?.length > 0 ? (
-                                    filteredInvoices.map((invoice: any) => (
-                                        <tr key={invoice._id} className="hover:bg-gray-50">
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium ">
-                                                <Link href={`/Invoice/${invoice._id}`} className='text-blue-500'>
-                                                    #{invoice.invoiceId}
-                                                </Link>
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500"> {invoice.clientName}</td>
+                            <div className="overflow-x-auto">
+                                <table className="min-w-full divide-y divide-gray-200">
+                                    <thead className="bg-gray-50">
+                                        <tr>
+                                            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Invoice</th>
+                                            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer</th>
                                             {
                                                 Company?.branch?.length > 0 && (
-                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{invoice?.branchId?.branchName}</td>
+                                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Branch</th>
                                                 )
                                             }
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{invoice.currency}{invoice.grandTotal}</td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 ">{invoice.paymentMode} </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{moment(invoice.createdAt).format('MMM DD, YYYY')}</td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                <Link href={`/Invoice/${invoice._id}`} className='text-blue-500'>View</Link>
-                                            </td>
+                                            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+                                            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Mode of Payment</th>
+                                            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                                            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                                             {
                                                 (User?.role == "Owner" || User?.role == "admin") &&
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                    <Link href={`/Invoice/saved-KOT/${invoice._id}`} className='text-blue-500'>
-                                                        {invoice?.kotCount} kot saved
-                                                    </Link>
-                                                </td>
+
+                                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">View Saved KOT</th>
                                             }
                                         </tr>
-                                    ))
-                                ) : (
-                                    <tr>
-                                        <td colSpan={Company?.branch?.length > 0 ? 7 : 6} className="px-6 py-8 text-center text-sm text-gray-500">
-                                            {searchQuery ?
-                                                `No invoices found matching "${searchQuery}"` :
-                                                'No invoices found'
-                                            }
-                                        </td>
-                                    </tr>
-                                )}
-                            </tbody>
-                        </table>
-                    </div>
+                                    </thead>
+                                    <tbody className="bg-white divide-y divide-gray-200 ">
+                                        {filteredInvoices?.length > 0 ? (
+                                            filteredInvoices.map((invoice: any) => (
+                                                <tr key={invoice._id} className="hover:bg-gray-50">
+                                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium ">
+                                                        <Link href={`/Invoice/${invoice._id}`} className='text-blue-500'>
+                                                            #{invoice.invoiceId}
+                                                        </Link>
+                                                    </td>
+                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500"> {invoice.clientName}</td>
+                                                    {
+                                                        Company?.branch?.length > 0 && (
+                                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{invoice?.branchId?.branchName}</td>
+                                                        )
+                                                    }
+                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{invoice.currency}{invoice.grandTotal}</td>
+                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 ">{invoice.paymentMode} </td>
+                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{moment(invoice.createdAt).format('MMM DD, YYYY')}</td>
+                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                        <Link href={`/Invoice/${invoice._id}`} className='text-blue-500'>View</Link>
+                                                    </td>
+                                                    {
+                                                        (User?.role == "Owner" || User?.role == "admin") &&
+                                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                            <Link href={`/Invoice/saved-KOT/${invoice._id}`} className='text-blue-500'>
+                                                                {invoice?.kotCount} kot saved
+                                                            </Link>
+                                                        </td>
+                                                    }
+                                                </tr>
+                                            ))
+                                        ) : (
+                                            <tr>
+                                                <td colSpan={Company?.branch?.length > 0 ? 7 : 6} className="px-6 py-8 text-center text-sm text-gray-500">
+                                                    {searchQuery ?
+                                                        `No invoices found matching "${searchQuery}"` :
+                                                        'No invoices found'
+                                                    }
+                                                </td>
+                                            </tr>
+                                        )}
+                                    </tbody>
+                                </table>
+                            </div>
+                        )
+                    }
                 </CardContent>
             </Card>
         </div>
