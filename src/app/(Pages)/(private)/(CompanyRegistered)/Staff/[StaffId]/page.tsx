@@ -216,7 +216,7 @@ export default function StaffDetailsCard({ params }: { params: Promise<{ StaffId
 
 
             {/* Staff DashBoard */}
-            <DashboardTopCards Invoice={Invoice} />
+            <DashboardTopCards Invoice={Invoice} loading={isLoading} />
 
 
             <>
