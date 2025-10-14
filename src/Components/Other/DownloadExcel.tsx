@@ -26,7 +26,7 @@ export default function DownloadExcel({ data, fileName }: { data: any, fileName:
             };
         });
         setDataToDownload(DownloadData)
-    }, [data, fileName])
+    }, [data])
 
     const handleProduct = useCallback(() => {
         const DownloadData = data.map((product: any) => {
@@ -40,7 +40,7 @@ export default function DownloadExcel({ data, fileName }: { data: any, fileName:
             }
         })
         setDataToDownload(DownloadData)
-    }, [data, fileName])
+    }, [data])
 
 
     const handleProductSummary = useCallback(() => {
@@ -53,7 +53,7 @@ export default function DownloadExcel({ data, fileName }: { data: any, fileName:
             }
         })
         setDataToDownload(DownloadData)
-    }, [data, fileName])
+    }, [data])
 
 
     const handleDownload = () => {
