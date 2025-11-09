@@ -93,7 +93,7 @@ export default function Dashboard() {
                             Dashboard Overview
                         </h1>
                         <p className="text-gray-600 text-sm md:text-base">
-                            Welcome back! Here's what's happening with your business.
+                            Welcome back! Here{`${"'"}`}s what{`${"'"}`}s  happening with your business.
                         </p>
                     </div>
                     <div className="flex flex-wrap gap-2">
