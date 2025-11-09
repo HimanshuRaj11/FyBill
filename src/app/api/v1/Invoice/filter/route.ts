@@ -22,7 +22,7 @@ export async function POST(request: Request) {
         const { selectedBranch, startDate, endDate } = await request.json();
 
 
-        let invoiceFilter: any = {
+        const invoiceFilter: any = {
             createdAt: { $gte: startDate, $lt: endDate },
             InvoiceStatus: "Done",
             BillType: { $ne: "KOT" }

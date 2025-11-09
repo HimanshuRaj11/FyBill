@@ -16,6 +16,7 @@ import InvoiceDateFilter from '../Other/InvoiceDateFilter'
 import { formatDateRange } from '@/lib/formatDateRange'
 import BarChartComponent from '../Other/BarChart'
 import BranchSalesPieChart from '../Other/PaiChart'
+import BranchSalesLineChart from '../Other/LineChart'
 
 export default function Dashboard() {
     const dispatch = useDispatch();
@@ -221,8 +222,13 @@ export default function Dashboard() {
             {/* Graph */}
 
             <BarChartComponent />
-            <div className="flex flex-col lg:flex-row w-full lg:w-[50%] my-2">
-                <BranchSalesPieChart />
+            <div className="flex flex-col lg:flex-row justify-between my-2">
+                <div className="w-full lg:w-[49%] mb-1 lg:mb-0">
+                    <BranchSalesPieChart />
+                </div>
+                <div className="w-full lg:w-[49%]">
+                    <BranchSalesLineChart />
+                </div>
             </div>
 
         </div>

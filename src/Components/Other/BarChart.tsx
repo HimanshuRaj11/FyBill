@@ -69,30 +69,30 @@ const BarChartComponent = () => {
         return data.reduce((sum, item) => sum + item.totalGrand, 0);
     };
 
-    const getTopBranch = () => {
-        const branchTotals = new Map();
-        data.forEach(item => {
-            const current = branchTotals.get(item.branch) || 0;
-            branchTotals.set(item.branch, current + item.totalGrand);
-        });
+    // const getTopBranch = () => {
+    //     const branchTotals = new Map();
+    //     data.forEach(item => {
+    //         const current = branchTotals.get(item.branch) || 0;
+    //         branchTotals.set(item.branch, current + item.totalGrand);
+    //     });
 
-        let topBranch = { name: '', total: 0 };
-        branchTotals.forEach((total, branch) => {
-            if (total > topBranch.total) {
-                topBranch = { name: branch, total };
-            }
-        });
-        return topBranch;
-    };
+    //     let topBranch = { name: '', total: 0 };
+    //     branchTotals.forEach((total, branch) => {
+    //         if (total > topBranch.total) {
+    //             topBranch = { name: branch, total };
+    //         }
+    //     });
+    //     return topBranch;
+    // };
 
-    const getAverageSales = () => {
-        return data.length > 0 ? totalSales / chartData.length : 0;
-    };
+    // const getAverageSales = () => {
+    //     return data.length > 0 ? totalSales / chartData.length : 0;
+    // };
 
     const chartData = transformData();
     const branches = getBranches();
     const totalSales = getTotalSales();
-    const topBranch = getTopBranch();
+    // const topBranch = getTopBranch();
 
     const colors = ['#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899'];
 
@@ -290,7 +290,22 @@ const BarChartComponent = () => {
                                 tickLine={{ stroke: 'currentColor' }}
                             />
                             <YAxis
-                                tickFormatter={(value) => `${company?.currency.symbol}${(value / 1000000).toFixed(1)}M`}
+                                tickFormatter={(value) => {
+                                    const raw = Number(value) || 0;
+                                    const abs = Math.abs(raw);
+                                    let formatted = '';
+
+                                    if (abs >= 1_000_000_000) {
+                                        formatted = `${(raw / 1_000_000_000).toFixed(2)}B`;
+                                    } else if (abs >= 1_000_000) {
+                                        formatted = `${(raw / 1_000_000).toFixed(2)}M`;
+                                    } else {
+                                        formatted = raw.toLocaleString();
+                                    }
+
+                                    const symbol = company?.currency?.symbol ?? '$';
+                                    return `${symbol}${formatted}`;
+                                }}
                                 className="text-xs font-medium"
                                 tick={{ fill: 'currentColor', fontSize: 12 }}
                                 tickLine={{ stroke: 'currentColor' }}

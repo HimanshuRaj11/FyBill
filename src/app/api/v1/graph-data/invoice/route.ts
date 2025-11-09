@@ -20,7 +20,7 @@ export async function POST(request: Request) {
 
         const last6Month = moment().subtract(6, 'months').startOf('day').toDate();
         const lastYear = moment().subtract(1, 'year').startOf('day').toDate();
-        let filterDate = lastYear
+        const filterDate = lastYear
 
         const { dateRange } = await request.json();
 
@@ -32,7 +32,7 @@ export async function POST(request: Request) {
         // }
 
 
-        let invoiceFilter: any = {
+        const invoiceFilter: any = {
             createdAt: { $gte: filterDate },
             InvoiceStatus: "Done",
             BillType: { $ne: "KOT" }
@@ -45,7 +45,7 @@ export async function POST(request: Request) {
         }
         const total = await InvoiceModel.countDocuments(invoiceFilter);
 
-        let invoices = await InvoiceModel.find(invoiceFilter).select("grandTotal issueDate branchId createdAt createdBy branchName")
+        const invoices = await InvoiceModel.find(invoiceFilter).select("grandTotal issueDate branchId createdAt createdBy branchName")
             .sort({ createdAt: -1 })
             .lean();
 
