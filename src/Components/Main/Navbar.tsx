@@ -22,9 +22,7 @@ export default function Navbar() {
     const dispatch = useDispatch();
     const { User } = useSelector((state: any) => state.User);
     const user = User
-
-    const { Company } = useSelector((state: any) => state.Company);
-    const company = Company
+    const { Company: company } = useSelector((state: any) => state.Company);
 
     const {
         selectedBranch,
