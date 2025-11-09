@@ -3,8 +3,14 @@ import React from 'react'
 import { Button } from '../ui/button'
 import { Building2, ArrowRight } from 'lucide-react'
 import Link from 'next/link'
+import { useSelector } from 'react-redux'
+import PreLoader from '../Other/PreLoader'
 
 export default function NotCompany() {
+    // const { loading } = useSelector((state: any) => state.Company)
+    // if (loading) {
+    //     return <PreLoader />
+    // }
     return (
         <div className="min-h-screen flex items-center justify-center  p-4">
             <div className="max-w-md w-full text-center space-y-8">

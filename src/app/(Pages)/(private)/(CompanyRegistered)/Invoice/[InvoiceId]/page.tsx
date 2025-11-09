@@ -3,6 +3,7 @@ import React, { useCallback, useEffect, useState } from 'react'
 import InvoiceDisplay from '@/Components/Main/InvoiceDisplay'
 import { IInvoice } from '@/Model/Invoice.model';
 import axios from 'axios';
+import PreLoader from '@/Components/Other/PreLoader';
 
 export default function Page({ params }: { params: Promise<{ InvoiceId: string }> }) {
     const [invoice, setInvoice] = useState<IInvoice | null>(null);
@@ -31,11 +32,7 @@ export default function Page({ params }: { params: Promise<{ InvoiceId: string }
 
 
     if (isLoading) {
-        return (
-            <div className="min-h-screen flex items-center justify-center">
-                <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-500"></div>
-            </div>
-        );
+        return <PreLoader />
     }
 
     return (

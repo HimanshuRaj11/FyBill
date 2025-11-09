@@ -6,7 +6,7 @@ import { Button } from '@/Components/ui/button';
 import Link from 'next/link';
 import axios from 'axios';
 import { toast } from 'react-toastify';
-import WebLoader from '@/Components/Other/loader';
+import PreLoader from '@/Components/Other/PreLoader';
 
 export default function ProfilePage() {
     const { User, loading } = useSelector((state: any) => state.User);
@@ -142,7 +142,7 @@ export default function ProfilePage() {
 
 
     if (loading || companyLoading || isLoading) {
-        return <WebLoader />
+        return <PreLoader />
     }
 
     return (

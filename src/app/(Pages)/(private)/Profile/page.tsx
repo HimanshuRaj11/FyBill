@@ -7,9 +7,9 @@ import Link from 'next/link';
 import { AlertDialog, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger, AlertDialogCancel, AlertDialogAction } from '@/Components/ui/alert-dialog';
 import axios from 'axios';
 import { toast } from 'react-toastify';
-import WebLoader from '@/Components/Other/loader';
+import PreLoader from '@/Components/Other/PreLoader';
 export default function ProfilePage() {
-    const { User } = useSelector((state: any) => state.User);
+    const { User, loading } = useSelector((state: any) => state.User);
     const { Company } = useSelector((state: any) => state.Company)
     const company = Company
     const [branches, setBranches] = useState([])
@@ -35,8 +35,8 @@ export default function ProfilePage() {
     }, [])
 
 
-    if (!User) {
-        return (<WebLoader />)
+    if (loading) {
+        return <PreLoader />
     }
     return (
         <div className=" min-h-screen ">

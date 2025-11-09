@@ -7,6 +7,7 @@ import Providers from "./Redux/ReduxProvider";
 import { GlobalContextProvider } from "@/context/contextProvider";
 
 
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -27,7 +28,6 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-neutral-200 dark:bg-[#09090B]`}>
@@ -40,6 +40,7 @@ export default function RootLayout({
               <div className="sm:px-4 pb-4">
                 {children}
               </div>
+
             </div>
 
           </GlobalContextProvider>

@@ -27,6 +27,10 @@ interface Product {
 
 export default function ProductsPage() {
     const { Company } = useSelector((state: any) => state.Company);
+
+    const { Products } = useSelector((state: any) => state.Products);
+
+
     const [products, setProducts] = useState<Product[]>([]);
     const [productName, setProductName] = useState('');
     const [debouncedProductName] = useDebounce(productName, 300);
@@ -42,11 +46,9 @@ export default function ProductsPage() {
     const fetchProducts = useCallback(async () => {
         try {
             setLoading(true);
-            const res = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/company/product/fetch`);
-            const data = res.data;
-            setProducts(data.products);
-            setFilteredProductList(data.products);
-            const uniqueCategories = [...new Set(data.products.map((product: Product) => product.category))];
+            setProducts(Products);
+            setFilteredProductList(Products);
+            const uniqueCategories = [...new Set(Products.map((product: Product) => product.category))];
             setCategories(uniqueCategories as string[]);
         } catch (error) {
             toast.error('Failed to fetch products');

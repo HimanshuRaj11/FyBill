@@ -9,6 +9,7 @@ import { z } from 'zod'
 import { useSelector } from 'react-redux'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import PreLoader from '../Other/PreLoader'
 
 const productSchema = z.object({
     name: z.string().min(1, "Product name is required"),
@@ -137,11 +138,7 @@ export default function AddProduct() {
     }
     if (loading) {
 
-        return (
-            <div className="min-h-screen flex items-center justify-center">
-                <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-500"></div>
-            </div>
-        )
+        return <PreLoader />
     }
 
 

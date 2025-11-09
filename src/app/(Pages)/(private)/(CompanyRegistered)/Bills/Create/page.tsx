@@ -2,7 +2,7 @@
 import BillingComponent from '@/Components/Main/CreateBill'
 import PrintInvoiceFormate from '@/Components/Main/PrintInvoiceFormate';
 import HeldInvoices from '@/Components/Other/HeldInvoices';
-import WebLoader from '@/Components/Other/loader';
+import PreLoader from '@/Components/Other/PreLoader';
 
 import { Button } from '@/Components/ui/button'
 import { Dialog, DialogContent, DialogTitle } from '@/Components/ui/dialog';
@@ -64,7 +64,7 @@ export default function Page() {
 
 
     if (loading) {
-        return <WebLoader />
+        return <PreLoader />
     }
     return (
         <div className=''>

@@ -1,5 +1,5 @@
 'use client'
-import WebLoader from '@/Components/Other/loader';
+import PreLoader from '@/Components/Other/PreLoader';
 import axios from 'axios';
 import { AlertCircle, ArrowLeft, Save } from 'lucide-react';
 import React, { useCallback, useEffect, useState } from 'react'
@@ -81,7 +81,7 @@ export default function Page({ params }: { params: Promise<{ product_id: string 
 
 
     if (isLoading) {
-        return (<WebLoader />);
+        return <PreLoader />
     }
 
     return (

@@ -22,9 +22,6 @@ import {
     Calendar,
     Phone,
     User as UserIcon,
-    Command,
-    ArrowBigLeft,
-    ArrowRightIcon
 } from "lucide-react";
 import { useSelector } from "react-redux";
 import {
@@ -287,22 +284,6 @@ export default function BillingComponent({
         setPaymentMode("");
     }
 
-    // Fetching Data
-    const FetchProducts = async () => {
-        try {
-            const { data } = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/company/product/fetch`);
-            if (data.success) {
-                setFilteredProducts(data.products);
-                setProductsList(data.products);
-            } else {
-                setProductsList(data?.products);
-                setFilteredProducts(data?.products);
-            }
-        }
-        catch (error) {
-            toast.error("Failed to fetch products");
-        }
-    };
 
     const fetchTaxData = async () => {
         try {
@@ -316,7 +297,8 @@ export default function BillingComponent({
     };
 
     useEffect(() => {
-        FetchProducts();
+        setFilteredProducts(Products);
+        setProductsList(Products);
         fetchTaxData();
     }, []);
 

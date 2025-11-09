@@ -12,6 +12,8 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useRouter } from 'next/navigation'
 import { FetchCompany } from '@/app/Redux/Slice/Company.slice'
 import { FetchProductsList } from '@/app/Redux/Slice/Products.slice'
+import { FetchInvoicesList } from '@/app/Redux/Slice/Invoice.slice'
+import { useGlobalContext } from '@/context/contextProvider'
 
 const base_url = process.env.NEXT_PUBLIC_BASE_URL
 
@@ -23,6 +25,14 @@ export default function Navbar() {
 
     const { Company } = useSelector((state: any) => state.Company);
     const company = Company
+
+    const {
+        selectedBranch,
+        setSelectedBranch,
+        dateRange,
+        startDate,
+        endDate,
+    } = useGlobalContext();
 
     const [isLoading, setIsLoading] = useState(false)
     const [notifications, setNotifications] = useState(0)
@@ -47,12 +57,16 @@ export default function Navbar() {
     useEffect(() => {
         ConnectDb();
         if (user && company) {
+            dispatch(FetchProductsList() as any);
+            dispatch(FetchInvoicesList({ selectedBranch, startDate, endDate }) as any)
             return
         }
 
         dispatch(FetchUser() as any);
-        dispatch(FetchProductsList() as any);
         dispatch(FetchCompany() as any);
+
+        dispatch(FetchProductsList() as any);
+        dispatch(FetchInvoicesList({ selectedBranch, startDate, endDate }) as any)
 
     }, [dispatch])
 

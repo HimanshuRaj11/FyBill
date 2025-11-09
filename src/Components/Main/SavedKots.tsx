@@ -1,6 +1,7 @@
 "use client"
 import axios from 'axios';
 import React, { useCallback, useEffect, useState } from 'react'
+import InvoiceKOTSkeleton from '../Skeleton/InvoiceKOTSkeleton';
 
 // Define types for clarity
 interface Product {
@@ -68,7 +69,11 @@ export default function SavedKOTs({ InvoiceId }: any) {
     useEffect(() => {
         FetchSavedKOTs()
     }, [FetchSavedKOTs])
-
+    if (!Invoice || Invoice.length === 0) {
+        return (
+            <InvoiceKOTSkeleton />
+        )
+    }
     return (
         <div className="p-4 space-y-6">
 

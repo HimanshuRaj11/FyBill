@@ -6,15 +6,25 @@ import Link from 'next/link'
 import { ArrowRight, FileText, Users, Package, ChartBar, Shield, Clock, Globe } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useSelector } from 'react-redux'
+import PreLoader from '@/Components/Other/PreLoader'
+
+
 export default function Page() {
   const router = useRouter()
-  const { User } = useSelector((state: any) => state.User)
-  const user = User
+  const { User: user, loading } = useSelector((state: any) => state.User)
+
   useEffect(() => {
-    if (user) {
-      router.push('/Dashboard')
+    if (!loading && user) {
+      router.replace('/Dashboard')
     }
-  }, [user, router])
+  }, [user, router, loading])
+
+  if (loading || !user) {
+    return <PreLoader />
+  }
+  if (user) {
+    return <PreLoader />;
+  }
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
@@ -26,7 +36,7 @@ export default function Page() {
           className="max-w-6xl mx-auto text-center"
         >
           <span className="bg-blue-100 text-blue-700 px-4 py-1.5 rounded-full text-sm font-medium inline-block mb-6">
-            Trusted by 10,000+ businesses worldwide
+            Trusted by businesses worldwide
           </span>
           <h1 className="text-6xl font-bold text-gray-900 mb-8 leading-tight">
             Streamline Your Business with <span className="text-blue-600 relative">FyBill
@@ -49,7 +59,7 @@ export default function Page() {
 
           <div className="grid grid-cols-3 gap-8 max-w-3xl mx-auto text-center">
             <div>
-              <h3 className="text-3xl font-bold text-gray-900">98%</h3>
+              <h3 className="text-3xl font-bold text-gray-900">100%</h3>
               <p className="text-gray-600">Customer Satisfaction</p>
             </div>
             <div>
@@ -57,8 +67,8 @@ export default function Page() {
               <p className="text-gray-600">Customer Support</p>
             </div>
             <div>
-              <h3 className="text-3xl font-bold text-gray-900">150+</h3>
-              <p className="text-gray-600">Countries Served</p>
+              <h3 className="text-3xl font-bold text-gray-900">1</h3>
+              <p className="text-gray-600">Country Served</p>
             </div>
           </div>
         </motion.div>

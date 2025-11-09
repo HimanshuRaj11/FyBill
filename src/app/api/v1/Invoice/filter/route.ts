@@ -6,61 +6,54 @@ import KOTModel from "@/Model/KOT.model";
 import UserModel from "@/Model/User.model";
 import { NextResponse } from "next/server";
 
+
 export async function POST(request: Request) {
     try {
         const user_id = await verifyUser();
+        if (!user_id) return NextResponse.json({ message: "Unauthorized", success: false }, { status: 401 });
 
-        if (!user_id) {
-            return NextResponse.json({ message: "Unauthorized", success: false }, { status: 401 });
-        }
-        const User = await UserModel.findById({ _id: user_id });
+        const User = await UserModel.findById(user_id);
+        if (!User) return NextResponse.json({ message: "User not found", success: false }, { status: 404 });
 
-        if (!User) {
-            return NextResponse.json({ message: "User not found", success: false }, { status: 404 });
-        }
         const companyId = User.companyId;
-        const company = await CompanyModel.findById({ _id: companyId });
-        if (!company) {
-            return NextResponse.json({ message: "Company not found", success: false }, { status: 404 });
-        }
+        const company = await CompanyModel.findById(companyId);
+        if (!company) return NextResponse.json({ message: "Company not found", success: false }, { status: 404 });
 
         const { selectedBranch, startDate, endDate } = await request.json();
-        let invoices;
 
-        if (User?.role == 'Owner') {
-            invoices = await InvoiceModel.find({
-                companyId: companyId,
-                createdAt: {
-                    $gte: startDate,
-                    $lt: endDate
-                },
-                ...(selectedBranch !== "All" && { branchName: selectedBranch }),
-                InvoiceStatus: "Done",
-                BillType: { $ne: "KOT" }
-            }).populate({
-                path: 'branchId',
-                model: branchModel
-            }).sort({ createdAt: -1 }).lean()
+
+        let invoiceFilter: any = {
+            createdAt: { $gte: startDate, $lt: endDate },
+            InvoiceStatus: "Done",
+            BillType: { $ne: "KOT" }
+        };
+
+        if (User.role === "Owner") {
+            invoiceFilter.companyId = companyId;
+            if (selectedBranch !== "All") invoiceFilter.branchName = selectedBranch;
         } else {
-            invoices = await InvoiceModel.find({
-                createdBy: user_id, createdAt: {
-                    $gte: startDate,
-                    $lt: endDate
-                },
-                InvoiceStatus: "Done",
-                BillType: { $ne: "KOT" }
-            }).populate({
-                path: 'branchId',
-                model: branchModel
-            }).sort({ createdAt: -1 }).lean()
+            invoiceFilter.createdBy = user_id;
         }
+
+        const total = await InvoiceModel.countDocuments(invoiceFilter);
+
+        let invoices = await InvoiceModel.find(invoiceFilter)
+            .populate({ path: "branchId", model: branchModel })
+            .sort({ createdAt: -1 })
+            .lean();
+
         invoices = await InvoiceKot(invoices);
-        return NextResponse.json({ invoices, success: true }, { status: 200 });
+
+        return NextResponse.json(
+            { invoices, total, success: true },
+            { status: 200 }
+        );
 
     } catch (error) {
         return NextResponse.json({ message: "Internal server error", success: false }, { status: 500 });
     }
 }
+
 
 // find NUMBER of KOTs of Invoices
 
