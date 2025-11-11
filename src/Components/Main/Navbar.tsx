@@ -21,13 +21,13 @@ export default function Navbar() {
     const router = useRouter();
     const dispatch = useDispatch();
     const { User } = useSelector((state: any) => state.User);
+    const Products = useSelector((state: any) => state.Products);
+
     const user = User
     const { Company: company } = useSelector((state: any) => state.Company);
 
     const {
         selectedBranch,
-        setSelectedBranch,
-        dateRange,
         startDate,
         endDate,
     } = useGlobalContext();

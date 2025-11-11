@@ -12,7 +12,6 @@ import PreLoader from '@/Components/Other/PreLoader'
 export default function Page() {
   const router = useRouter()
   const { User: user, loading, error } = useSelector((state: any) => state.User)
-  console.log(error);
 
   useEffect(() => {
     if (!loading && user) {

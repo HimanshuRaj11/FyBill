@@ -27,6 +27,8 @@ export async function GET(request: NextRequest) {
         if (!company) {
             return NextResponse.json({ success: false, error: 'Company not found' });
         }
+        console.log(company);
+
         const products = await ProductModel.find({ companyId: company._id }).populate({
             path: 'branchId',
             model: branchModel

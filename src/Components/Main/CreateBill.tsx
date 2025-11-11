@@ -23,7 +23,7 @@ import {
     Phone,
     User as UserIcon,
 } from "lucide-react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import {
     Select,
     SelectContent,
@@ -38,6 +38,8 @@ import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Badge } from "../ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
+import { FetchProductsList } from "@/app/Redux/Slice/Products.slice";
+import ProductCardSkeleton from "../Skeleton/ProductCardCreateBill";
 
 interface Product {
     name: string;
@@ -66,6 +68,7 @@ export default function BillingComponent({
 
     const { Products } = useSelector((state: any) => state.Products);
 
+    const dispatch = useDispatch()
     const [invoice, setInvoice] = useState<any>(null);
     const [showInvoice, setShowInvoice] = useState(false);
     const [BillType, setBillType] = useState("BILL");
@@ -89,10 +92,10 @@ export default function BillingComponent({
     const [selectedCategory, setSelectedCategory] = useState<string>("all");
     const [isProcessing, setIsProcessing] = useState(false);
 
+    const [ProductIsLoading, setProductIsLoading] = useState(true)
 
     const [discountType, setDiscountType] = useState("percentage");
     const [discountValue, setDiscountValue] = useState<number | "">("");
-
 
     const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
     const [highlightedIndex, setHighlightedIndex] = useState<number>(0);
@@ -112,11 +115,11 @@ export default function BillingComponent({
 
     // Extract unique categories from products
     useEffect(() => {
-        if (productsList.length > 0) {
+        if (productsList?.length > 0) {
             const categories = ["all", ...new Set(productsList.map((product: any) => product.category || "uncategorized"))];
             setProductCategories(categories);
         }
-    }, [productsList]);
+    }, [productsList, Products]);
     // Tax calculation
     useEffect(() => {
         setAppliedTaxes([]);
@@ -284,7 +287,6 @@ export default function BillingComponent({
         setPaymentMode("");
     }
 
-
     const fetchTaxData = async () => {
         try {
             const { data } = await axios.get(
@@ -295,12 +297,6 @@ export default function BillingComponent({
             toast.error("Failed to fetch taxes");
         }
     };
-
-    useEffect(() => {
-        setFilteredProducts(Products);
-        setProductsList(Products);
-        fetchTaxData();
-    }, []);
 
 
 
@@ -325,7 +321,6 @@ export default function BillingComponent({
 
         setFilteredProducts(filtered);
     };
-
 
     const invoiceRef = useRef<HTMLDivElement>(null);
 
@@ -532,7 +527,6 @@ export default function BillingComponent({
     // key selection
     useEffect(() => {
 
-
         const handleKeyDown = (e: KeyboardEvent) => {
             const el = itemRefs.current[highlightedIndex];
             if (el) {
@@ -565,7 +559,20 @@ export default function BillingComponent({
         setHighlightedIndex(0)
     }, [filteredProducts])
 
+    useEffect(() => {
+        const fetchProduct = async () => {
+            setProductIsLoading(true)
+            const { data } = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/company/product/fetch`, { withCredentials: true })
+            setFilteredProducts(data.products);
+            setProductsList(data.products);
+            setProductIsLoading(false)
 
+        }
+        fetchProduct()
+    }, [])
+    useEffect(() => {
+        fetchTaxData();
+    }, []);
     return (
         <div className="container mx-auto pb-8">
             {showInvoice && invoice && (
@@ -836,7 +843,15 @@ export default function BillingComponent({
                                         <span className="text-sm font-medium">Complement</span>
                                         <span className="text-xs text-gray-500">{Company?.currency?.symbol}0.00</span>
                                     </div>
-
+                                    {
+                                        ProductIsLoading && (
+                                            <>
+                                                {[...Array(6)].map((_, index) => (
+                                                    <ProductCardSkeleton key={index} />
+                                                ))}
+                                            </>
+                                        )
+                                    }
                                     {filteredProducts?.map((product: any, index: any) => (
                                         <div
                                             onClick={() => AddProduct(product)}
