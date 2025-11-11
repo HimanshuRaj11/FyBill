@@ -57,15 +57,10 @@ export default function Navbar() {
         if (user && company) {
             dispatch(FetchProductsList() as any);
             dispatch(FetchInvoicesList({ selectedBranch, startDate, endDate }) as any)
-            return
         }
 
         dispatch(FetchUser() as any);
         dispatch(FetchCompany() as any);
-
-        dispatch(FetchProductsList() as any);
-        dispatch(FetchInvoicesList({ selectedBranch, startDate, endDate }) as any)
-
     }, [dispatch])
 
     return (

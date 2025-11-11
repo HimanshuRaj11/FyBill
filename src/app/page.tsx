@@ -11,7 +11,8 @@ import PreLoader from '@/Components/Other/PreLoader'
 
 export default function Page() {
   const router = useRouter()
-  const { User: user, loading } = useSelector((state: any) => state.User)
+  const { User: user, loading, error } = useSelector((state: any) => state.User)
+  console.log(error);
 
   useEffect(() => {
     if (!loading && user) {
@@ -19,7 +20,7 @@ export default function Page() {
     }
   }, [user, router, loading])
 
-  if (loading || !user) {
+  if (loading || !error) {
     return <PreLoader />
   }
   if (user) {
