@@ -18,6 +18,9 @@ export default function InvoiceDateFilter() {
     setEndDate,
   } = useGlobalContext();
 
+  console.log(startDate);
+
+
   const [isFilterOpen, setIsFilterOpen] = useState(false)
   const [tempDateRange, setTempDateRange] = useState(dateRange)
   const [tempStartDate, setTempStartDate] = useState(startDate)
@@ -55,7 +58,7 @@ export default function InvoiceDateFilter() {
       setTempEndDate(moment().endOf('day').toDate())
     }
     if (range == "Custom") {
-      setTempStartDate(moment().subtract(1, 'year').startOf('day').toDate())
+      setTempStartDate(moment().startOf('day').toDate())
       setTempEndDate(moment().endOf('day').toDate())
     }
   }

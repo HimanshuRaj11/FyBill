@@ -24,8 +24,6 @@ export async function POST(request: Request) {
 
         const { data } = await request.json()
 
-        console.log(data.invoiceIds);
-
         await InvoiceModel.updateMany(
             { _id: { $in: data.invoiceIds } },
             { $set: { delete: true } }
