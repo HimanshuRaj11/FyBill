@@ -23,6 +23,8 @@ export default function Dashboard() {
     const { User } = useSelector((state: any) => state.User);
     const { Company } = useSelector((state: any) => state.Company)
     const { Invoices, loading } = useSelector((state: any) => state.Invoices)
+
+
     const [isLoading, setIsLoading] = useState(false)
     const [searchOn, setSearchOn] = useState<boolean>(false)
     const {
@@ -37,7 +39,9 @@ export default function Dashboard() {
     const [searchQuery, setSearchQuery] = useState('')
 
     const dateRangeString = formatDateRange(startDate, endDate)
-
+    if (!Invoices) {
+        dispatch(FetchInvoicesList({ selectedBranch, startDate, endDate }) as any)
+    }
     const FilterInvoice = useCallback(async () => {
         try {
             setIsLoading(true)
@@ -167,52 +171,56 @@ export default function Dashboard() {
                     </div>
                 )}
 
+
                 {/* Search and Filter Section */}
-                {(User?.role === "Owner" || User?.role === "admin") && (
-                    <>
-                        <div className="flex flex-col md:flex-row gap-3 justify-between mb-6">
-                            {/* Enhanced Search Input */}
-                            <div className="relative flex-1 max-w-md">
-                                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                                    <Search className="h-5 w-5 text-gray-400" />
+                <div className="">
+                    {(User?.role === "Owner" || User?.role === "admin") && (
+                        <>
+                            <div className="flex flex-col md:flex-row gap-3 justify-between mb-6">
+                                {/* Enhanced Search Input */}
+                                <div className="relative flex-1 max-w-md">
+                                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                        <Search className="h-5 w-5 text-gray-400" />
+                                    </div>
+                                    <input
+                                        type="text"
+                                        placeholder="Search invoices by number, customer..."
+                                        value={searchQuery}
+                                        onChange={handleSearchChange}
+                                        onClick={() => setSearchOn(true)}
+                                        className="w-full pl-12 pr-12 py-3.5 bg-white border-2 border-gray-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all shadow-sm hover:shadow-md placeholder:text-gray-400"
+                                    />
+                                    {searchQuery && (
+                                        <button
+                                            onClick={clearSearch}
+                                            className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-gray-700 transition-colors"
+                                        >
+                                            <X className="h-5 w-5" />
+                                        </button>
+                                    )}
                                 </div>
-                                <input
-                                    type="text"
-                                    placeholder="Search invoices by number, customer..."
-                                    value={searchQuery}
-                                    onChange={handleSearchChange}
-                                    onClick={() => setSearchOn(true)}
-                                    className="w-full pl-12 pr-12 py-3.5 bg-white border-2 border-gray-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all shadow-sm hover:shadow-md placeholder:text-gray-400"
-                                />
-                                {searchQuery && (
-                                    <button
-                                        onClick={clearSearch}
-                                        className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-gray-700 transition-colors"
-                                    >
-                                        <X className="h-5 w-5" />
-                                    </button>
-                                )}
+
+                                {/* Filter Button */}
+                                <InvoiceDateFilter />
                             </div>
 
-                            {/* Filter Button */}
-                            <InvoiceDateFilter />
-                        </div>
-
-                        {/* Invoice Data Section with card design */}
-                        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 md:p-6">
-                            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                                <div>
-                                    <h2 className="text-xl md:text-2xl font-bold text-gray-800">
-                                        {dateRangeString} Invoice Data
-                                    </h2>
-                                    <p className="text-sm text-gray-500 mt-1">
-                                        Export your invoice data to Excel
-                                    </p>
+                            {/* Invoice Data Section with card design */}
+                            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 md:p-6">
+                                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                                    <div>
+                                        <h2 className="text-xl md:text-2xl font-bold text-gray-800">
+                                            {dateRangeString} Invoice Data
+                                        </h2>
+                                        <p className="text-sm text-gray-500 mt-1">
+                                            Export your invoice data to Excel
+                                        </p>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    </>
-                )}
+                        </>
+                    )}
+                </div>
+
             </div>
 
             {/* Stats Cards */}

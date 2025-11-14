@@ -4,6 +4,7 @@ import InvoiceModel from "@/Model/Invoice.model";
 import InvoiceKotModel from "@/Model/KOT.model";
 import UserModel from "@/Model/User.model";
 import CompanyModel from "@/Model/Company.model";
+import KOTModel from "@/Model/KOT.model";
 
 export async function DELETE(req: Request, { params }: { params: Promise<{ InvoiceId: string }> }) {
     try {
@@ -28,13 +29,17 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ Invoi
             return NextResponse.json({ message: "Invoice not found", success: false }, { status: 404 });
         }
 
-        await InvoiceModel.deleteOne({ _id: InvoiceId });
-        await InvoiceKotModel.deleteMany({
-            $and: [
-                { invoiceMongoId: InvoiceId },
-                { companyId: companyId },
-            ],
+        await InvoiceModel.findByIdAndUpdate({ _id: InvoiceId }, {
+            delete: true
+        }).then(async () => {
+            await KOTModel.deleteMany({
+                $and: [
+                    { invoiceMongoId: InvoiceId },
+                    { companyId: companyId },
+                ],
+            })
         })
+
         return NextResponse.json({ message: "Invoice deleted successfully", success: true }, { status: 200 });
     } catch (error) {
         return NextResponse.json({ message: "Internal Server Error", success: false }, { status: 500 });

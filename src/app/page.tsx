@@ -25,6 +25,7 @@ export default function Page() {
   if (user) {
     return <PreLoader />;
   }
+
   return (
     <div className="min-h-screen">
       {/* Hero Section */}

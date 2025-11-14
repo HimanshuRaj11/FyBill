@@ -23,13 +23,14 @@ export async function POST(request: Request) {
 
 
         const invoiceFilter: any = {
+            companyId: companyId,
             createdAt: { $gte: startDate, $lt: endDate },
             InvoiceStatus: "Done",
-            BillType: { $ne: "KOT" }
+            BillType: { $ne: "KOT" },
+            delete: false,
         };
 
         if (User.role === "Owner") {
-            invoiceFilter.companyId = companyId;
             if (selectedBranch !== "All") invoiceFilter.branchName = selectedBranch;
         } else {
             invoiceFilter.createdBy = user_id;

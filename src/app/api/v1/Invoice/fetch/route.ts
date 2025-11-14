@@ -25,34 +25,22 @@ export async function GET() {
         if (!company) {
             return NextResponse.json({ message: "Company not found", success: false }, { status: 404 });
         }
-        let invoices;
 
-        if (User?.role == 'Owner') {
-            invoices = await InvoiceModel.find({
-                companyId: companyId,
-                createdAt: {
-                    $gte: today,
-                    $lt: tomorrow
-                },
-                InvoiceStatus: "Done",
-                BillType: { $ne: "KOT" }
-            }).populate({
-                path: 'branchId',
-                model: branchModel
-            }).sort({ createdAt: -1 }).lean();
-        } else {
-            invoices = await InvoiceModel.find({
-                createdBy: user_id, createdAt: {
-                    $gte: today,
-                    $lt: tomorrow
-                },
-                InvoiceStatus: "Done",
-                BillType: { $ne: "KOT" }
-            }).populate({
-                path: 'branchId',
-                model: branchModel
-            }).sort({ createdAt: -1 }).lean()
+        const invoiceFilter: any = {
+            companyId: companyId,
+            createdAt: { $gte: today, $lt: tomorrow },
+            InvoiceStatus: "Done",
+            BillType: { $ne: "KOT" },
+            delete: false,
+        };
+
+        if (User?.role != 'Owner') {
+            invoiceFilter.createdBy = user_id
         }
+        const invoices = await InvoiceModel.find(invoiceFilter).populate({
+            path: 'branchId',
+            model: branchModel
+        }).sort({ createdAt: -1 }).lean();
 
         return NextResponse.json({ invoices, success: true }, { status: 200 });
 

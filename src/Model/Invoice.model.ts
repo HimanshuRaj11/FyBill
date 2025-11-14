@@ -37,6 +37,7 @@ export interface IInvoice extends Document {
     InvoiceStatus: string;
     discountValue: number;
     discountType: string;
+    delete: boolean;
 }
 
 const ProductSchema: Schema = new Schema({
@@ -78,6 +79,7 @@ const InvoiceSchema: Schema = new Schema<IInvoice>(
         notes: { type: String },
         discountType: { type: String },
         discountValue: { type: Number, default: 0 },
+        delete: { type: Boolean, default: false }
     },
     {
         timestamps: true,

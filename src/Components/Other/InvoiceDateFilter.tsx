@@ -19,43 +19,54 @@ export default function InvoiceDateFilter() {
   } = useGlobalContext();
 
   const [isFilterOpen, setIsFilterOpen] = useState(false)
+  const [tempDateRange, setTempDateRange] = useState(dateRange)
+  const [tempStartDate, setTempStartDate] = useState(startDate)
+  const [tempEndDate, setTempEndDate] = useState(endDate)
 
 
-  const HandleDateRange = (dateRange: string) => {
-    setDateRange(dateRange);
-    if (dateRange == "Today") {
-      setStartDate(moment().startOf('day').toDate())
-      setEndDate(moment().endOf('day').toDate())
+  const HandleDateRangeChange = (range: string) => {
+    setTempDateRange(range);
+    if (range == "Today") {
+      setTempStartDate(moment().startOf('day').toDate())
+      setTempEndDate(moment().endOf('day').toDate())
     }
-    if (dateRange == "Yesterday") {
-      setStartDate(moment().subtract(1, 'day').startOf('day').toDate())
-      setEndDate(moment().subtract(1, 'day').endOf('day').toDate())
+    if (range == "Yesterday") {
+      setTempStartDate(moment().subtract(1, 'day').startOf('day').toDate())
+      setTempEndDate(moment().subtract(1, 'day').endOf('day').toDate())
     }
-    if (dateRange == "Last 7 days") {
-      setStartDate(moment().subtract(7, 'days').startOf('day').toDate())
-      setEndDate(moment().endOf('day').toDate())
+    if (range == "Last 7 days") {
+      setTempStartDate(moment().subtract(7, 'days').startOf('day').toDate())
+      setTempEndDate(moment().endOf('day').toDate())
     }
-    if (dateRange == "Last 30 days") {
-      setStartDate(moment().subtract(30, 'days').startOf('day').toDate())
-      setEndDate(moment().endOf('day').toDate())
+    if (range == "Last 30 days") {
+      setTempStartDate(moment().subtract(30, 'days').startOf('day').toDate())
+      setTempEndDate(moment().endOf('day').toDate())
     }
-    if (dateRange == "Last 90 days") {
-      setStartDate(moment().subtract(90, 'days').startOf('day').toDate())
-      setEndDate(moment().endOf('day').toDate())
+    if (range == "Last 90 days") {
+      setTempStartDate(moment().subtract(90, 'days').startOf('day').toDate())
+      setTempEndDate(moment().endOf('day').toDate())
     }
-    if (dateRange == "Last 6 Months") {
-      setStartDate(moment().subtract(6, 'months').startOf('day').toDate())
-      setEndDate(moment().endOf('day').toDate())
+    if (range == "Last 6 Months") {
+      setTempStartDate(moment().subtract(6, 'months').startOf('day').toDate())
+      setTempEndDate(moment().endOf('day').toDate())
     }
-    if (dateRange == "Last 1 Year") {
-      setStartDate(moment().subtract(1, 'year').startOf('day').toDate())
-      setEndDate(moment().endOf('day').toDate())
+    if (range == "Last 1 Year") {
+      setTempStartDate(moment().subtract(1, 'year').startOf('day').toDate())
+      setTempEndDate(moment().endOf('day').toDate())
     }
-    if (dateRange == "Custom range") {
-      setStartDate(moment().subtract(1, 'year').startOf('day').toDate())
-      setEndDate(moment().endOf('day').toDate())
+    if (range == "Custom") {
+      setTempStartDate(moment().subtract(1, 'year').startOf('day').toDate())
+      setTempEndDate(moment().endOf('day').toDate())
     }
   }
+
+  const handleApply = () => {
+    setDateRange(tempDateRange);
+    setStartDate(tempStartDate);
+    setEndDate(tempEndDate);
+    setIsFilterOpen(false);
+  }
+
   return (
     <div className="relative">
       <button
@@ -83,8 +94,8 @@ export default function InvoiceDateFilter() {
                   Select Date Range
                 </label>
                 <select
-                  value={dateRange}
-                  onChange={(e) => { HandleDateRange(e.target.value) }}
+                  value={tempDateRange}
+                  onChange={(e) => { HandleDateRangeChange(e.target.value) }}
                   className="w-full border border-gray-300 rounded-md p-2.5 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                 >
                   <option value="Today">Today</option>
@@ -99,7 +110,7 @@ export default function InvoiceDateFilter() {
               </div>
 
               {/* Custom Date Range Section */}
-              {dateRange === 'Custom' && (
+              {tempDateRange === 'Custom' && (
                 <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-4 border-2 border-blue-100">
                   <h4 className="text-sm font-semibold text-gray-800 mb-4 flex items-center">
                     <Calendar className="w-4 h-4 mr-2 text-blue-500" />
@@ -116,8 +127,8 @@ export default function InvoiceDateFilter() {
                       <div className="relative">
                         <input
                           type="date"
-                          value={startDate?.toISOString()?.split('T')[0]}
-                          onChange={(e) => setStartDate(new Date(e.target.value))}
+                          value={tempStartDate?.toISOString()?.split('T')[0]}
+                          onChange={(e) => setTempStartDate(new Date(e.target.value))}
                           max={new Date().toISOString().split('T')[0]}
                           className="w-full border-2 border-gray-200 bg-white rounded-lg p-3 text-sm font-medium text-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
                         />
@@ -132,8 +143,8 @@ export default function InvoiceDateFilter() {
                       <div className="relative">
                         <input
                           type="date"
-                          value={endDate?.toISOString()?.split('T')[0]}
-                          onChange={(e) => setEndDate(new Date(e.target.value))}
+                          value={tempEndDate?.toISOString()?.split('T')[0]}
+                          onChange={(e) => setTempEndDate(new Date(e.target.value))}
                           max={new Date().toISOString().split('T')[0]}
                           className="w-full border-2 border-gray-200 bg-white rounded-lg p-3 text-sm font-medium text-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
                         />
@@ -146,8 +157,8 @@ export default function InvoiceDateFilter() {
                     <button
                       onClick={() => {
                         const today = new Date();
-                        setStartDate(today);
-                        setEndDate(today);
+                        setTempStartDate(today);
+                        setTempEndDate(today);
                       }}
                       className="text-xs font-medium text-red-600 hover:text-red-700 hover:underline focus:outline-none transition-colors"
                     >
@@ -157,6 +168,15 @@ export default function InvoiceDateFilter() {
                 </div>
               )}
 
+              {/* Apply Button */}
+              <div className="pt-3 border-t border-gray-200">
+                <button
+                  onClick={handleApply}
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 px-4 rounded-lg transition-colors duration-200 shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                >
+                  Apply Filter
+                </button>
+              </div>
             </div>
           </div>
         </>

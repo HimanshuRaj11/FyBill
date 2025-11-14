@@ -15,28 +15,39 @@ export async function GET(request: Request) {
 
     try {
 
-        // const user_id = await verifyUser();
-        // if (!user_id) return NextResponse.json({ message: "Unauthorized", success: false }, { status: 401 });
+        const user_id = await verifyUser();
+        if (!user_id) return NextResponse.json({ message: "Unauthorized", success: false }, { status: 401 });
 
-        // const User = await UserModel.findById(user_id);
-        // if (!User) return NextResponse.json({ message: "User not found", success: false }, { status: 404 });
+        const User = await UserModel.findById(user_id);
+        if (!User) return NextResponse.json({ message: "User not found", success: false }, { status: 404 });
 
-        // const companyId = User.companyId;
-        // const company = await CompanyModel.findById(companyId);
-        // if (!company) return NextResponse.json({ message: "Company not found", success: false }, { status: 404 });
-        // const lastYear = moment().subtract(1, 'year').startOf('day').toDate();
-        // const filterDate = lastYear
-        // const invoiceFilter: any = {
-        //     createdAt: { $gte: filterDate },
-        //     companyId: companyId,
-        //     InvoiceStatus: "Done",
-        //     branchName: "Barbies",
-        //     BillType: { $ne: "KOT" }
-        // };
+        const companyId = User.companyId;
+        const company = await CompanyModel.findById(companyId);
+        if (!company) return NextResponse.json({ message: "Company not found", success: false }, { status: 404 });
 
-        // const invoices = await InvoiceModel.find(invoiceFilter).select("grandTotal issueDate branchId createdAt createdBy branchName")
-        //     .sort({ createdAt: -1 })
-        //     .lean();
+
+        // Set delete: false on all invoices
+        // const updateResult = await InvoiceModel.updateMany({}, { $set: { delete: false } });
+        // console.log("Invoice update result:", updateResult);
+
+
+        // start from July 1 of the current fiscal year (if today is on/after July 1 use this year, otherwise use previous year)
+
+        const filterDate = moment('2025-07-01').startOf('day').toDate();
+
+
+        const invoiceFilter: any = {
+            createdAt: { $lte: filterDate },
+            companyId: companyId,
+            InvoiceStatus: "Done",
+            // branchName: "Barbies",
+            BillType: { $ne: "KOT" },
+            delete: false
+        };
+
+        const invoices = await InvoiceModel.updateMany(invoiceFilter, {
+            delete: true
+        })
 
         // await Promise.all(invoices).then((value) => {
         //     console.log(value.length);
@@ -56,6 +67,7 @@ export async function GET(request: Request) {
 
         // console.log(invoices);cls
 
+        console.log("PONG");
 
 
         return NextResponse.json({ message: "Pong", }, { status: 200 });

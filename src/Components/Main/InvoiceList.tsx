@@ -32,7 +32,7 @@ export default function InvoiceList({ filteredInvoices, searchQuery, Company }: 
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200 ">
                         {filteredInvoices?.length > 0 ? (
-                            filteredInvoices.map((invoice: any, i) => (
+                            filteredInvoices.map((invoice: any, i: number) => (
                                 <tr key={invoice._id} className="hover:bg-gray-50">
                                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium ">
                                         <Link href={`/Invoice/${invoice._id}`} className='text-blue-500'>

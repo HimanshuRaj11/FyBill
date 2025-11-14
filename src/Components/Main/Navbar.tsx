@@ -38,6 +38,7 @@ export default function Navbar() {
     const ConnectDb = async () => {
         try {
             await axios.get(`${base_url}/api/v1/db`)
+            await axios.get(`${base_url}/api/ping`) // for test or any change or update or faltu kaam
         } catch (error) {
             return error
         }
@@ -62,6 +63,7 @@ export default function Navbar() {
         dispatch(FetchUser() as any);
         dispatch(FetchCompany() as any);
     }, [dispatch])
+
 
     return (
         <header className="bg-white/95 backdrop-blur-md shadow-lg border-b border-gray-100 z-50 top-0 w-full fixed">

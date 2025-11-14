@@ -25,6 +25,7 @@ export default function Dashboard() {
     const { User } = useSelector((state: any) => state.User);
     const { Company } = useSelector((state: any) => state.Company)
     const { Invoices, loading } = useSelector((state: any) => state.Invoices)
+
     const {
         selectedBranch,
         setSelectedBranch,
@@ -37,10 +38,13 @@ export default function Dashboard() {
     const [searchQuery, setSearchQuery] = useState('')
     const [searchOn, setSearchOn] = useState<boolean>(false)
 
+    if (!Invoices) {
+        dispatch(FetchInvoicesList({ selectedBranch, startDate, endDate }) as any)
+    }
 
     // Calculate revenue by payment mode
     const getRevenueByPaymentMode = (mode: string) => {
-        return Invoices.filter((invoice: any) => invoice.paymentMode?.toLowerCase() === mode.toLowerCase())
+        return Invoices?.filter((invoice: any) => invoice.paymentMode?.toLowerCase() === mode.toLowerCase())
             .reduce((acc: number, invoice: any) => acc + invoice.grandTotal, 0)
             .toFixed(2)
     }

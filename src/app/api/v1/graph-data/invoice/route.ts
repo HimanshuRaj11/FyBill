@@ -35,7 +35,8 @@ export async function POST(request: Request) {
         const invoiceFilter: any = {
             createdAt: { $gte: filterDate },
             InvoiceStatus: "Done",
-            BillType: { $ne: "KOT" }
+            BillType: { $ne: "KOT" },
+            delete: false
         };
 
         if (User.role === "Owner") {

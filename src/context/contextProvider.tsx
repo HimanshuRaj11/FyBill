@@ -18,9 +18,9 @@ const GlobalContext = createContext<GlobalContextType>({
     setSelectedBranch: () => { },
     dateRange: "Today",
     setDateRange: () => { },
-    startDate: new Date(),
+    startDate: moment().startOf('day').toDate(),
     setStartDate: () => { },
-    endDate: new Date(),
+    endDate: moment().endOf('day').toDate(),
     setEndDate: () => { },
 });
 
