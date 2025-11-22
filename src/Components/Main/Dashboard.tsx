@@ -230,7 +230,7 @@ export default function Dashboard() {
 
             {/* Graph */}
 
-            <MonthInvoiceLine />
+            {/* <MonthInvoiceLine /> */}
 
             <BarChartComponent />
             <div className="flex flex-col lg:flex-row justify-between my-2">
