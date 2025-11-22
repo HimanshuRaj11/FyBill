@@ -1,3 +1,4 @@
+'use client'
 import React, { useState, useEffect } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/Components/ui/card';
@@ -41,6 +42,8 @@ const BranchSalesLineChart = () => {
 
         fetchData();
     }, [dateRange]);
+
+
     // Transform data for the line chart
     const transformData = () => {
         const monthMap = new Map();

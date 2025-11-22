@@ -17,6 +17,7 @@ import { formatDateRange } from '@/lib/formatDateRange'
 import BarChartComponent from '../Other/BarChart'
 import BranchSalesPieChart from '../Other/PaiChart'
 import BranchSalesLineChart from '../Other/LineChart'
+import MonthInvoiceLine from '../Other/MonthInvoiceLine'
 
 export default function Dashboard() {
     const dispatch = useDispatch();
@@ -228,6 +229,8 @@ export default function Dashboard() {
 
 
             {/* Graph */}
+
+            <MonthInvoiceLine />
 
             <BarChartComponent />
             <div className="flex flex-col lg:flex-row justify-between my-2">

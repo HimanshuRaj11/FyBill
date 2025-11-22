@@ -1,10 +1,8 @@
 'use client'
 import React, { useState } from 'react'
 import { useGlobalContext } from '@/context/contextProvider'
-import { Button } from '../ui/button';
 import { Calendar, ChevronDown, Filter } from 'lucide-react';
 import moment from 'moment';
-import DatePicker from 'react-datepicker';
 
 
 
@@ -17,9 +15,6 @@ export default function InvoiceDateFilter() {
     endDate,
     setEndDate,
   } = useGlobalContext();
-
-  console.log(startDate);
-
 
   const [isFilterOpen, setIsFilterOpen] = useState(false)
   const [tempDateRange, setTempDateRange] = useState(dateRange)

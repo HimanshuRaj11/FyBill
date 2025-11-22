@@ -28,39 +28,29 @@ export async function POST(request: Request) {
             BillType: { $ne: "KOT" },
             delete: false,
         };
-        const TARGET = 1200000; // 25 lakh
-
-        // 1. Fetch invoices that are NOT deleted
+        const TARGET = 275000;
         const invoices = await InvoiceModel.find(invoiceFilter).select("_id branchName createdAt grandTotal invoiceId delete")
+        console.log(invoices.length);
 
-        // 2. Calculate current total
         let currentTotal = invoices.reduce((sum, inv) => sum + Number(inv.grandTotal), 0);
 
         console.log("CURRENT TOTAL:", currentTotal);
 
-        // If total already less than target
         if (currentTotal <= TARGET) {
             return NextResponse.json({ message: "Already below target", currentTotal });
         }
 
-        // 3. Select random invoices until total <= target
         const invoicesToDelete = [];
 
-        // Clone array so we can randomly remove from it
         const pool = [...invoices];
 
         while (currentTotal > TARGET && pool.length > 0) {
-            // Pick a random invoice
             const randomIndex = Math.floor(Math.random() * pool.length);
             const selected = pool[randomIndex];
 
-            // Add to delete list
             invoicesToDelete.push(selected._id);
 
-            // Subtract from total
             currentTotal -= Number(selected.grandTotal);
-
-            // Remove from pool
             pool.splice(randomIndex, 1);
         }
 
@@ -74,9 +64,10 @@ export async function POST(request: Request) {
         );
 
         // Delete related KOT documents
-        await KOTModel.deleteMany(
-            { invoiceModelId: { $in: invoicesToDelete } }
-        );
+
+        // await KOTModel.deleteMany(
+        //     { invoiceModelId: { $in: invoices } }
+        // );
 
 
 
@@ -85,6 +76,8 @@ export async function POST(request: Request) {
             invoicesToDelete, l: invoicesToDelete.length,
             message: "Invoices Deleted SuccessFul", success: true
         }, { status: 200 });
+
+        return NextResponse.json({ message: "done", 1: invoices.length, currentTotal, }, { status: 200 });
 
     } catch (error) {
         console.log(error);

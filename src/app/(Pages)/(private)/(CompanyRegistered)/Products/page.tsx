@@ -5,7 +5,7 @@ import { Button } from '@/Components/ui/button';
 import Link from 'next/link';
 import { FiEdit2, FiTrash2 } from 'react-icons/fi';
 import { toast } from 'react-toastify';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { Input } from '@/Components/ui/input';
 import { X } from 'lucide-react';
 import { useDebounce } from 'use-debounce';
@@ -13,6 +13,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Skeleton } from '@/Components/ui/skeleton';
 import MultipleProductUpdate from '@/Components/Main/MultiProductEdit';
 import DownloadExcel from '@/Components/Other/DownloadExcel';
+import { FetchProductsList } from '@/app/Redux/Slice/Products.slice';
 
 // TypeScript interface for Product
 interface Product {
@@ -26,15 +27,13 @@ interface Product {
 
 
 export default function ProductsPage() {
+    const dispatch = useDispatch();
     const { Company } = useSelector((state: any) => state.Company);
 
-    const { Products } = useSelector((state: any) => state.Products);
+    const { Products, loading } = useSelector((state: any) => state.Products);
 
-
-    const [products, setProducts] = useState<Product[]>([]);
     const [productName, setProductName] = useState('');
     const [debouncedProductName] = useDebounce(productName, 300);
-    const [loading, setLoading] = useState(true);
     const [selectedCategory, setSelectedCategory] = useState<string>('all');
     const [categories, setCategories] = useState<string[]>([]);
     const [filteredProductsList, setFilteredProductList] = useState<Product[]>([]);
@@ -45,15 +44,11 @@ export default function ProductsPage() {
     // Fetch products
     const fetchProducts = useCallback(async () => {
         try {
-            setLoading(true);
-            setProducts(Products);
             setFilteredProductList(Products);
-            const uniqueCategories = [...new Set(Products.map((product: Product) => product.category))];
+            const uniqueCategories = [...new Set(Products?.map((product: Product) => product.category))];
             setCategories(uniqueCategories as string[]);
         } catch (error) {
             toast.error('Failed to fetch products');
-        } finally {
-            setLoading(false);
         }
     }, []);
 
@@ -78,9 +73,9 @@ export default function ProductsPage() {
 
     // Filtering
     useEffect(() => {
-        if (!products.length) return;
+        if (!Products?.length) return;
 
-        let filtered = [...products];
+        let filtered = [...Products];
 
         // Apply search filter
         if (debouncedProductName.trim() !== '') {
@@ -95,10 +90,14 @@ export default function ProductsPage() {
         }
 
         setFilteredProductList(filtered);
-    }, [products, debouncedProductName, selectedCategory]);
+    }, [Products, debouncedProductName, selectedCategory]);
 
     // Fetch products on mount
     useEffect(() => {
+
+        if (!Products) {
+            dispatch(FetchProductsList() as any);
+        }
         fetchProducts();
     }, [fetchProducts]);
 
@@ -185,7 +184,7 @@ export default function ProductsPage() {
                             />
                         )}
                     </div>
-                    <div className="relative w-full sm:w-64">
+                    <div className="relative w-full sm:w-64 z-50">
                         <select
                             value={selectedCategory}
                             onChange={(e) => setSelectedCategory(e.target.value)}
@@ -224,14 +223,14 @@ export default function ProductsPage() {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {filteredProductsList.length === 0 ? (
+                                    {filteredProductsList?.length === 0 ? (
                                         <tr>
                                             <td colSpan={Company?.branch.length > 0 ? 5 : 4} className="p-4 text-center text-gray-500">
                                                 No products found. Try adjusting your search or filters.
                                             </td>
                                         </tr>
                                     ) : (
-                                        filteredProductsList.map((product) => (
+                                        filteredProductsList?.map((product) => (
                                             <tr key={product._id} className="hover:bg-gray-50 border-b">
                                                 <td className="p-4 text-gray-800">{product.name}</td>
                                                 {Company?.branch.length > 0 && (

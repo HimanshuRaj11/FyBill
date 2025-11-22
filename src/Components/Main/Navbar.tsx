@@ -21,7 +21,6 @@ export default function Navbar() {
     const router = useRouter();
     const dispatch = useDispatch();
     const { User } = useSelector((state: any) => state.User);
-    const Products = useSelector((state: any) => state.Products);
 
     const user = User
     const { Company: company } = useSelector((state: any) => state.Company);
@@ -38,7 +37,7 @@ export default function Navbar() {
     const ConnectDb = async () => {
         try {
             await axios.get(`${base_url}/api/v1/db`)
-            await axios.get(`${base_url}/api/ping`) // for test or any change or update or faltu kaam
+            // await axios.get(`${base_url}/api/ping`) // for test or any change or update or faltu kaam
         } catch (error) {
             return error
         }
@@ -56,10 +55,8 @@ export default function Navbar() {
     useEffect(() => {
         ConnectDb();
         if (user && company) {
-            dispatch(FetchProductsList() as any);
             dispatch(FetchInvoicesList({ selectedBranch, startDate, endDate }) as any)
         }
-
         dispatch(FetchUser() as any);
         dispatch(FetchCompany() as any);
     }, [dispatch])

@@ -29,7 +29,7 @@ export default function DownloadExcel({ data, fileName }: { data: any, fileName:
     }, [data])
 
     const handleProduct = useCallback(() => {
-        const DownloadData = data.map((product: any) => {
+        const DownloadData = data?.map((product: any) => {
             return {
                 "ID": product._id,
                 "Name": product.name,
@@ -44,7 +44,7 @@ export default function DownloadExcel({ data, fileName }: { data: any, fileName:
 
 
     const handleProductSummary = useCallback(() => {
-        const DownloadData = data.map((product: any) => {
+        const DownloadData = data?.map((product: any) => {
             return {
                 "Name": product.name,
                 "Rate": product.rate,
