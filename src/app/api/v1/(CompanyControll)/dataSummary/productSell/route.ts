@@ -1,5 +1,5 @@
 import branchModel from '@/Model/branch.model';
-import { IUser } from './../../../../../Model/User.model';
+import { IUser } from '@/Model/User.model';
 import { verifyUser } from "@/lib/verifyUser";
 import CompanyModel from '@/Model/Company.model';
 import InvoiceModel from '@/Model/Invoice.model';
