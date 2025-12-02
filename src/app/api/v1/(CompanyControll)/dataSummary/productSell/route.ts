@@ -5,6 +5,7 @@ import CompanyModel from '@/Model/Company.model';
 import InvoiceModel from '@/Model/Invoice.model';
 import UserModel from "@/Model/User.model";
 import { NextResponse } from 'next/server';
+
 interface IProduct {
     name: string;
     rate: number;

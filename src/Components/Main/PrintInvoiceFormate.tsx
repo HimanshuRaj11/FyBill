@@ -11,8 +11,6 @@ export default function PrintInvoiceFormate({ invoice }: { invoice: any }) {
     if (Branch?.address) {
         Address = Branch?.address?.street + " " + Branch?.address?.city + " " + Branch?.address?.state
     }
-    console.log(invoice);
-
 
     return (
         <div className="w-[20rem] mx-auto p-2 text-black uppercase text-">
@@ -48,7 +46,7 @@ export default function PrintInvoiceFormate({ invoice }: { invoice: any }) {
                     </p>
 
                 </div>
-                <div className="text-sm font-bold mt-1">INVOICE: {invoice.invoiceId}</div>
+                <div className="text-sm font-bold mt-1">TAX INVOICE: {invoice.invoiceId}</div>
                 <div className="text-sm font-semibold">
                     Date: {moment(invoice.createdAt).format('DD/MM/YYYY hh:mm A')}
                 </div>
