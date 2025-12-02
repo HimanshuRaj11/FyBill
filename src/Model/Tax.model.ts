@@ -5,6 +5,7 @@ interface ITax extends Document {
     taxes: Array<{
         taxName: string;
         percentage: number;
+        taxCode?: string;
     }>;
 }
 
@@ -25,6 +26,10 @@ const taxSchema = new Schema<ITax>({
             required: true,
             min: -100,
             max: 100
+        },
+        taxCode: {
+            type: String,
+            trim: true
         }
     }]
 }, {

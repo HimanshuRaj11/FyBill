@@ -32,24 +32,24 @@ export async function GET(request: Request) {
 
 
         // start from July 1 of the current fiscal year (if today is on/after July 1 use this year, otherwise use previous year)
-        // const companyId = "6803e4c62a9cdbcaf5b3e6e4"
+        const companyId = "6803e4c62a9cdbcaf5b3e6e4"
         // // const filterDate = moment('2025-07-01').startOf('day').toDate();
         // const start = moment('2025-07-01').startOf('day').toDate();
         // const end = moment('2025-07-31').endOf('day').toDate();
 
-        // const invoiceFilter: any = {
-        //     createdAt: { $gte: start, $lte: end },
-        //     companyId: companyId,
-        //     InvoiceStatus: "Done",
-        //     branchName: "Georgetown",
-        //     BillType: { $ne: "KOT" },
-        //     delete: false
-        // };
+        const invoiceFilter: any = {
+            // createdAt: { $gte: start, $lte: end },
+            companyId: companyId,
+            InvoiceStatus: "Done",
+            branchName: "Georgetown", //Berbice , Georgetown
+            BillType: { $ne: "KOT" },
+            delete: false
+        };
 
         // // const invoices = await InvoiceModel.updateMany(invoiceFilter, {
         // //     delete: true
         // // })
-        // // const invoices = await InvoiceModel.find(invoiceFilter)
+        const invoices = await InvoiceModel.find(invoiceFilter)
         // const invoices = await InvoiceModel.find(invoiceFilter)
         //     .select("_id branchName createdAt grandTotal invoiceId delete")
         //     .lean();
@@ -59,23 +59,27 @@ export async function GET(request: Request) {
         //     return sum + (isNaN(val) ? 0 : val);
         // }, 0);
 
-        // await Promise.all(invoices).then((value) => {
-        //     console.log(value.length);
-        //     value.forEach((inv: any) => {
+        // console.log(invoices.length);
 
-        //         InvoiceModel.findByIdAndUpdate({ _id: inv._id }, {
-        //             branchName: "Berbice"
-        //         }).then((data) => {
-        //             console.log(data);
 
-        //         }).catch((error) => {
-        //             console.log(error);
+        // for (let index = 0; index < invoices.length; index++) {
 
-        //         })
+        //     const inv = invoices[index];
+        //     InvoiceModel.findByIdAndUpdate({ _id: inv._id }, {
+        //         invoiceId: index + 1,
+        //     }).then((data) => {
+        //         console.log("Update Data :::", data);
+
         //     })
-        // })
 
-        // console.log(invoices);cls
+        // }
+
+        const Branch = await branchModel.findOne({ branchName: "Georgetown" })
+        Branch.lastInvoiceNo = invoices.length + 1;
+        await Branch.save();
+
+
+
 
         console.log("PONG");
 

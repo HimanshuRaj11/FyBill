@@ -13,6 +13,7 @@ export interface ICompany extends Document {
     phone: string;
     countryCode: string;
     gstNumber?: string;
+    vatId?: string;
     panNumber?: string;
     logoUrl?: string;
     website?: string;
@@ -48,6 +49,7 @@ const CompanySchema: Schema = new Schema<ICompany>(
         countryCode: { type: String, },
         gstNumber: { type: String },
         panNumber: { type: String },
+        vatId: { type: String },
         logoUrl: { type: String },
         website: { type: String },
         description: { type: String, required: true },

@@ -19,13 +19,14 @@ export async function POST(request: Request) {
         const tax = await TaxModel.findOne({ companyId: Company._id });
         if (!tax) { return NextResponse.json({ success: false, message: "Tax not found" }, { status: 404 }) }
 
-        const { taxName, percentage, _id } = await request.json();
+        const { taxName, percentage, _id, taxCode } = await request.json();
 
         const updatedTax = tax.taxes.find((tax: any) => tax._id.toString() === _id);
         if (!updatedTax) { return NextResponse.json({ success: false, message: "Tax not found" }, { status: 404 }) }
 
         updatedTax.taxName = taxName;
         updatedTax.percentage = percentage;
+        updatedTax.taxCode = taxCode;
 
         await tax.save();
 

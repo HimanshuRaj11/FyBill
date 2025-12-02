@@ -29,6 +29,11 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ Invoi
             return NextResponse.json({ message: "Invoice not found", success: false }, { status: 404 });
         }
 
+        // check if invoice is important
+        if (invoice.important) {
+            return NextResponse.json({ message: "Cannot delete an important invoice", success: false }, { status: 400 });
+        }
+
         await InvoiceModel.findByIdAndUpdate({ _id: InvoiceId }, {
             delete: true
         }).then(async () => {

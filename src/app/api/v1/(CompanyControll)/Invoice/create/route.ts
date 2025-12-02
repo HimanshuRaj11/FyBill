@@ -72,6 +72,7 @@ export async function POST(request: Request) {
 
             invoice = await InvoiceModel.create({
                 invoiceId: lastInvoiceNo + 1,
+                invoiceIdTrack: lastInvoiceNo + 1,
                 companyId: Company._id,
                 clientName,
                 clientPhone: phoneNumber,
@@ -102,6 +103,8 @@ export async function POST(request: Request) {
         return Response.json({ message: "Invoice created successfully", invoice, success: true }, { status: 200 });
 
     } catch (error) {
+        console.log(error);
+
         return Response.json({ message: "Internal server error", error }, { status: 500 });
     }
 

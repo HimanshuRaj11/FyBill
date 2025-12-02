@@ -15,22 +15,38 @@ export async function POST(request: Request) {
 
         const companyId = "6803e4c62a9cdbcaf5b3e6e4"
         // const branchName = "Georgetown"
-        // const branchName2 = "Berbice"
+        const branchName = "Berbice"
 
-        const start = moment('2025-07-01').startOf('day').toDate();
-        const end = moment('2025-07-31').endOf('day').toDate();
+        const start = moment('2025-06-01').startOf('day').toDate();
+        const end = moment('2025-06-30').endOf('day').toDate();
 
         const invoiceFilter: any = {
             companyId,
-            branchName: "Berbice",
+            branchName,
             createdAt: { $gte: start, $lte: end },
             InvoiceStatus: "Done",
             BillType: { $ne: "KOT" },
             delete: false,
+            important: { $ne: true }
         };
-        const TARGET = 275000;
-        const invoices = await InvoiceModel.find(invoiceFilter).select("_id branchName createdAt grandTotal invoiceId delete")
-        console.log(invoices.length);
+        const TARGET = 690000;
+        const invoices = await InvoiceModel.find(invoiceFilter).select("_id grandTotal").lean();
+
+
+        // const invoiceIds = invoices.map(inv => inv._id);
+
+        // if (invoiceIds.length) {
+        //     const result = await InvoiceModel.updateMany(
+        //         { _id: { $in: invoiceIds } },
+        //         { $set: { delete: false } }
+        //     );
+        //     // console.log("matched:", result.matchedCount ?? result.n ?? 0, "modified:", result.modifiedCount ?? result.nModified ?? 0);
+        // } else {
+        //     console.log("No invoices found to update");
+        // }
+
+        // const invoicesToDelete = invoiceIds;
+
 
         let currentTotal = invoices.reduce((sum, inv) => sum + Number(inv.grandTotal), 0);
 
@@ -77,7 +93,7 @@ export async function POST(request: Request) {
             message: "Invoices Deleted SuccessFul", success: true
         }, { status: 200 });
 
-        return NextResponse.json({ message: "done", 1: invoices.length, currentTotal, }, { status: 200 });
+        // return NextResponse.json({ message: "done", 1: invoices.length, currentTotal, }, { status: 200 });
 
     } catch (error) {
         console.log(error);

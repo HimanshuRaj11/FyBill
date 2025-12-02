@@ -10,10 +10,12 @@ interface Product {
 interface Tax {
     taxName: string;
     percentage: number;
+    taxCode?: string;
 }
 
 export interface IInvoice extends Document {
     invoiceId: string;
+    invoiceIdTrack: string;
     companyId: mongoose.Types.ObjectId;
     branchId: mongoose.Types.ObjectId;
     clientName: string;
@@ -38,6 +40,7 @@ export interface IInvoice extends Document {
     discountValue: number;
     discountType: string;
     delete: boolean;
+    important: boolean;
 }
 
 const ProductSchema: Schema = new Schema({
@@ -60,6 +63,7 @@ const InvoiceSchema: Schema = new Schema<IInvoice>(
         companyId: { type: mongoose.Schema.Types.ObjectId, required: true, ref: "Company" },
         branchId: { type: mongoose.Schema.Types.ObjectId, ref: "Branch" },
         invoiceId: { type: String, required: true },
+        invoiceIdTrack: { type: String, required: true },
         clientName: { type: String, default: "" },
         clientPhone: { type: String, default: "" },
         companyName: { type: String, default: "" },
@@ -79,7 +83,8 @@ const InvoiceSchema: Schema = new Schema<IInvoice>(
         notes: { type: String },
         discountType: { type: String },
         discountValue: { type: Number, default: 0 },
-        delete: { type: Boolean, default: false }
+        delete: { type: Boolean, default: false },
+        important: { type: Boolean, default: false },
     },
     {
         timestamps: true,

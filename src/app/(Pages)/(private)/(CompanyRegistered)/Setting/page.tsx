@@ -13,6 +13,7 @@ interface Tax {
     _id?: string;
     taxName: string;
     percentage: number;
+    taxCode?: string;
 }
 
 export default function SettingsPage() {
@@ -28,7 +29,7 @@ export default function SettingsPage() {
     const [editTaxMode, setEditTaxMode] = useState(false);
     const [editCategoryMode, setEditCategoryMode] = useState(false);
     const [editCurrencyMode, setEditCurrencyMode] = useState(false);
-    const [newTax, setNewTax] = useState({ taxName: '', percentage: 0 });
+    const [newTax, setNewTax] = useState({ taxName: '', percentage: 0, taxCode: '' });
     const [newCategory, setNewCategory] = useState('');
     const [editedTaxes, setEditedTaxes] = useState<Tax[]>([]);
 
@@ -70,7 +71,7 @@ export default function SettingsPage() {
             const res = await axios.post(`${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/company/Tax/add`, newTax);
             if (res.data.success) {
                 setTaxes([...taxes, newTax]);
-                setNewTax({ taxName: '', percentage: 0 });
+                setNewTax({ taxName: '', percentage: 0, taxCode: '' });
                 toast.success('Tax added successfully');
             }
         } catch (error) {
@@ -272,7 +273,7 @@ export default function SettingsPage() {
                         </div>
                     </div>
                     <div className="space-y-4">
-                        {taxes?.map((tax, index) => (
+                        {taxes?.map((tax: any, index: number) => (
                             <motion.div
                                 key={index}
                                 initial={{ opacity: 0 }}
@@ -284,6 +285,13 @@ export default function SettingsPage() {
                                     value={editedTaxes[index]?.taxName || tax.taxName}
                                     onChange={(e) => handleTaxChange(index, { ...editedTaxes[index], taxName: e.target.value })}
                                     className="w-1/2 border-2"
+                                    disabled={!editTaxMode}
+                                />
+                                <Input
+                                    type="string"
+                                    value={editedTaxes[index]?.taxCode || tax.taxCode}
+                                    onChange={(e) => handleTaxChange(index, { ...editedTaxes[index], taxCode: e.target.value })}
+                                    className="w-1/4 border-2"
                                     disabled={!editTaxMode}
                                 />
                                 <Input
@@ -316,6 +324,14 @@ export default function SettingsPage() {
                                     value={newTax.taxName}
                                     onChange={(e) => setNewTax({ ...newTax, taxName: e.target.value })}
                                     className="w-1/2 border-2"
+                                />
+                                <Input
+                                    type="string"
+                                    placeholder='eg. TIN: 123-456-789'
+                                    value={newTax.taxCode}
+                                    onChange={(e) => setNewTax({ ...newTax, taxCode: e.target.value })}
+                                    className="w-1/4 border-2"
+                                    disabled={!editTaxMode}
                                 />
                                 <Input
                                     type="number"

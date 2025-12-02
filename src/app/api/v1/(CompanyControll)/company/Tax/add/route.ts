@@ -19,7 +19,7 @@ export async function POST(request: Request) {
         }
 
 
-        const { taxName, percentage } = await request.json();
+        const { taxName, percentage, taxCode } = await request.json();
 
         let tax = await TaxModel.findOne({ companyId: company._id });
 
@@ -29,7 +29,7 @@ export async function POST(request: Request) {
                 taxes: [{ taxName, percentage }]
             });
         } else {
-            tax.taxes.push({ taxName, percentage });
+            tax.taxes.push({ taxName, percentage, taxCode });
             await tax.save();
         }
 
