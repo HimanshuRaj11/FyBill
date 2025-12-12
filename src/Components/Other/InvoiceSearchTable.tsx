@@ -12,11 +12,9 @@ const base_url = process.env.NEXT_PUBLIC_BASE_URL
 
 interface Invoice {
     _id: string;
-    invoiceId: string;
+    invoiceIdTrack: string;
     clientName: string;
-    branchId?: {
-        branchName: string;
-    };
+    branchName: string;
     currency: string;
     grandTotal: number;
     paymentMode: string;
@@ -45,20 +43,15 @@ export default function InvoiceSearchTable({ setSearchOn }: { setSearchOn: any }
         return () => clearTimeout(timer);
     }, [searchQuery]);
 
-    // Fetch invoices when debounced query changes
 
     const fetchInvoices = async (query: string) => {
-
-
         if (debouncedQuery.length === 0) {
             setInvoices([]);
             return;
         }
-
         setLoading(true);
         try {
             const { data } = await axios.post(`${base_url}/api/v1/Invoice/search`, { query }, { withCredentials: true });
-
             setInvoices(data.invoices);
         } catch (error) {
             console.error('Error fetching invoices:', error);
@@ -67,8 +60,6 @@ export default function InvoiceSearchTable({ setSearchOn }: { setSearchOn: any }
             setLoading(false);
         }
     };
-
-
 
     const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setSearchQuery(e.target.value);
@@ -80,12 +71,10 @@ export default function InvoiceSearchTable({ setSearchOn }: { setSearchOn: any }
         setInvoices([]);
     };
 
-
-
     return (
-        <div className="w-full max-w-7xl mx-auto bg-white rounded-xl shadow-2xl overflow-hidden">
+        <div className="w-full max-w-7xl mx-auto bg-white dark:bg-gray-800 rounded-xl shadow-2xl dark:shadow-gray-900/50 overflow-hidden">
             {/* Header with Close Button */}
-            <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4 flex items-center justify-between">
+            <div className="bg-gradient-to-r from-blue-600 to-blue-700 dark:from-blue-700 dark:to-blue-900 px-6 py-4 flex items-center justify-between">
                 <div className="flex items-center gap-3">
                     <Search className="h-6 w-6 text-white" />
                     <h2 className="text-xl font-semibold text-white">Search Invoices</h2>
@@ -93,7 +82,7 @@ export default function InvoiceSearchTable({ setSearchOn }: { setSearchOn: any }
 
                 <button
                     onClick={() => setSearchOn(false)}
-                    className="text-white hover:bg-white/20 rounded-lg p-2 transition-colors duration-200"
+                    className="text-white hover:bg-white/20 dark:hover:bg-white/10 rounded-lg p-2 transition-colors duration-200"
                     aria-label="Close"
                 >
                     <X className="h-6 w-6" />
@@ -106,7 +95,7 @@ export default function InvoiceSearchTable({ setSearchOn }: { setSearchOn: any }
                 <div className="mb-6">
                     <div className="relative">
                         <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                            <Search className="h-5 w-5 text-gray-400" />
+                            <Search className="h-5 w-5 text-gray-400 dark:text-gray-500" />
                         </div>
                         <input
                             type="text"
@@ -114,12 +103,12 @@ export default function InvoiceSearchTable({ setSearchOn }: { setSearchOn: any }
                             value={searchQuery}
                             onChange={handleSearchChange}
                             autoFocus
-                            className="w-full pl-12 pr-12 py-3 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all shadow-sm"
+                            className="w-full pl-12 pr-12 py-3 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400 transition-all shadow-sm"
                         />
                         {searchQuery && (
                             <button
                                 onClick={clearSearch}
-                                className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-gray-600 transition-colors"
+                                className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
                             >
                                 <X className="h-5 w-5" />
                             </button>
@@ -127,7 +116,7 @@ export default function InvoiceSearchTable({ setSearchOn }: { setSearchOn: any }
                         {loading && (
                             <div className="absolute inset-y-0 right-12 flex items-center pr-4">
                                 <svg
-                                    className="animate-spin h-5 w-5 text-blue-500"
+                                    className="animate-spin h-5 w-5 text-blue-500 dark:text-blue-400"
                                     xmlns="http://www.w3.org/2000/svg"
                                     fill="none"
                                     viewBox="0 0 24 24"
@@ -152,14 +141,14 @@ export default function InvoiceSearchTable({ setSearchOn }: { setSearchOn: any }
 
                     {/* Search hint */}
                     {searchQuery.length === 0 && (
-                        <p className="mt-2 text-sm text-gray-500">
+                        <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
                             Start typing to search invoices...
                         </p>
                     )}
 
                     {/* Results count */}
                     {searchQuery.length > 0 && !loading && (
-                        <p className="mt-2 text-sm text-gray-600">
+                        <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">
                             {invoices.length > 0
                                 ? `Found ${invoices.length} invoice${invoices.length !== 1 ? 's' : ''}`
                                 : `No invoices found for "${searchQuery}"`}
@@ -171,103 +160,103 @@ export default function InvoiceSearchTable({ setSearchOn }: { setSearchOn: any }
                 {loading ? (
                     <InvoiceTableSkeleton />
                 ) : (
-                    <div className="overflow-x-auto rounded-lg border border-gray-200">
-                        <table className="min-w-full divide-y divide-gray-200">
-                            <thead className="bg-gray-50">
+                    <div className="overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700">
+                        <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                            <thead className="bg-gray-50 dark:bg-gray-900">
                                 <tr>
                                     <th
                                         scope="col"
-                                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
                                     >
                                         Invoice
                                     </th>
                                     <th
                                         scope="col"
-                                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
                                     >
                                         Customer
                                     </th>
                                     {Company?.branch?.length > 0 && (
                                         <th
                                             scope="col"
-                                            className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                                            className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
                                         >
                                             Branch
                                         </th>
                                     )}
                                     <th
                                         scope="col"
-                                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
                                     >
                                         Amount
                                     </th>
                                     <th
                                         scope="col"
-                                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
                                     >
                                         Payment Mode
                                     </th>
                                     <th
                                         scope="col"
-                                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
                                     >
                                         Date
                                     </th>
                                     <th
                                         scope="col"
-                                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
                                     >
                                         Actions
                                     </th>
                                     {(User?.role === 'Owner' || User?.role === 'admin') && (
                                         <th
                                             scope="col"
-                                            className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                                            className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
                                         >
                                             Saved KOT
                                         </th>
                                     )}
                                 </tr>
                             </thead>
-                            <tbody className="bg-white divide-y divide-gray-200">
+                            <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                                 {invoices.length > 0 ? (
                                     invoices.map((invoice) => (
                                         <tr
                                             key={invoice._id}
-                                            className="hover:bg-gray-50 transition-colors"
+                                            className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                                         >
                                             <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                                 <Link
-                                                    href={`/Invoice/${invoice._id}`}
-                                                    className="text-blue-600 hover:text-blue-800 hover:underline"
+                                                    href={`/Invoice/search/${invoice._id}`}
+                                                    className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 hover:underline"
                                                 >
-                                                    #{invoice.invoiceId}
+                                                    #{invoice.invoiceIdTrack}
                                                 </Link>
                                             </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
                                                 {invoice.clientName}
                                             </td>
                                             {Company?.branch?.length > 0 && (
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                                                    {invoice?.branchId?.branchName || '-'}
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
+                                                    {invoice?.branchName || '-'}
                                                 </td>
                                             )}
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-semibold">
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 font-semibold">
                                                 {invoice.currency}
                                                 {invoice.grandTotal.toLocaleString()}
                                             </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
+                                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
                                                     {invoice.paymentMode}
                                                 </span>
                                             </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
                                                 {moment(invoice.createdAt).format('MMM DD, YYYY')}
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm">
                                                 <Link
                                                     href={`/Invoice/${invoice._id}`}
-                                                    className="text-blue-600 hover:text-blue-800 font-medium hover:underline"
+                                                    className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium hover:underline"
                                                 >
                                                     View
                                                 </Link>
@@ -277,12 +266,12 @@ export default function InvoiceSearchTable({ setSearchOn }: { setSearchOn: any }
                                                     {invoice?.kotCount && invoice.kotCount > 0 ? (
                                                         <Link
                                                             href={`/Invoice/saved-KOT/${invoice._id}`}
-                                                            className="text-green-600 hover:text-green-800 font-medium hover:underline"
+                                                            className="text-green-600 dark:text-green-400 hover:text-green-800 dark:hover:text-green-300 font-medium hover:underline"
                                                         >
                                                             {invoice.kotCount} KOT{invoice.kotCount !== 1 ? 's' : ''}
                                                         </Link>
                                                     ) : (
-                                                        <span className="text-gray-400">No KOT</span>
+                                                        <span className="text-gray-400 dark:text-gray-500">No KOT</span>
                                                     )}
                                                 </td>
                                             )}
@@ -298,14 +287,14 @@ export default function InvoiceSearchTable({ setSearchOn }: { setSearchOn: any }
                                             }
                                             className="px-6 py-12 text-center"
                                         >
-                                            <div className="flex flex-col items-center justify-center text-gray-500">
-                                                <Search className="h-12 w-12 text-gray-300 mb-3" />
+                                            <div className="flex flex-col items-center justify-center text-gray-500 dark:text-gray-400">
+                                                <Search className="h-12 w-12 text-gray-300 dark:text-gray-600 mb-3" />
                                                 <p className="text-sm font-medium">
                                                     {searchQuery
                                                         ? `No invoices found matching "${searchQuery}"`
                                                         : 'Start searching to find invoices'}
                                                 </p>
-                                                <p className="text-xs text-gray-400 mt-1">
+                                                <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
                                                     Try searching by invoice number, customer name, or amount
                                                 </p>
                                             </div>

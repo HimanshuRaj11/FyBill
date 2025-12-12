@@ -1,21 +1,19 @@
 'use client'
 import { useRef, useState } from "react";
-import { Button } from "../ui/button";
-import { Download, Printer, Share2, Mail, Trash2 } from "lucide-react";
+import { Button } from "@/Components/ui/button";
+import { Printer } from "lucide-react";
 import { motion } from "framer-motion";
-import { IInvoice } from "@/Model/Invoice.model";
 import moment from "moment";
-import axios from "axios";
 import { useRouter } from "next/navigation";
-import { toast } from "react-toastify";
+// import { toast } from "react-toastify";
 import { useSelector } from "react-redux";
 import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
-import { Dialog, DialogContent, DialogTitle } from "../ui/dialog";
-import PrintInvoiceFormate from "./PrintInvoiceFormate";
+import { Dialog, DialogContent, DialogTitle } from "@/Components/ui/dialog";
+import PrintInvoiceFormate from "@/Components/Main/PrintInvoiceFormate";
 
 
-export default function InvoiceDisplay({ invoice }: { invoice: any }) {
+export default function InvoiceDisplayPage({ invoice }: { invoice: any }) {
     const { Company } = useSelector((state: any) => state.Company)
     const { User } = useSelector((state: any) => state.User);
     const Branch = invoice?.branchId;
@@ -58,18 +56,10 @@ export default function InvoiceDisplay({ invoice }: { invoice: any }) {
         pdf.save(`invoice-${invoice.invoiceId}.pdf`);
     }
 
-    if (!invoice) return <div className="p-4 text-center text-gray-500 dark:text-gray-400">No invoice data available</div>;
+    if (!invoice) return <div className="p-4 text-center text-gray-500">No invoice data available</div>;
 
+    console.log(invoice);
 
-    const deleteInvoice = async () => {
-        const { data } = await axios.delete(`${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/Invoice/${invoice._id}/delete`, { withCredentials: true });
-        if (data.success) {
-            toast.success("Invoice deleted successfully");
-            router.back();
-        } else {
-            toast.error("Failed to delete invoice");
-        }
-    }
     return (
         <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             {isPrinting && invoice && (
@@ -78,7 +68,7 @@ export default function InvoiceDisplay({ invoice }: { invoice: any }) {
                         <DialogContent className="max-w-7xl w-full ">
                             <DialogTitle >Print Invoice</DialogTitle>
                             <div ref={invoiceRef} className="max-h-[80vh] overflow-auto bg-white rounded-lg">
-                                <PrintInvoiceFormate invoice={invoice} />
+                                <PrintInvoiceFormate invoice={{ ...invoice, invoiceId: invoice.invoiceIdTrack }} />
                             </div>
 
                             <div className="flex justify-end my-4">
@@ -94,7 +84,6 @@ export default function InvoiceDisplay({ invoice }: { invoice: any }) {
                             </div>
                         </DialogContent>
                     </Dialog>
-
                 </div>
 
             )
@@ -105,7 +94,7 @@ export default function InvoiceDisplay({ invoice }: { invoice: any }) {
                 <div className="w-full sm:w-auto flex items-center gap-3">
                     <div className="w-full">
                         <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-gray-100 text-center sm:text-left">
-                            Invoice #{invoice.invoiceId}
+                            Invoice #{invoice.invoiceIdTrack}
                         </h1>
                     </div>
                 </div>
@@ -122,12 +111,12 @@ export default function InvoiceDisplay({ invoice }: { invoice: any }) {
                         <span>Print</span>
                     </Button>
                     {/* <Button
-                        onClick={handleDownload}
-                        className="bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-700 dark:hover:bg-indigo-800 text-white flex items-center gap-2 text-sm sm:text-base cursor-pointer"
-                    >
-                        <Download className="h-4 w-4" />
-                        <span>Download</span>
-                    </Button> */}
+                                   onClick={handleDownload}
+                                   className="bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-700 dark:hover:bg-indigo-800 text-white flex items-center gap-2 text-sm sm:text-base cursor-pointer"
+                               >
+                                   <Download className="h-4 w-4" />
+                                   <span>Download</span>
+                               </Button> */}
                 </div>
             </div>
 
@@ -146,7 +135,7 @@ export default function InvoiceDisplay({ invoice }: { invoice: any }) {
                                 <h2 className="text-3xl sm:text-4xl font-bold text-gray-800 dark:text-gray-100">INVOICE</h2>
 
                                 <div className="bg-indigo-50 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-200 px-6 py-3 rounded-lg font-bold text-lg">
-                                    {invoice.invoiceId}
+                                    #{invoice.invoiceIdTrack}
                                 </div>
                             </div>
                             <div className="space-y-4">

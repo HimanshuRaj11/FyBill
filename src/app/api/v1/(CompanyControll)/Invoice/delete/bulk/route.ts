@@ -25,13 +25,13 @@ export async function POST(request: Request) {
         const { data } = await request.json()
 
         await InvoiceModel.updateMany(
-            { _id: { $in: data.invoiceIds } },
-            { $set: { delete: true } }
+            { _id: { $in: data.invoiceIds }, important: { $ne: true } },
+            { $set: { "delete": true } }
         ).then(async () => {
             await KOTModel.deleteMany({
                 InvoiceModelId: { $in: data.invoiceIds }
             });
-        })
+        });
 
         return NextResponse.json({ message: "Invoices Deleted SuccessFul", success: true }, { status: 200 });
 

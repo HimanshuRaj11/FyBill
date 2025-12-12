@@ -258,7 +258,7 @@ export default function DeleteInvoice() {
                                             />
                                         </td>
                                         <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">
-                                            {i + 1}
+                                            {i + 1}{invoice.important && <span title="Important Invoice" className="ml-1 text-yellow-500">★</span>}
                                         </td>
                                         <td className="px-4 py-3 whitespace-nowrap text-sm font-medium">
                                             <Link href={`/Invoice/${invoice._id}`} className='text-blue-600 hover:text-blue-800 hover:underline'>

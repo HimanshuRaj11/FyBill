@@ -15,15 +15,15 @@ const base_url = process.env.NEXT_PUBLIC_BASE_URL
 interface Invoice {
     _id: string;
     invoiceId: string;
+    invoiceIdTrack: string;
     clientName: string;
-    branchId?: {
-        branchName: string;
-    };
+    branchName: string;
     currency: string;
     grandTotal: number;
     paymentMode: string;
     createdAt: string;
     kotCount?: number;
+    important?: boolean;
 }
 
 export default function Page() {
@@ -394,6 +394,7 @@ export default function Page() {
                                 </th>
                                 <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">S.N</th>
                                 <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Invoice</th>
+                                <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Invoice Track Id</th>
                                 <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer</th>
                                 {Company?.branch?.length > 0 && (
                                     <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Branch</th>
@@ -445,16 +446,23 @@ export default function Page() {
                                             />
                                         </td>
                                         <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">
-                                            {i + 1}
+                                            {i + 1} {
+                                                invoice.important && <span title="Important Invoice" className="ml-1 text-yellow-500">★</span>
+                                            }
                                         </td>
                                         <td className="px-4 py-3 whitespace-nowrap text-sm font-medium">
                                             <Link href={`/Invoice/${invoice._id}`} className='text-blue-600 hover:text-blue-800 hover:underline'>
                                                 #{invoice.invoiceId}
                                             </Link>
                                         </td>
+                                        <td className="px-4 py-3 whitespace-nowrap text-sm font-medium">
+                                            <Link href={`/Invoice/${invoice._id}`} className='text-green-600 hover:text-green-800 hover:underline'>
+                                                #{invoice.invoiceIdTrack}
+                                            </Link>
+                                        </td>
                                         <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-700">{invoice.clientName}</td>
                                         {Company?.branch?.length > 0 && (
-                                            <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-600">{invoice?.branchId?.branchName || '-'}</td>
+                                            <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-600">{invoice?.branchName || '-'}</td>
                                         )}
                                         <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">{invoice.currency}{invoice.grandTotal.toFixed(2)}</td>
                                         <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-600">

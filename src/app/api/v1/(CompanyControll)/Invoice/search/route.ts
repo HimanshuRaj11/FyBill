@@ -5,10 +5,9 @@ import InvoiceModel from "@/Model/Invoice.model";
 import UserModel from "@/Model/User.model";
 import { NextResponse } from "next/server";
 import moment from "moment";
-import { log } from "console";
+
 import KOTModel from "@/Model/KOT.model";
-const today = moment().startOf('day').toDate();
-const tomorrow = moment().startOf('day').add(1, 'day').toDate();
+
 
 export async function POST(request: Request) {
     try {
@@ -23,47 +22,30 @@ export async function POST(request: Request) {
         if (!User) {
             return NextResponse.json({ message: "User not found", success: false }, { status: 404 });
         }
+        const branchId = User.branchId;
         const companyId = User.companyId;
         const company = await CompanyModel.findById({ _id: companyId });
         if (!company) {
             return NextResponse.json({ message: "Company not found", success: false }, { status: 404 });
         }
-        let invoices;
 
         const searchRegex = new RegExp(SearchQuery.query, 'i'); // case-insensitive search
-        log(searchRegex)
-        if (User?.role == 'Owner') {
-            invoices = await InvoiceModel.find({
-                companyId: companyId,
-                InvoiceStatus: "Done",
-                BillType: { $ne: "KOT" },
-                $or: [
-                    { invoiceId: searchRegex },
-                    { clientName: searchRegex }
-                ]
-            })
-                .populate({
-                    path: 'branchId',
-                    model: branchModel
-                })
-                .sort({ createdAt: -1 })
-                .lean();
-        } else {
-            invoices = await InvoiceModel.find({
-                InvoiceStatus: "Done",
-                BillType: { $ne: "KOT" },
-                $or: [
-                    { invoiceId: searchRegex },
-                    { clientName: searchRegex }
-                ]
-            })
-                .populate({
-                    path: 'branchId',
-                    model: branchModel
-                })
-                .sort({ createdAt: -1 })
-                .lean();
+
+        const invoiceFilter: any = {
+            companyId,
+            InvoiceStatus: "Done",
+            BillType: { $ne: "KOT" },
+            // delete: { $ne: true },
+            $or: [
+                { invoiceIdTrack: searchRegex },
+                { clientName: searchRegex }
+            ]
+        };
+        if (User?.role != 'Owner') {
+            invoiceFilter.branchId = branchId
         }
+
+        let invoices = await InvoiceModel.find(invoiceFilter).sort({ createdAt: -1 }).lean()
 
         invoices = await InvoiceKot(invoices);
 
