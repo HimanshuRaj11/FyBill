@@ -133,16 +133,16 @@ export default function Login() {
     }
 
     return (
-        <div className="min-h-screen flex items-center justify-center p-4">
-            <div className="w-full max-w-md bg-white rounded-xl shadow-lg p-8 transition-all duration-300 hover:shadow-xl">
-                <h2 className="text-3xl font-bold text-gray-800 mb-6 text-center">Welcome Back</h2>
-                <p className="text-gray-600 text-center mb-8">Sign in to access your account</p>
+        <div className="min-h-screen flex items-center justify-center p-4 bg-gray-50 dark:bg-gray-900">
+            <div className="w-full max-w-md bg-white dark:bg-gray-800 rounded-xl shadow-lg dark:shadow-gray-900/50 p-8 transition-all duration-300 hover:shadow-xl dark:hover:shadow-gray-900/70">
+                <h2 className="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-6 text-center">Welcome Back</h2>
+                <p className="text-gray-600 dark:text-gray-400 text-center mb-8">Sign in to access your account</p>
 
                 <form className="space-y-6" onSubmit={HandleSubmit}>
                     <div className="space-y-4">
                         {/* Email Input */}
                         <div className="relative">
-                            <div className={`absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none ${focusedField === 'email' ? 'text-indigo-500' : 'text-gray-400'}`}>
+                            <div className={`absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none ${focusedField === 'email' ? 'text-indigo-500 dark:text-indigo-400' : 'text-gray-400 dark:text-gray-500'}`}>
                                 <FiMail className="h-5 w-5" />
                             </div>
                             <input
@@ -152,16 +152,16 @@ export default function Login() {
                                 value={InputData.email}
                                 name='email'
                                 type="email"
-                                className={`pl-10 w-full py-3 px-4 rounded-lg border ${errors.email ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:border-indigo-500'} focus:outline-none focus:ring-2 transition-all duration-200`}
+                                className={`pl-10 w-full py-3 px-4 rounded-lg border bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 ${errors.email ? 'border-red-500 dark:border-red-400 focus:ring-red-500 dark:focus:ring-red-400' : 'border-gray-300 dark:border-gray-600 focus:border-indigo-500 dark:focus:border-indigo-400'} focus:outline-none focus:ring-2 transition-all duration-200`}
                                 placeholder="Email Address"
                                 aria-label="Email Address"
                             />
-                            {errors.email && <p className="text-red-500 text-sm mt-1 ml-1">{errors.email}</p>}
+                            {errors.email && <p className="text-red-500 dark:text-red-400 text-sm mt-1 ml-1">{errors.email}</p>}
                         </div>
 
                         {/* Password Input */}
                         <div className="relative">
-                            <div className={`absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none ${focusedField === 'password' ? 'text-indigo-500' : 'text-gray-400'}`}>
+                            <div className={`absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none ${focusedField === 'password' ? 'text-indigo-500 dark:text-indigo-400' : 'text-gray-400 dark:text-gray-500'}`}>
                                 <FiLock className="h-5 w-5" />
                             </div>
                             <input
@@ -171,28 +171,28 @@ export default function Login() {
                                 value={InputData.password}
                                 name='password'
                                 type={showPassword ? "text" : "password"}
-                                className={`pl-10 w-full py-3 px-4 rounded-lg border ${errors.password ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:border-indigo-500'} focus:outline-none focus:ring-2 transition-all duration-200`}
+                                className={`pl-10 w-full py-3 px-4 rounded-lg border bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 ${errors.password ? 'border-red-500 dark:border-red-400 focus:ring-red-500 dark:focus:ring-red-400' : 'border-gray-300 dark:border-gray-600 focus:border-indigo-500 dark:focus:border-indigo-400'} focus:outline-none focus:ring-2 transition-all duration-200`}
                                 placeholder="Password"
                                 aria-label="Password"
                             />
                             <button
                                 type="button"
                                 onClick={() => setShowPassword(!showPassword)}
-                                className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 focus:outline-none"
+                                className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 focus:outline-none"
                                 aria-label={showPassword ? "Hide password" : "Show password"}
                             >
                                 {showPassword ? <FiEyeOff className="h-5 w-5" /> : <FiEye className="h-5 w-5" />}
                             </button>
-                            {errors.password && <p className="text-red-500 text-sm mt-1 ml-1">{errors.password}</p>}
+                            {errors.password && <p className="text-red-500 dark:text-red-400 text-sm mt-1 ml-1">{errors.password}</p>}
                         </div>
                     </div>
 
                     <div className="flex items-center justify-between text-sm">
-                        <Link href="#" className="text-indigo-600 hover:text-indigo-800 font-medium transition-colors duration-200">
+                        <Link href="#" className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 font-medium transition-colors duration-200">
                             Forgot password?
                         </Link>
-                        <div className="text-gray-600">
-                            {`Don't`} have an account? <Link href={'/Register'} className="text-indigo-600 hover:text-indigo-800 font-medium transition-colors duration-200">Sign Up</Link>
+                        <div className="text-gray-600 dark:text-gray-400">
+                            {`Don't`} have an account? <Link href={'/Register'} className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 font-medium transition-colors duration-200">Sign Up</Link>
                         </div>
                     </div>
 
@@ -200,8 +200,8 @@ export default function Login() {
                         type="submit"
                         disabled={!isFormValid || isLoading}
                         className={`w-full py-3 px-4 rounded-lg text-white font-medium transition-all duration-200 ${isFormValid && !isLoading
-                            ? 'bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2'
-                            : 'bg-gray-400 cursor-not-allowed'
+                            ? 'bg-gradient-to-r from-indigo-600 to-blue-600 dark:from-indigo-700 dark:to-blue-700 hover:from-indigo-700 hover:to-blue-700 dark:hover:from-indigo-800 dark:hover:to-blue-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:ring-offset-2 dark:focus:ring-offset-gray-800'
+                            : 'bg-gray-400 dark:bg-gray-600 cursor-not-allowed'
                             }`}
                         aria-label="Login"
                     >
@@ -219,8 +219,8 @@ export default function Login() {
                     </button>
                 </form>
 
-                <div className="mt-6 text-center text-sm text-gray-500">
-                    By signing in, you agree to our <Link href="#" className="text-indigo-600 hover:text-indigo-800">Terms of Service</Link> and <Link href="#" className="text-indigo-600 hover:text-indigo-800">Privacy Policy</Link>
+                <div className="mt-6 text-center text-sm text-gray-500 dark:text-gray-400">
+                    By signing in, you agree to our <Link href="#" className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300">Terms of Service</Link> and <Link href="#" className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300">Privacy Policy</Link>
                 </div>
             </div>
         </div>
