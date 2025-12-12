@@ -118,7 +118,7 @@ export default function Dashboard() {
                                 Invoice Overview
                             </h1>
                             <p className="text-gray-600 dark:text-gray-400 text-sm md:text-base">
-                                Here's your Invoices of your business.
+                                Here{"'"}s your Invoices of your business.
                             </p>
                         </div>
                         <div className="flex flex-wrap gap-2">
