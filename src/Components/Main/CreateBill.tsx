@@ -124,7 +124,10 @@ export default function BillingComponent({
     useEffect(() => {
         setAppliedTaxes([]);
         taxes?.forEach((tax) => {
-            const taxAmount: number = parseFloat((subTotal * (tax.percentage / 100)).toFixed(2));
+            const rawTax: number = subTotal * (tax.percentage / 100);
+            const rounded: number = Math.round(rawTax / 50) * 50;
+            const taxAmount: number = parseFloat(rounded.toFixed(2));
+
             setAppliedTaxes((prev) => [
                 ...prev,
                 {
@@ -703,10 +706,10 @@ export default function BillingComponent({
                             {BillType !== "KOT" && (
                                 <div className="space-y-1">
                                     <label className="text-sm font-medium">Payment Mode</label>
-                                    <div className="relative">
+                                    <div className="relative ">
                                         <CreditCard className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                                         <select
-                                            className="w-full p-2 pl-10 border rounded-md bg-white appearance-none"
+                                            className="w-full dark:bg-gray-950 p-2 pl-10 border rounded-md bg-white appearance-none"
                                             onChange={(e) => setPaymentMode(e.target.value)}
                                             value={paymentMode}
                                         >
@@ -837,7 +840,7 @@ export default function BillingComponent({
                                 <div className="grid grid-cols-2 gap-3 overflow-y-auto max-h-[380px] pr-1">
                                     <div
                                         onClick={() => AddProduct(ComplementProduct)}
-                                        className="bg-gray-100 hover:bg-gray-200 border border-dashed border-gray-300 rounded-lg p-4 flex flex-col items-center justify-center gap-2 cursor-pointer transition-colors"
+                                        className="bg-gray-100 hover:bg-gray-200 dark:bg-gray-950 border border-dashed border-gray-300 rounded-lg p-4 flex flex-col items-center justify-center gap-2 cursor-pointer transition-colors"
                                     >
                                         <PlusCircle className="h-8 w-8 text-blue-500" />
                                         <span className="text-sm font-medium">Complement</span>
@@ -858,7 +861,7 @@ export default function BillingComponent({
                                             ref={(el: any) => (itemRefs.current[index + 1] = el)}
                                             key={index}
 
-                                            className={`bg-white hover:bg-blue-50 border rounded-lg p-2 shadow-sm hover:shadow cursor-pointer transition-all ${index + 1 === highlightedIndex
+                                            className={`bg-white hover:bg-blue-50 border dark:bg-gray-950 rounded-lg p-2 shadow-sm hover:shadow cursor-pointer transition-all ${index + 1 === highlightedIndex
                                                 ? "border-blue-600"
                                                 : "hover:bg-gray-100"
                                                 }`}
@@ -890,7 +893,7 @@ export default function BillingComponent({
                                                 handleCategoryChange(category);
                                                 setActiveTab("products");
                                             }}
-                                            className={`border rounded-lg p-3 cursor-pointer transition-all flex items-center justify-center text-center ${selectedCategory === category
+                                            className={`border rounded-lg p-3 dark:bg-gray-950 cursor-pointer transition-all flex items-center justify-center text-center ${selectedCategory === category
                                                 ? "bg-blue-100 border-blue-300"
                                                 : "bg-white hover:bg-gray-50"
                                                 }`}
