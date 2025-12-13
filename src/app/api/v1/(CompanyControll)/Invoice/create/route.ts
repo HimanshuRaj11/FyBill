@@ -35,6 +35,7 @@ export async function POST(request: Request) {
             HoldedInvoice,
             discountValue,
             discountType,
+            isExempted,
         } = await request.json();
         let invoice
 
@@ -50,6 +51,9 @@ export async function POST(request: Request) {
                 BillType,
                 paymentMode,
                 InvoiceStatus,
+                isExempted,
+                discountValue,
+                discountType,
             }, { returnDocument: "after" })
             await invoice.save();
         }
@@ -91,6 +95,7 @@ export async function POST(request: Request) {
                 createdBy: User._id,
                 discountValue,
                 discountType,
+                isExempted,
 
             })
             if (User.branchId || selectedBranch) {
@@ -103,8 +108,6 @@ export async function POST(request: Request) {
         return Response.json({ message: "Invoice created successfully", invoice, success: true }, { status: 200 });
 
     } catch (error) {
-        console.log(error);
-
         return Response.json({ message: "Internal server error", error }, { status: 500 });
     }
 

@@ -92,6 +92,9 @@ export default function BillingComponent({
     const [selectedCategory, setSelectedCategory] = useState<string>("all");
     const [isProcessing, setIsProcessing] = useState(false);
 
+    const [isExempted, setIsExempted] = useState(false);
+
+
     const [ProductIsLoading, setProductIsLoading] = useState(true)
 
     const [discountType, setDiscountType] = useState("percentage");
@@ -301,6 +304,14 @@ export default function BillingComponent({
         }
     };
 
+    useEffect(() => {
+        if (isExempted) {
+            setTaxes([]);
+        } else {
+            fetchTaxData();
+        }
+
+    }, [isExempted])
 
 
     const handleCategoryChange = (category: string) => {
@@ -377,6 +388,7 @@ export default function BillingComponent({
                     InvoiceStatus: "Done",
                     discountValue,
                     discountType,
+                    isExempted,
                 }
             );
 
@@ -430,6 +442,7 @@ export default function BillingComponent({
                     InvoiceStatus: "Hold",
                     discountValue,
                     discountType,
+                    isExempted,
                 }
             );
 
@@ -585,7 +598,7 @@ export default function BillingComponent({
                             <Receipt className="h-6 w-6" />
                             Invoice #{invoice.invoiceId}
                         </DialogTitle>
-                        <div ref={invoiceRef} className="max-h-[70vh] overflow-auto p-4 border rounded-lg">
+                        <div ref={invoiceRef} className="max-h-[70vh] overflow-auto p-4 border rounded-lg bg-white">
                             <PrintInvoiceFormate invoice={invoice} />
                         </div>
 
@@ -702,6 +715,21 @@ export default function BillingComponent({
                                     </div>
                                 </div>
                             </div>
+
+                            <div className="space-y-1">
+                                <label className="text-sm font-medium">EXEMPTED</label>
+                                <div className="flex items-center gap-2 mt-2">
+                                    <input
+                                        id="exempted"
+                                        type="checkbox"
+                                        checked={isExempted}
+                                        onChange={(e) => setIsExempted(e.target.checked)}
+                                        className="h-4 w-4"
+                                    />
+                                    <label htmlFor="exempted" className="text-sm">EXEMPTED</label>
+                                </div>
+                            </div>
+
 
                             {BillType !== "KOT" && (
                                 <div className="space-y-1">
@@ -1013,18 +1041,28 @@ export default function BillingComponent({
                                                 <span className="text-gray-600">
                                                     {tax.taxName} ({tax.percentage}%)
                                                 </span>
-                                                <span>{Company.currency.symbol}{tax.amount.toFixed(2)}</span>
+                                                <span>{Company.currency.symbol}{tax.amount}</span>
                                             </div>
                                         ))}
+                                        {isExempted && (
+                                            <div className="flex justify-between text-sm">
+                                                <span className="text-gray-600">
+                                                    VAT(0%)
+                                                </span>
+                                                <span className="uppercase">Exempted</span>
+                                            </div>
+                                        )}
 
                                         {appliedTaxes.length > 0 && (
                                             <div className="flex justify-between text-sm border-t pt-2">
                                                 <span>Total Tax</span>
                                                 <span>
-                                                    +{Company.currency.symbol}{appliedTaxes?.reduce((sum, tax) => sum + tax.amount, 0)?.toFixed(2)}
+                                                    +{Company.currency.symbol}{appliedTaxes?.reduce((sum, tax) => sum + tax.amount, 0)}
                                                 </span>
                                             </div>
                                         )}
+
+
                                         {discountValue && discountValue > 0 && (
                                             <div className="flex justify-between text-sm border-t pt-2">
                                                 <span>Discount</span>

@@ -41,6 +41,7 @@ export interface IInvoice extends Document {
     discountType: string;
     delete: boolean;
     important: boolean;
+    isExempted?: boolean;
 }
 
 const ProductSchema: Schema = new Schema({
@@ -85,6 +86,7 @@ const InvoiceSchema: Schema = new Schema<IInvoice>(
         discountValue: { type: Number, default: 0 },
         delete: { type: Boolean, default: false },
         important: { type: Boolean, default: false },
+        isExempted: { type: Boolean, default: false },
     },
     {
         timestamps: true,

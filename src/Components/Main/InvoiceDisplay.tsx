@@ -225,6 +225,17 @@ export default function InvoiceDisplay({ invoice }: { invoice: any }) {
                                             </td>
                                         </tr>
                                     ))}
+                                    {invoice?.isExempted && (
+                                        <tr >
+                                            <td className="p-4 text-gray-700 dark:text-gray-300" colSpan={3}>
+                                                <span>VAT(0%)</span>
+                                            </td>
+                                            <td className="p-4 text-gray-800 uppercase dark:text-gray-200 text-right">
+                                                Exempted
+                                            </td>
+                                        </tr>
+                                    )}
+
                                     <tr className="border-t-2 border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800">
                                         <td className="p-4 text-gray-800 dark:text-gray-100 font-bold text-lg" colSpan={3}>GRAND TOTAL</td>
                                         <td className="p-4 text-gray-800 dark:text-gray-100 font-bold text-lg text-right">{invoice.currency} {invoice.grandTotal.toFixed(2)}</td>

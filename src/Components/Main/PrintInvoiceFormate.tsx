@@ -109,6 +109,13 @@ export default function PrintInvoiceFormate({ invoice }: { invoice: any }) {
                             <span>{invoice.currency} {tax.amount.toFixed(2)}</span>
                         </div>
                     ))}
+                    {
+                        invoice?.isExempted &&
+                        <div className="flex justify-between py-1">
+                            <span>VAT(0%)</span>
+                            <span className='uppercase'>Exempted</span>
+                        </div>
+                    }
 
                     <div className="flex justify-between border-t border-gray-400 pt-1 font-bold">
                         <span>TOTAL:</span>
