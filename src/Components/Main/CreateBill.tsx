@@ -124,12 +124,15 @@ export default function BillingComponent({
         }
     }, [productsList, Products]);
     // Tax calculation
+
+    const [rawTaxes, setRawTaxes] = useState<number>();
     useEffect(() => {
         setAppliedTaxes([]);
         taxes?.forEach((tax) => {
             const rawTax: number = subTotal * (tax.percentage / 100);
             const rounded: number = Math.round(rawTax / 50) * 50;
-            const taxAmount: number = parseFloat(rounded.toFixed(2));
+            const taxAmount: number = parseFloat(rounded.toFixed(1));
+            setRawTaxes(rawTax);
 
             setAppliedTaxes((prev) => [
                 ...prev,
@@ -1037,11 +1040,14 @@ export default function BillingComponent({
                                             <span>{Company.currency.symbol}{subTotal.toFixed(2)}</span>
                                         </div>
                                         {appliedTaxes?.map((tax, index) => (
-                                            <div key={index} className="flex justify-between text-sm">
-                                                <span className="text-gray-600">
-                                                    {tax.taxName} ({tax.percentage}%)
-                                                </span>
-                                                <span>{Company.currency.symbol}{tax.amount}</span>
+                                            <div className="">
+                                                <div key={index} className="flex justify-between text-sm">
+                                                    <span className="text-gray-600">
+                                                        {tax.taxName} ({tax.percentage}%)
+                                                    </span>
+                                                    <span>{Company.currency.symbol}{tax.amount}</span>
+                                                </div>
+
                                             </div>
                                         ))}
                                         {isExempted && (

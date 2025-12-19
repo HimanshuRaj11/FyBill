@@ -13,7 +13,7 @@ export default function PrintInvoiceFormate({ invoice }: { invoice: any }) {
     }
 
     return (
-        <div className="w-[20rem] mx-auto p-2 text-black uppercase bg-white">
+        <div className="w-[20rem] mx-auto p-2 text-black uppercase bg-white font-sans print:font-sans">
             <div className="flex justify-end">
                 {
                     invoice?.BillType == "KOT" ?
@@ -30,7 +30,7 @@ export default function PrintInvoiceFormate({ invoice }: { invoice: any }) {
             <div className="text-center mb-2">
                 <h2 className="text-2xl font-bold">{invoice.companyName}</h2>
 
-                <h3>{Company?.vatId || ''}</h3>
+                <h3 className='font-semibold'>{Company?.vatId || ''}</h3>
 
                 {
                     Address ?
@@ -53,7 +53,7 @@ export default function PrintInvoiceFormate({ invoice }: { invoice: any }) {
             </div>
 
             {/* Customer Info */}
-            <div className="mb-2 border-t border-b border-gray-400 py-1">
+            <div className="mb-2 border-t border-b border-gray-400 py-1 font-semibold">
                 <p className="text-sm font-bold">Customer: {invoice.clientName}</p>
                 <p className="text-sm">Phone: {invoice.clientPhone}</p>
             </div>
@@ -81,12 +81,12 @@ export default function PrintInvoiceFormate({ invoice }: { invoice: any }) {
                                     product?.Specification && <p className="text-sm font-semibold">({product.Specification})</p>
                                 }
                             </td>
-                            <td className="text-right py-1 mx-1 font-semibold">{product.quantity}</td>
+                            <td className="text-right py-1 mr-3 font-semibold">{product.quantity}</td>
                             {
                                 invoice?.BillType != "KOT" &&
                                 <>
-                                    <td className="text-right py-1 mx-1 font-semibold">{invoice.currency}{product.rate.toFixed(2)}</td>
-                                    <td className="text-right py-1 mx-1 font-semibold">{invoice.currency}{product.amount.toFixed(2)}</td>
+                                    <td className="text-right py-1 mx-1 font-semibold">{invoice.currency}{product.rate}</td>
+                                    <td className="text-right py-1 mx-1 font-semibold">{invoice.currency}{product.amount}</td>
                                 </>
                             }
                         </tr>
@@ -104,7 +104,7 @@ export default function PrintInvoiceFormate({ invoice }: { invoice: any }) {
                     </div>
 
                     {invoice?.appliedTaxes?.map((tax: any, index: any) => (
-                        <div key={index} className="flex justify-between py-1">
+                        <div key={index} className="flex justify-between py-1 font-semibold">
                             <span>{tax.taxName} ({tax.percentage}%):</span>
                             <span>{invoice.currency} {tax.amount.toFixed(2)}</span>
                         </div>
@@ -135,7 +135,7 @@ export default function PrintInvoiceFormate({ invoice }: { invoice: any }) {
             {/* Footer */}
             <div className="text-center mt-3 mb-1">
                 <p className="font-bold text-sm">THANK YOU</p>
-                <p className="text-sm">For your business!</p>
+                <p className="text-sm font-semibold">For your business!</p>
             </div>
         </div>
     )

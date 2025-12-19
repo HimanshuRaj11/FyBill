@@ -18,8 +18,8 @@ export async function POST(request: Request) {
         // const branchName = "Georgetown"
         const branchName = "Berbice"
 
-        const start = moment('2025-07-01').startOf('day').toDate();
-        const end = moment('2025-07-31').endOf('day').toDate();
+        const start = moment('2025-12-01').startOf('day').toDate();
+        const end = moment('2025-12-31').endOf('day').toDate();
 
         const invoiceFilter: any = {
             companyId,
@@ -30,8 +30,11 @@ export async function POST(request: Request) {
             delete: false,
             important: { $ne: true }
         };
-        const TARGET = 680000;
+        const TARGET = 1700000;
         const invoices = await InvoiceModel.find(invoiceFilter).select("_id grandTotal").lean();
+        // const invoices = await InvoiceModel.updateMany(invoiceFilter, {
+        //     $set: { delete: false }
+        // })
 
         let currentTotal = invoices.reduce((sum, inv) => sum + Number(inv.grandTotal), 0);
 
@@ -64,13 +67,6 @@ export async function POST(request: Request) {
             { $set: { delete: true } }
         );
 
-        // Delete related KOT documents
-
-        // await KOTModel.deleteMany(
-        //     { invoiceModelId: { $in: invoices } }
-        // );
-
-
 
 
         return NextResponse.json({
@@ -78,7 +74,7 @@ export async function POST(request: Request) {
             message: "Invoices Deleted SuccessFul", success: true
         }, { status: 200 });
 
-        // return NextResponse.json({ message: "done", 1: invoices.length, currentTotal, }, { status: 200 });
+        // return NextResponse.json({ message: "done", }, { status: 200 });
 
     } catch (error) {
         console.log(error);

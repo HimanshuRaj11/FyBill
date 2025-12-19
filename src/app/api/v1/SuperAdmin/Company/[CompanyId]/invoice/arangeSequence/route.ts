@@ -42,17 +42,26 @@ export async function POST(request: Request) {
             branchName,
             BillType: { $ne: "KOT" },
             delete: { $ne: true },
-            important: { $ne: true }
+            // important: { $ne: true }
         };
+
+
+        ////-------code to reset invoiceId to invoiceIdTrack first------
+        // const invoices = await InvoiceModel.find(invoiceFilter)
+
+        // for (let index = 0; index < invoices.length; index++) {
+        //     const inv = invoices[index];
+        //     await InvoiceModel.findByIdAndUpdate({ _id: inv._id }, {
+        //         invoiceId: inv.invoiceIdTrack,
+        //     })
+        // }
+        ////----------------
+
+        // actual code to arrange sequence........
 
         const invoices = await InvoiceModel.find(invoiceFilter)
             .select("_id branchName createdAt grandTotal invoiceId delete")
             .lean();
-
-
-        console.log(invoices.length);
-
-
         for (let index = 0; index < invoices.length; index++) {
             const inv = invoices[index];
             await InvoiceModel.findByIdAndUpdate({ _id: inv._id }, {
