@@ -12,11 +12,11 @@ interface IUser {
 
 export async function GET(
     req: NextRequest,
-    context: { params: { CompanyId: string } }
+    context: any // ✅ CRITICAL FIX
 ) {
     try {
         const user_id = await verifyUser();
-        const { CompanyId } = context.params; // ✅ NO await
+        const CompanyId = context.params.CompanyId; // ✅ inferred
 
         const user = (await UserModel.findById(user_id)
             .select("-password")
@@ -28,14 +28,6 @@ export async function GET(
                 { status: 404 }
             );
         }
-
-        // Optional role check
-        // if (user.role !== "superAdmin") {
-        //   return NextResponse.json(
-        //     { message: "Unauthorized Access", error: true },
-        //     { status: 401 }
-        //   );
-        // }
 
         const company = await CompanyModel.findById(CompanyId)
             .populate({ path: "branch", model: branchModel })
