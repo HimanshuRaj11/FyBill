@@ -167,7 +167,7 @@ const MultipleProductUpdate: React.FC<BulkUpdateTableProps> = ({
                     <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg flex items-start gap-2">
                         <CheckCircle className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
                         <p className="text-sm text-blue-800 dark:text-blue-300">
-                            You have {ChangeProducts.length} unsaved {ChangeProducts.length === 1 ? 'change' : 'changes'}. Click "Update All Products" to save.
+                            You have {ChangeProducts.length} unsaved {ChangeProducts.length === 1 ? 'change' : 'changes'}. Click {"'"}Update All Products{"'"} to save.
                         </p>
                     </div>
                 )}

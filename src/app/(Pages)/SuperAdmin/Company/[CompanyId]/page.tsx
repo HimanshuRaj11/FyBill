@@ -1,12 +1,12 @@
 'use client'
 import axios from 'axios';
-import React from 'react'
+import React, { use, useState } from 'react'
 import CompanyProfile from './CompanyProfile';
 
-export default function page({ params }: { params: Promise<{ CompanyId: string }> }) {
-    const CompanyId = React.use(params).CompanyId;
+export default function Page({ params }: { params: Promise<{ CompanyId: string }> }) {
+    const CompanyId = use(params).CompanyId;
 
-    const [company, setCompany] = React.useState(null);
+    const [company, setCompany] = useState(null);
 
     const FetchCompanyData = async () => {
         try {

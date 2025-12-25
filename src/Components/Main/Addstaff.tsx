@@ -414,7 +414,7 @@ export default function AddStaff({ setShowAddStaffModal }: { setShowAddStaffModa
                             ) : (
                                 <p className="text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
                                     <AlertCircle className="h-4 w-4" />
-                                    Passwords don't match
+                                    Passwords don{"'"}t match
                                 </p>
                             )}
                         </motion.div>
