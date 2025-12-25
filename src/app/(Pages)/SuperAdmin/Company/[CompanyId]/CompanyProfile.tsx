@@ -2,9 +2,27 @@
 import React, { useState } from 'react';
 import { MapPin, Phone, Mail, Globe, Users, Building2, Calendar, DollarSign, FileText, ChevronDown, ChevronUp } from 'lucide-react';
 import Link from 'next/link';
+import axios from 'axios';
 
-export default function CompanyProfile({ companyData }: { companyData: any }) {
+export default function CompanyProfile({ CompanyId }: { CompanyId: any }) {
+
     const [expandedBranch, setExpandedBranch] = useState(null);
+    const [companyData, setCompanyData] = useState<any>();
+    const FetchCompanyData = async () => {
+        try {
+            const { data } = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/SuperAdmin/Company/${CompanyId}`,
+                { withCredentials: true }
+            );
+            if (data.success) {
+                setCompanyData(data.company);
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    }
+    if (!companyData) {
+        FetchCompanyData();
+    }
 
 
     const formatDate = (dateString: any) => {
@@ -19,7 +37,12 @@ export default function CompanyProfile({ companyData }: { companyData: any }) {
         setExpandedBranch(expandedBranch === branchId ? null : branchId);
     };
 
+    if (!companyData) {
+        return <div>Loading...</div>;
+    }
+
     return (
+
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8 px-4 sm:px-6 lg:px-8 transition-colors duration-200">
             <div className="max-w-6xl mx-auto">
                 {/* Header Section */}
