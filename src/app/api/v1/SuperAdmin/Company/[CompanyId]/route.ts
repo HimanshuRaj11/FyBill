@@ -3,19 +3,21 @@ import { verifyUser } from "@/lib/verifyUser";
 import branchModel from "@/Model/branch.model";
 import CompanyModel from "@/Model/Company.model";
 import UserModel from "@/Model/User.model";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 interface IUser {
     _id: string;
     role: string;
 }
 
-export async function GET(req: Request, { params }: { params: { CompanyId: string } }) {
+export async function GET(
+    request: NextRequest,
+    context: { params: { CompanyId: string } }
+) {
     try {
 
         const user_id = await verifyUser();
-        const { CompanyId } = await params;
-
+        const { CompanyId } = context.params;
         const user = await UserModel.findById(user_id).select("-password").lean() as IUser | null;
         if (!user) {
             return NextResponse.json({ message: "User not found", error: true }, { status: 404 });
