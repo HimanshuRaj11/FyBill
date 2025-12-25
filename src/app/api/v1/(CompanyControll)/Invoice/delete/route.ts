@@ -15,11 +15,11 @@ export async function POST(request: Request) {
         // const {TARGET, startDate, endDate, branchName, companyId} = await request.json();
 
         const companyId = "6803e4c62a9cdbcaf5b3e6e4"
-        // const branchName = "Georgetown"
-        const branchName = "Berbice"
+        const branchName = "Georgetown" //  1.6 per day
+        // const branchName = "Berbice" // 1.3 per day
 
-        const start = moment('2025-12-01').startOf('day').toDate();
-        const end = moment('2025-12-31').endOf('day').toDate();
+        const start = moment('2025-12-19').startOf('day').toDate();
+        const end = moment('2025-12-31').endOf('day').toDate(); // 23rd December
 
         const invoiceFilter: any = {
             companyId,
@@ -30,7 +30,7 @@ export async function POST(request: Request) {
             delete: false,
             important: { $ne: true }
         };
-        const TARGET = 1700000;
+        const TARGET = 820000;
         const invoices = await InvoiceModel.find(invoiceFilter).select("_id grandTotal").lean();
         // const invoices = await InvoiceModel.updateMany(invoiceFilter, {
         //     $set: { delete: false }

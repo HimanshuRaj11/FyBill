@@ -1040,15 +1040,14 @@ export default function BillingComponent({
                                             <span>{Company.currency.symbol}{subTotal.toFixed(2)}</span>
                                         </div>
                                         {appliedTaxes?.map((tax, index) => (
-                                            <div className="">
-                                                <div key={index} className="flex justify-between text-sm">
-                                                    <span className="text-gray-600">
-                                                        {tax.taxName} ({tax.percentage}%)
-                                                    </span>
-                                                    <span>{Company.currency.symbol}{tax.amount}</span>
-                                                </div>
 
+                                            <div key={index} className="flex justify-between text-sm">
+                                                <span className="text-gray-600">
+                                                    {tax.taxName} ({tax.percentage}%)
+                                                </span>
+                                                <span>{Company.currency.symbol}{tax.amount}</span>
                                             </div>
+
                                         ))}
                                         {isExempted && (
                                             <div className="flex justify-between text-sm">
