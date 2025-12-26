@@ -43,6 +43,9 @@ export default function page({ params }: { params: Promise<{ branchId: string }>
         } catch (error) {
         }
     }
+    if (!branchData || !invoiceData) {
+        return <div>Loading...</div>;
+    }
     return (
         <div>
             <BranchData data={branchData} />
