@@ -7,7 +7,7 @@ import { useGlobalContext } from '@/context/contextProvider';
 import ArrangeInvoice from './ArrangeInvoice';
 
 
-export default function Page({ params }: { params: { branchId: string } }) {
+export default function Page({ params }: any) {
     const {
         startDate,
         endDate,
