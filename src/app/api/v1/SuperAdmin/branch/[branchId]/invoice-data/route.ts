@@ -31,7 +31,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ bra
 
 
 
-        let invoices = await InvoiceModel.find(invoiceFilter)
+        const invoices = await InvoiceModel.find(invoiceFilter)
             .select('_id grandTotal totalTaxAmount createdAt invoiceIdTrack currency clientName invoiceId ')
             .sort({ createdAt: -1 })
             .lean();

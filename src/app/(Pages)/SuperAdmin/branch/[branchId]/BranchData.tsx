@@ -1,7 +1,5 @@
-'use client'
-import React, { useEffect, useState } from 'react';
+
 import { Building2, MapPin, Mail, Phone, Calendar, FileText, Hash, User } from 'lucide-react';
-import axios from 'axios';
 
 interface Address {
     street: string;
