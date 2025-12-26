@@ -1,5 +1,5 @@
 'use client';
-import React, { use, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import BranchData from './BranchData';
 import BranchInvoiceData from './BranchInvoiceData';
 import axios from 'axios';
@@ -7,21 +7,23 @@ import { useGlobalContext } from '@/context/contextProvider';
 import ArrangeInvoice from './ArrangeInvoice';
 
 
-export default function Page({ params }: { params: Promise<{ branchId: string }> }) {
+export default function Page({ params }: { params: { branchId: string } }) {
     const {
         startDate,
         endDate,
         dateRange
     } = useGlobalContext();
 
-    const { branchId } = use(params);
+    const { branchId } = params;
     const [branchData, setBranchData] = useState<any>(null);
     const [invoiceData, setInvoiceData] = useState<any>(null);
 
 
 
     useEffect(() => {
-        !branchData && fetchBranchData();
+        if (!branchData) {
+            fetchBranchData();
+        }
     }, []);
     const fetchBranchData = async () => {
         try {
