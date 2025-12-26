@@ -2,6 +2,12 @@
 import moment from 'moment'
 import React from 'react'
 import { useSelector } from 'react-redux';
+import { Roboto } from 'next/font/google';
+const roboto = Roboto({
+    subsets: ['latin'],
+    weight: ['400', '700'], // Specify the weights you need
+    variable: '--font-roboto', // Define a CSS variable name
+});
 
 export default function PrintInvoiceFormate({ invoice }: { invoice: any }) {
     const { Company } = useSelector((state: any) => state.Company)
@@ -13,7 +19,7 @@ export default function PrintInvoiceFormate({ invoice }: { invoice: any }) {
     }
 
     return (
-        <div className="w-[20rem] mx-auto p-2 text-black uppercase bg-white font-sans print:font-sans">
+        <div className={`w-[20rem] mx-auto p-2 text-black uppercase bg-white ${roboto.variable} print: ${roboto.variable}`}>
             <div className="flex justify-end">
                 {
                     invoice?.BillType == "KOT" ?
