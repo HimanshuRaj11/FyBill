@@ -75,12 +75,12 @@ export default function InvoiceDateFilter() {
       </button>
 
       {isFilterOpen && (
-        <>
+        <div className="">
           <div
             className="fixed inset-0 z-10"
             onClick={() => setIsFilterOpen(false)}
           />
-          <div className="absolute right-0 mt-2 w-80 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 p-5 z-20 animate-in fade-in slide-in-from-top-2 duration-200">
+          <div className="absolute  mt-2 w-80 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 p-5 z-20 animate-in fade-in slide-in-from-top-2 duration-200">
             <div className="space-y-4">
               {/* Date Range Selector */}
               <div>
@@ -174,7 +174,7 @@ export default function InvoiceDateFilter() {
               </div>
             </div>
           </div>
-        </>
+        </div>
       )}
     </div>
   )

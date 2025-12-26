@@ -20,6 +20,9 @@ export interface IBranch extends Document {
     staffIds: mongoose.Types.ObjectId[];
     createdAt: Date;
     updatedAt: Date;
+    dailyApprox?: number;
+    lastInvoiceCheck?: Date;
+    active?: boolean;
 }
 
 
@@ -42,6 +45,9 @@ const BranchSchema: Schema = new Schema<IBranch>(
         panNumber: { type: String },
         ownerId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
         staffIds: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+        dailyApprox: { type: Number, default: 0 },
+        lastInvoiceCheck: { type: Date },
+        active: { type: Boolean, default: true },
     },
     {
         timestamps: true,

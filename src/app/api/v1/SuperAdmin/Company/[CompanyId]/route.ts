@@ -16,7 +16,7 @@ export async function GET(
 ) {
     try {
         const user_id = await verifyUser();
-        const CompanyId = context.params.CompanyId; // ✅ inferred
+        const CompanyId = await context.params.CompanyId; // ✅ inferred
 
         const user = (await UserModel.findById(user_id)
             .select("-password")

@@ -31,6 +31,7 @@ export interface ICompany extends Document {
         symbol: string;
     };
     branch: mongoose.Types.ObjectId[];
+    active: boolean;
 }
 
 
@@ -64,6 +65,7 @@ const CompanySchema: Schema = new Schema<ICompany>(
             code: { type: String, required: true, default: "USD" },
             symbol: { type: String, required: true, default: "$" },
         },
+        active: { type: Boolean, default: true },
     },
     {
         timestamps: true,

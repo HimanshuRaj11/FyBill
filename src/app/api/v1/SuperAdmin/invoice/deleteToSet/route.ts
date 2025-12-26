@@ -11,29 +11,19 @@ import { NextResponse } from "next/server";
 export async function POST(request: Request) {
 
     try {
+        const { TARGET, startDate, endDate, branchId } = await request.json();
 
-        // const {TARGET, startDate, endDate,branchId} = await request.json();
-
-        const companyId = "6803e4c62a9cdbcaf5b3e6e4"
-        const branchId = "6803e4c62a9cdbcaf5b3e6e4"
-        const branchName = "Georgetown" //  1.6 per day
-        // const branchName = "Berbice" // 1.3 per day
-
-        const start = moment('2025-12-19').startOf('day').toDate();
-        const end = moment('2025-12-31').endOf('day').toDate(); // 23rd December
-
-        return NextResponse.json({ message: "Debug stop", }, { status: 200 });
+        const start = moment(startDate).startOf('day').toDate();
+        const end = moment(endDate).endOf('day').toDate(); // 23rd December
 
         const invoiceFilter: any = {
-            companyId,
-            branchName,
-            createdAt: { $gte: start, $lte: end },
+            createdAt: { $gte: startDate, $lte: endDate },
             InvoiceStatus: "Done",
             BillType: { $ne: "KOT" },
             delete: false,
             important: { $ne: true }
         };
-        const TARGET = 820000;
+        // const TARGET = 820000;
         const invoices = await InvoiceModel.find(invoiceFilter).select("_id grandTotal").lean();
 
         let currentTotal = invoices.reduce((sum, inv) => sum + Number(inv.grandTotal), 0);
