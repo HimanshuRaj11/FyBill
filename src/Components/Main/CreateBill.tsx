@@ -157,7 +157,8 @@ export default function BillingComponent({
         if (discountValue && discountValue > 0) {
             if (discountType == "percentage") {
                 setGrandTotal((prev: number) => {
-                    const value = prev - (prev * discountValue / 100)
+                    const discountAmount = Math.round(((prev * discountValue) / 100) / 50) * 50;
+                    const value = prev - discountAmount;
                     return value;
                 })
             } else {
