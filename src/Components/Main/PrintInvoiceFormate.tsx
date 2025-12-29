@@ -14,6 +14,7 @@ export default function PrintInvoiceFormate({ invoice }: { invoice: any }) {
     const Branch = invoice?.branchId;
     let Address;
 
+
     if (Branch?.address) {
         Address = Branch?.address?.street + " " + Branch?.address?.city + " " + Branch?.address?.state
     }
@@ -122,6 +123,23 @@ export default function PrintInvoiceFormate({ invoice }: { invoice: any }) {
                             <span className='uppercase'>Exempted</span>
                         </div>
                     }
+                    {invoice.discountValue && invoice.discountValue > 0 && (
+                        <div className="flex justify-between text-sm border-t pt-2">
+                            <span>Discount</span>
+                            {
+                                invoice.discountType == "percentage" ?
+                                    <span>
+                                        - {invoice.discountValue.toFixed(2)}&#37;<br />
+                                        -{Company.currency.symbol}{((invoice.subTotal + invoice.appliedTaxes.reduce((sum: any, tax: any) => sum + tax.amount, 0)) * invoice.discountValue) / 100}
+                                    </span>
+                                    :
+                                    <span>
+                                        -{Company.currency.symbol}{invoice.discountValue.toFixed(2)}
+                                    </span>
+
+                            }
+                        </div>
+                    )}
 
                     <div className="flex justify-between border-t border-gray-400 pt-1 font-bold">
                         <span>TOTAL:</span>

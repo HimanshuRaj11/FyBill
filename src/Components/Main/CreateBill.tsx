@@ -405,6 +405,7 @@ export default function BillingComponent({
                 setGrandTotal(0);
                 setBillType("BILL");
                 SetHoldedInvoice("")
+                setDiscountValue("")
                 setHoldInvoices((prev: any) => prev.filter((invoice: any) => invoice._id !== data.invoice._id));
             }
         } catch (error) {
@@ -527,6 +528,7 @@ export default function BillingComponent({
                 setPaymentMode("");
                 toast.success("KOT Invoice Created", { position: "bottom-right" });
                 handleKotSave(data.invoice)
+                setDiscountValue("")
             }
         } catch (error) {
             toast.error("Something went wrong");
@@ -1074,7 +1076,8 @@ export default function BillingComponent({
                                                 {
                                                     discountType == "percentage" ?
                                                         <span>
-                                                            - {discountValue.toFixed(2)}&#37;
+                                                            - {discountValue.toFixed(2)}&#37;<br />
+                                                            -{Company.currency.symbol}{((subTotal + appliedTaxes.reduce((sum, tax) => sum + tax.amount, 0)) * discountValue) / 100}
                                                         </span>
                                                         :
                                                         <span>
