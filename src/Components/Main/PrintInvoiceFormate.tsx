@@ -129,8 +129,8 @@ export default function PrintInvoiceFormate({ invoice }: { invoice: any }) {
                             {
                                 invoice.discountType == "percentage" ?
                                     <span>
-                                        - {invoice.discountValue.toFixed(2)}&#37;<br />
-                                        -{Company.currency.symbol}{((invoice.subTotal + invoice.appliedTaxes.reduce((sum: any, tax: any) => sum + tax.amount, 0)) * invoice.discountValue) / 100}
+                                        - {invoice.discountValue.toFixed(2)}%<br />
+                                        -{Company.currency.symbol}{(Math.round(((invoice.subTotal + invoice.appliedTaxes.reduce((sum: number, tax: any) => sum + tax.amount, 0)) * invoice.discountValue) / 100 / 50) * 50).toFixed(2)}
                                     </span>
                                     :
                                     <span>
