@@ -1076,14 +1076,13 @@ export default function BillingComponent({
                                                 {
                                                     discountType == "percentage" ?
                                                         <span>
-                                                            - {discountValue.toFixed(2)}&#37;<br />
-                                                            -{Company.currency.symbol}{((subTotal + appliedTaxes.reduce((sum, tax) => sum + tax.amount, 0)) * discountValue) / 100}
+                                                            - {discountValue.toFixed(2)}%<br />
+                                                            -{Company.currency.symbol}{(Math.round(((subTotal + appliedTaxes.reduce((sum, tax) => sum + tax.amount, 0)) * discountValue) / 100 / 50) * 50).toFixed(2)}
                                                         </span>
                                                         :
                                                         <span>
                                                             -{Company.currency.symbol}{discountValue.toFixed(2)}
                                                         </span>
-
                                                 }
                                             </div>
                                         )}
