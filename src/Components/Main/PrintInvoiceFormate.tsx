@@ -55,7 +55,7 @@ export default function PrintInvoiceFormate({ invoice }: { invoice: any }) {
                 </div>
                 <div className="text-sm font-bold mt-1">TAX INVOICE: {invoice.invoiceId}</div>
                 <div className="text-sm font-semibold">
-                    Date: {moment(invoice.createdAt).format('DD/MM/YYYY hh:mm A')}
+                    Date: {moment(invoice.issueDate).format('DD/MM/YYYY hh:mm A')}
                 </div>
             </div>
 
