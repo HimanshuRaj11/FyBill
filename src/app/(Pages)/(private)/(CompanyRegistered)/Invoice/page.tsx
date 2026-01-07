@@ -195,7 +195,7 @@ export default function Dashboard() {
                     )}
 
                     {/* Search and Filter Section */}
-                    {(User?.role === "Owner" || User?.role === "admin") && (
+                    {(Invoice.length > 0) && (
                         <>
                             <div className="flex flex-col md:flex-row gap-3 justify-between mb-6">
                                 {/* Enhanced Search Input */}
