@@ -32,11 +32,11 @@ export async function POST(request: Request) {
 
         const companyId = "6803e4c62a9cdbcaf5b3e6e4"
         const start = moment('2025-12-01').startOf('day').toDate();
-        const end = moment('2025-12-31').endOf('day').toDate();
+        // const end = moment('2025-12-31').endOf('day').toDate();
         const branchName = "Georgetown"
         // const branchName = "Berbice"
         const invoiceFilter: any = {
-            createdAt: { $gte: start, $lte: end },
+            createdAt: { $gte: start },
             companyId: companyId,
             InvoiceStatus: "Done",
             branchName,
@@ -45,6 +45,10 @@ export async function POST(request: Request) {
             // important: { $ne: true }
         };
 
+        const branch = await branchModel.findOne({ branchName });
+        if (!branch) {
+            return NextResponse.json({ message: "Branch not found" }, { status: 404 });
+        }
 
         ////-------code to reset invoiceId to invoiceIdTrack first------
         // const invoices = await InvoiceModel.find(invoiceFilter)

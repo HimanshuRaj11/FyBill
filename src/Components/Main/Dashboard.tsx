@@ -34,6 +34,8 @@ export default function Dashboard() {
 
     const Invoice = Invoices || []
     const [searchQuery, setSearchQuery] = useState('')
+    console.log(startDate, "___", endDate);
+
 
     const dateRangeString = formatDateRange(startDate, endDate)
 

@@ -24,10 +24,11 @@ export async function POST(request: Request) {
 
         const { data } = await request.json()
 
-        await InvoiceModel.updateMany(
+        const uInvoice = await InvoiceModel.updateMany(
             { _id: { $in: data.invoiceIds } },
-            { $set: { important: true, delete: false } }
+            { $set: { important: true, delete: false } }, { returnDocument: 'after' }
         )
+
 
         return NextResponse.json({ message: "Invoices set important SuccessFul", success: true }, { status: 200 });
 

@@ -14,7 +14,7 @@ export async function POST(request: Request) {
         const { TARGET, startDate, endDate, branchId } = await request.json();
 
         const start = moment(startDate).startOf('day').toDate();
-        const end = moment(endDate).endOf('day').toDate(); // 23rd December
+        const end = moment(endDate).endOf('day').toDate();
 
         const invoiceFilter: any = {
             createdAt: { $gte: startDate, $lte: endDate },

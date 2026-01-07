@@ -24,6 +24,7 @@ interface Invoice {
     createdAt: string;
     kotCount?: number;
     important?: boolean;
+    delete?: boolean;
 }
 
 export default function Page() {
@@ -448,6 +449,11 @@ export default function Page() {
                                         <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">
                                             {i + 1} {
                                                 invoice.important && <span title="Important Invoice" className="ml-1 text-yellow-500">★</span>
+                                            }
+                                            {
+                                                invoice.delete && <span title="Important Invoice" className="ml-1 text-red-500">
+                                                    🗑
+                                                </span>
                                             }
                                         </td>
                                         <td className="px-4 py-3 whitespace-nowrap text-sm font-medium">
