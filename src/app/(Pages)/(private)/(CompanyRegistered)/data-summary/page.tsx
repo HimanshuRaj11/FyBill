@@ -10,6 +10,10 @@ import { Button } from '@/Components/ui/button';
 import { ChevronDown, Filter, Search, X, RefreshCw, Package, TrendingUp, DollarSign, Calendar } from 'lucide-react';
 import DownloadExcel from '@/Components/Other/DownloadExcel';
 import PreLoader from '@/Components/Other/PreLoader';
+import InvoiceDateFilter from '@/Components/Other/InvoiceDateFilter';
+import { useGlobalContext } from '@/context/contextProvider';
+import { formatDateRange } from '@/lib/formatDateRange';
+import ProductSkeleton from './skeleton';
 
 interface IProduct {
     name: string;
@@ -26,54 +30,17 @@ export default function Page() {
     const [filteredProducts, setFilteredProducts] = useState<IProduct[]>([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
-
-    const [selectedBranch, setSelectedBranch] = useState("All");
-
-    const [isFilterOpen, setIsFilterOpen] = useState(false)
-
-    const [dateRange, setDateRange] = useState('Today')
-
-    const [startDate, setStartDate] = useState(moment().startOf('day').toDate())
-    const [endDate, setEndDate] = useState(moment().endOf('day').toDate())
-
     // Search state
     const [searchTerm, setSearchTerm] = useState('')
 
-    const HandleDateRange = (dateRange: string) => {
-        setDateRange(dateRange);
-        if (dateRange == "Today") {
-            setStartDate(moment().startOf('day').toDate())
-            setEndDate(moment().endOf('day').toDate())
-        }
-        if (dateRange == "Yesterday") {
-            setStartDate(moment().subtract(1, 'day').startOf('day').toDate())
-            setEndDate(moment().subtract(1, 'day').endOf('day').toDate())
-        }
-        if (dateRange == "Last 7 days") {
-            setStartDate(moment().subtract(7, 'days').startOf('day').toDate())
-            setEndDate(moment().endOf('day').toDate())
-        }
-        if (dateRange == "Last 30 days") {
-            setStartDate(moment().subtract(30, 'days').startOf('day').toDate())
-            setEndDate(moment().endOf('day').toDate())
-        }
-        if (dateRange == "Last 90 days") {
-            setStartDate(moment().subtract(90, 'days').startOf('day').toDate())
-            setEndDate(moment().endOf('day').toDate())
-        }
-        if (dateRange == "Last 6 Months") {
-            setStartDate(moment().subtract(6, 'months').startOf('day').toDate())
-            setEndDate(moment().endOf('day').toDate())
-        }
-        if (dateRange == "Last 1 Year") {
-            setStartDate(moment().subtract(1, 'year').startOf('day').toDate())
-            setEndDate(moment().endOf('day').toDate())
-        }
-        if (dateRange == "Custom range") {
-            setStartDate(moment().subtract(1, 'year').startOf('day').toDate())
-            setEndDate(moment().endOf('day').toDate())
-        }
-    }
+    const {
+        selectedBranch,
+        setSelectedBranch,
+        startDate,
+        endDate,
+    } = useGlobalContext();
+    const dateRangeString = formatDateRange(startDate, endDate)
+
 
     const getProductData = useCallback(async () => {
         try {
@@ -144,9 +111,6 @@ export default function Page() {
         )
     }
 
-    if (loading) {
-        return <PreLoader />
-    }
 
     return (
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
@@ -227,7 +191,7 @@ export default function Page() {
                 )}
 
                 {/* Search and Filter */}
-                <div className="flex justify-between flex-col sm:flex-row gap-3 mb-6">
+                <div className="flex justify-between flex-col  gap-3 mb-6">
                     {/* Search Bar */}
                     <div className="relative flex-1 max-w-md">
                         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -250,132 +214,12 @@ export default function Page() {
                         )}
                     </div>
 
-                    <div className="relative">
-                        <Button
-                            variant="outline"
-                            className="!rounded-lg whitespace-nowrap flex items-center gap-2 bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-700"
-                            onClick={() => setIsFilterOpen(!isFilterOpen)}
-                        >
-                            <Filter className="h-4 w-4" />
-                            Filter
-                            <ChevronDown className={`h-4 w-4 transition-transform ${isFilterOpen ? 'rotate-180' : ''}`} />
-                        </Button>
-                        {isFilterOpen && (
-                            <div className="absolute right-0 mt-2 w-80 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 p-4 z-10 transition-colors duration-200">
-                                <h3 className="font-medium mb-4 text-gray-800 dark:text-white flex items-center gap-2">
-                                    <Calendar className="w-5 h-5" />
-                                    Filter Options
-                                </h3>
-                                <div className="space-y-4">
-                                    {/* Date Range Selector */}
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Date Range</label>
-                                        <div className="relative">
-                                            <select
-                                                value={dateRange}
-                                                onChange={(e) => { HandleDateRange(e.target.value) }}
-                                                className="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400 transition-all duration-200 appearance-none cursor-pointer"
-                                            >
-                                                <option value="Today">Today</option>
-                                                <option value="Yesterday">Yesterday</option>
-                                                <option value="Last 7 days">Last 7 days</option>
-                                                <option value="Last 30 days">Last 30 days</option>
-                                                <option value="Last 90 days">Last 90 days</option>
-                                                <option value="Last 6 Months">Last 6 Months</option>
-                                                <option value="Last 1 Year">Last 1 Year</option>
-                                                <option value="Custom">Custom Range</option>
-                                            </select>
-                                            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-700 dark:text-gray-300">
-                                                <svg className="h-4 w-4 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                                                    <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
-                                                </svg>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    {/* Custom Date Range Section */}
-                                    {dateRange === 'Custom' && (
-                                        <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-3 border border-gray-200 dark:border-gray-600">
-                                            <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Custom Date Range</h4>
-
-                                            {/* Date Range Inputs */}
-                                            <div className="grid grid-cols-1 gap-3">
-                                                {/* Start Date */}
-                                                <div>
-                                                    <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Start Date</label>
-                                                    <div className="relative">
-                                                        <DatePicker
-                                                            selected={startDate}
-                                                            onChange={(date: any) => setStartDate(date)}
-                                                            selectsStart
-                                                            startDate={startDate}
-                                                            endDate={endDate}
-                                                            maxDate={new Date()}
-                                                            placeholderText="Select start date"
-                                                            className="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400 transition-all duration-200 pr-10"
-                                                            dateFormat="MM/dd/yyyy"
-                                                            showPopperArrow={false}
-                                                            popperClassName="custom-datepicker-popper"
-                                                        />
-                                                        <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                                                            <svg className="w-4 h-4 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                                            </svg>
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-                                                {/* End Date */}
-                                                <div>
-                                                    <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">End Date</label>
-                                                    <div className="relative">
-                                                        <DatePicker
-                                                            selected={endDate}
-                                                            onChange={(date: any) => setEndDate(date)}
-                                                            selectsEnd
-                                                            startDate={startDate}
-                                                            endDate={endDate}
-                                                            minDate={startDate}
-                                                            maxDate={new Date()}
-                                                            placeholderText="Select end date"
-                                                            className="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400 transition-all duration-200 pr-10"
-                                                            dateFormat="MM/dd/yyyy"
-                                                            showPopperArrow={false}
-                                                            popperClassName="custom-datepicker-popper"
-                                                        />
-                                                        <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                                                            <svg className="w-4 h-4 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                                            </svg>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            {/* Clear Dates Button */}
-                                            <div className="mt-3 pt-2 border-t border-gray-200 dark:border-gray-600">
-                                                <button
-                                                    onClick={() => {
-                                                        const today = new Date();
-                                                        setStartDate(today);
-                                                        setEndDate(today);
-                                                    }}
-                                                    className="text-xs text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 focus:outline-none focus:underline transition-colors"
-                                                >
-                                                    Clear dates
-                                                </button>
-                                            </div>
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-                        )}
-                    </div>
+                    <InvoiceDateFilter />
                 </div>
 
                 <div className="mb-4">
                     <h2 className="text-xl font-bold text-gray-800 dark:text-white">
-                        {dateRange} Sales Data
+                        {dateRangeString} Sales Data
                         {searchTerm && (
                             <span className="text-sm font-normal text-gray-600 dark:text-gray-400 ml-2">
                                 - Showing results for {"'"}{searchTerm}{"'"}
@@ -387,150 +231,158 @@ export default function Page() {
                 <div className="mb-4">
                     <DownloadExcel data={ProductsDataSummary} fileName={`ProductsSummary`} />
                 </div>
-
-                {/* Summary Cards */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-all duration-300">
-                        <div className="flex items-center justify-between">
-                            <div>
-                                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                                    {searchTerm ? 'Filtered Products' : 'Total Products'}
-                                </p>
-                                <p className="text-3xl font-bold text-gray-900 dark:text-white mt-2">{filteredProducts.length}</p>
-                                {searchTerm && ProductsDataSummary.length !== filteredProducts.length && (
-                                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                        of {ProductsDataSummary.length} total
-                                    </p>
-                                )}
-                            </div>
-                            <div className="bg-blue-100 dark:bg-blue-900/30 p-4 rounded-full">
-                                <Package className="w-8 h-8 text-blue-600 dark:text-blue-400" />
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-all duration-300">
-                        <div className="flex items-center justify-between">
-                            <div>
-                                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                                    {searchTerm ? 'Filtered Quantity' : 'Total Quantity'}
-                                </p>
-                                <p className="text-3xl font-bold text-gray-900 dark:text-white mt-2">{totalQuantity.toLocaleString()}</p>
-                            </div>
-                            <div className="bg-green-100 dark:bg-green-900/30 p-4 rounded-full">
-                                <TrendingUp className="w-8 h-8 text-green-600 dark:text-green-400" />
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-all duration-300">
-                        <div className="flex items-center justify-between">
-                            <div>
-                                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                                    {searchTerm ? 'Filtered Amount' : 'Total Amount'}
-                                </p>
-                                <p className="text-3xl font-bold text-gray-900 dark:text-white mt-2">{Company?.currency?.symbol}{totalAmount.toLocaleString()}</p>
-                            </div>
-                            <div className="bg-purple-100 dark:bg-purple-900/30 p-4 rounded-full">
-                                <DollarSign className="w-8 h-8 text-purple-600 dark:text-purple-400" />
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Products Grid */}
-                {filteredProducts.length === 0 ? (
-                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-12 text-center border border-gray-200 dark:border-gray-700">
-                        {searchTerm ? (
-                            <>
-                                <Search className="w-16 h-16 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
-                                <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">No products found</h3>
-                                <p className="text-gray-600 dark:text-gray-400 mb-4">
-                                    We couldn{"'"}t find any products matching {"'"}{searchTerm}{"'"}.
-                                </p>
-                                <button
-                                    onClick={clearSearch}
-                                    className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200"
-                                >
-                                    Show all products
-                                </button>
-                            </>
-                        ) : (
-                            <>
-                                <Package className="w-16 h-16 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
-                                <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">No Products Found</h3>
-                                <p className="text-gray-600 dark:text-gray-400">There are no products to display at the moment.</p>
-                            </>
-                        )}
-                    </div>
-                ) : (
-                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
-                        <div className="px-6 py-4 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-700 border-b border-gray-200 dark:border-gray-700">
-                            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Product Details</h2>
-                        </div>
-
-                        {/* Desktop Table */}
-                        <div className="hidden md:block overflow-x-auto">
-                            <table className="w-full">
-                                <thead className="bg-gray-50 dark:bg-gray-700/50">
-                                    <tr>
-                                        <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Product Name</th>
-                                        <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Quantity</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                                    {filteredProducts.map((product, index) => (
-                                        <tr key={index} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-150">
-                                            <td className="px-6 py-4 whitespace-nowrap">
-                                                <div className="flex items-center">
-                                                    <div className="bg-gradient-to-r from-blue-500 to-purple-600 dark:from-blue-400 dark:to-purple-500 w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm mr-4 shadow-md">
-                                                        {product.name.charAt(0).toUpperCase()}
-                                                    </div>
-                                                    <div className="text-sm font-medium text-gray-900 dark:text-white capitalize">{product.name}</div>
-                                                </div>
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap">
-                                                <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300">
-                                                    {product.quantity.toLocaleString()}
-                                                </span>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-
-                        {/* Mobile Cards */}
-                        <div className="md:hidden divide-y divide-gray-200 dark:divide-gray-700">
-                            {filteredProducts.map((product, index) => (
-                                <div key={index} className="p-6 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-150">
-                                    <div className="flex items-center mb-4">
-                                        <div className="bg-gradient-to-r from-blue-500 to-purple-600 dark:from-blue-400 dark:to-purple-500 w-12 h-12 rounded-full flex items-center justify-center text-white font-bold mr-4 shadow-md">
-                                            {product.name.charAt(0).toUpperCase()}
-                                        </div>
-                                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white capitalize">{product.name}</h3>
-                                    </div>
-                                    <div className="grid grid-cols-3 gap-4">
+                {
+                    loading ? (
+                        <ProductSkeleton />
+                    ) : (
+                        <div className="">
+                            {/* Summary Cards */}
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                                <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-all duration-300">
+                                    <div className="flex items-center justify-between">
                                         <div>
-                                            <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">Rate</p>
-                                            <p className="text-sm font-medium text-gray-900 dark:text-white">{Company?.currency?.symbol}{product.rate.toLocaleString()}</p>
+                                            <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                                                {searchTerm ? 'Filtered Products' : 'Total Products'}
+                                            </p>
+                                            <p className="text-3xl font-bold text-gray-900 dark:text-white mt-2">{filteredProducts.length}</p>
+                                            {searchTerm && ProductsDataSummary.length !== filteredProducts.length && (
+                                                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                                    of {ProductsDataSummary.length} total
+                                                </p>
+                                            )}
                                         </div>
-                                        <div>
-                                            <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">Quantity</p>
-                                            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300">
-                                                {product.quantity.toLocaleString()}
-                                            </span>
-                                        </div>
-                                        <div>
-                                            <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">Amount</p>
-                                            <p className="text-sm font-semibold text-green-600 dark:text-green-400">{Company?.currency?.symbol}{product.amount.toLocaleString()}</p>
+                                        <div className="bg-blue-100 dark:bg-blue-900/30 p-4 rounded-full">
+                                            <Package className="w-8 h-8 text-blue-600 dark:text-blue-400" />
                                         </div>
                                     </div>
                                 </div>
-                            ))}
+
+                                <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-all duration-300">
+                                    <div className="flex items-center justify-between">
+                                        <div>
+                                            <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                                                {searchTerm ? 'Filtered Quantity' : 'Total Quantity'}
+                                            </p>
+                                            <p className="text-3xl font-bold text-gray-900 dark:text-white mt-2">{totalQuantity.toLocaleString()}</p>
+                                        </div>
+                                        <div className="bg-green-100 dark:bg-green-900/30 p-4 rounded-full">
+                                            <TrendingUp className="w-8 h-8 text-green-600 dark:text-green-400" />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-all duration-300">
+                                    <div className="flex items-center justify-between">
+                                        <div>
+                                            <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                                                {searchTerm ? 'Filtered Amount' : 'Total Amount'}
+                                            </p>
+                                            <p className="text-3xl font-bold text-gray-900 dark:text-white mt-2">{Company?.currency?.symbol}{totalAmount.toLocaleString()}</p>
+                                        </div>
+                                        <div className="bg-purple-100 dark:bg-purple-900/30 p-4 rounded-full">
+                                            <DollarSign className="w-8 h-8 text-purple-600 dark:text-purple-400" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Products Grid */}
+                            {filteredProducts.length === 0 ? (
+                                <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-12 text-center border border-gray-200 dark:border-gray-700">
+                                    {searchTerm ? (
+                                        <>
+                                            <Search className="w-16 h-16 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
+                                            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">No products found</h3>
+                                            <p className="text-gray-600 dark:text-gray-400 mb-4">
+                                                We couldn{"'"}t find any products matching {"'"}{searchTerm}{"'"}.
+                                            </p>
+                                            <button
+                                                onClick={clearSearch}
+                                                className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200"
+                                            >
+                                                Show all products
+                                            </button>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <Package className="w-16 h-16 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
+                                            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">No Products Found</h3>
+                                            <p className="text-gray-600 dark:text-gray-400">There are no products to display at the moment.</p>
+                                        </>
+                                    )}
+                                </div>
+                            ) : (
+                                <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+                                    <div className="px-6 py-4 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-700 border-b border-gray-200 dark:border-gray-700">
+                                        <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Product Details</h2>
+                                    </div>
+
+                                    {/* Desktop Table */}
+                                    <div className="hidden md:block overflow-x-auto">
+                                        <table className="w-full">
+                                            <thead className="bg-gray-50 dark:bg-gray-700/50">
+                                                <tr>
+                                                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Product Name</th>
+                                                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Quantity</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+                                                {filteredProducts.map((product, index) => (
+                                                    <tr key={index} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-150">
+                                                        <td className="px-6 py-4 whitespace-nowrap">
+                                                            <div className="flex items-center">
+                                                                <div className="bg-gradient-to-r from-blue-500 to-purple-600 dark:from-blue-400 dark:to-purple-500 w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm mr-4 shadow-md">
+                                                                    {product.name.charAt(0).toUpperCase()}
+                                                                </div>
+                                                                <div className="text-sm font-medium text-gray-900 dark:text-white capitalize">{product.name}</div>
+                                                            </div>
+                                                        </td>
+                                                        <td className="px-6 py-4 whitespace-nowrap">
+                                                            <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300">
+                                                                {product.quantity.toLocaleString()}
+                                                            </span>
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                    {/* Mobile Cards */}
+                                    <div className="md:hidden divide-y divide-gray-200 dark:divide-gray-700">
+                                        {filteredProducts.map((product, index) => (
+                                            <div key={index} className="p-6 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-150">
+                                                <div className="flex items-center mb-4">
+                                                    <div className="bg-gradient-to-r from-blue-500 to-purple-600 dark:from-blue-400 dark:to-purple-500 w-12 h-12 rounded-full flex items-center justify-center text-white font-bold mr-4 shadow-md">
+                                                        {product.name.charAt(0).toUpperCase()}
+                                                    </div>
+                                                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white capitalize">{product.name}</h3>
+                                                </div>
+                                                <div className="grid grid-cols-3 gap-4">
+                                                    <div>
+                                                        <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">Rate</p>
+                                                        <p className="text-sm font-medium text-gray-900 dark:text-white">{Company?.currency?.symbol}{product.rate.toLocaleString()}</p>
+                                                    </div>
+                                                    <div>
+                                                        <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">Quantity</p>
+                                                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300">
+                                                            {product.quantity.toLocaleString()}
+                                                        </span>
+                                                    </div>
+                                                    <div>
+                                                        <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">Amount</p>
+                                                        <p className="text-sm font-semibold text-green-600 dark:text-green-400">{Company?.currency?.symbol}{product.amount.toLocaleString()}</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
                         </div>
-                    </div>
-                )}
+                    )
+                }
+
             </div>
         </div>
     )

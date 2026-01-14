@@ -177,51 +177,49 @@ export default function Dashboard() {
 
                     {/* Search and Filter Section */}
                     <div className="">
-                        {(User?.role === "Owner" || User?.role === "admin") && (
-                            <>
-                                <div className="flex flex-col md:flex-row gap-3 justify-between mb-6">
-                                    {/* Enhanced Search Input */}
-                                    <div className="relative flex-1 max-w-md">
-                                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                                            <Search className="h-5 w-5 text-gray-400 dark:text-gray-500" />
-                                        </div>
-                                        <input
-                                            type="text"
-                                            placeholder="Search invoices by number, customer..."
-                                            value={searchQuery}
-                                            onChange={handleSearchChange}
-                                            onClick={() => setSearchOn(true)}
-                                            className="w-full pl-12 pr-12 py-3.5 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl text-sm font-medium text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 focus:border-blue-500 dark:focus:border-blue-600 transition-all shadow-sm hover:shadow-md placeholder:text-gray-400 dark:placeholder:text-gray-500"
-                                        />
-                                        {searchQuery && (
-                                            <button
-                                                onClick={clearSearch}
-                                                className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
-                                            >
-                                                <X className="h-5 w-5" />
-                                            </button>
-                                        )}
-                                    </div>
 
-                                    {/* Filter Button */}
-                                    <InvoiceDateFilter />
+                        <div className="flex flex-col gap-3 justify-between mb-6">
+                            {/* Enhanced Search Input */}
+                            <div className="relative flex-1 max-w-md">
+                                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                    <Search className="h-5 w-5 text-gray-400 dark:text-gray-500" />
                                 </div>
+                                <input
+                                    type="text"
+                                    placeholder="Search invoices by number, customer..."
+                                    value={searchQuery}
+                                    onChange={handleSearchChange}
+                                    onClick={() => setSearchOn(true)}
+                                    className="w-full pl-12 pr-12 py-3.5 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl text-sm font-medium text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 focus:border-blue-500 dark:focus:border-blue-600 transition-all shadow-sm hover:shadow-md placeholder:text-gray-400 dark:placeholder:text-gray-500"
+                                />
+                                {searchQuery && (
+                                    <button
+                                        onClick={clearSearch}
+                                        className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
+                                    >
+                                        <X className="h-5 w-5" />
+                                    </button>
+                                )}
+                            </div>
 
-                                {/* Invoice Data Section */}
-                                <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4 md:p-6 transition-colors">
-                                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                                        <div>
-                                            <h2 className="text-xl md:text-2xl font-bold text-gray-800 dark:text-gray-100">
-                                                {dateRangeString} Invoice Data
-                                            </h2>
-                                            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                                                Export your invoice data to Excel
-                                            </p>
-                                        </div>
-                                    </div>
+                            {/* Filter Button */}
+                            <InvoiceDateFilter />
+                        </div>
+
+                        {/* Invoice Data Section */}
+                        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4 md:p-6 transition-colors">
+                            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                                <div>
+                                    <h2 className="text-xl md:text-2xl font-bold text-gray-800 dark:text-gray-100">
+                                        {dateRangeString} Invoice Data
+                                    </h2>
+                                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                                        Export your invoice data to Excel
+                                    </p>
                                 </div>
-                            </>
-                        )}
+                            </div>
+                        </div>
+
                     </div>
                 </div>
 
