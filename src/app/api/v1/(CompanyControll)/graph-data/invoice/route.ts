@@ -24,14 +24,6 @@ export async function POST(request: Request) {
 
         const { dateRange } = await request.json();
 
-        // if (dateRange == "Last 6 Months") {
-        //     filterDate = last6Month;
-        // }
-        // if (dateRange == "Last 1 Year") {
-        //     filterDate = lastYear;
-        // }
-
-
         const invoiceFilter: any = {
             createdAt: { $gte: filterDate },
             InvoiceStatus: "Done",
@@ -81,7 +73,6 @@ const filterInvoicesByBranch = async (invoices: any[]) => {
     return data
 
 }
-
 const filterInvoicesByMonth = async ({
     branch,
     branchInvoices,
@@ -89,25 +80,48 @@ const filterInvoicesByMonth = async ({
     branch: string;
     branchInvoices: { createdAt: string; grandTotal: number }[];
 }) => {
-    const groupedByMonth = branchInvoices.reduce<Record<string, any[]>>((acc, item) => {
-        const date = new Date(item.createdAt);
-        const monthKey = date.toLocaleString("en-US", { month: "long", year: "numeric" });
+    // 1️⃣ Group by stable UTC month key
+    const groupedByMonth = branchInvoices.reduce<Record<string, typeof branchInvoices>>(
+        (acc, item) => {
+            const date = new Date(item.createdAt);
 
-        if (!acc[monthKey]) acc[monthKey] = [];
-        acc[monthKey].push(item);
+            // Always use UTC to avoid timezone issues
+            const year = date.getUTCFullYear();
+            const month = date.getUTCMonth(); // 0-based
 
-        return acc;
-    }, {});
+            const key = `${year}-${String(month + 1).padStart(2, "0")}`;
 
-    const data = Object.entries(groupedByMonth).map(([month, records]) => {
-        const totalGrand = records.reduce((sum, record) => sum + record.grandTotal, 0);
+            if (!acc[key]) acc[key] = [];
+            acc[key].push(item);
+
+            return acc;
+        },
+        {}
+    );
+
+    // 2️⃣ Convert to final readable format
+    const data = Object.entries(groupedByMonth).map(([key, records]) => {
+        const [year, month] = key.split("-");
+
+        const readableMonth = new Date(
+            Date.UTC(Number(year), Number(month) - 1)
+        ).toLocaleString("en-US", {
+            month: "long",
+            year: "numeric",
+        });
+
+        const totalGrand = records.reduce(
+            (sum, record) => sum + record.grandTotal,
+            0
+        );
 
         return {
             branch,
-            month,
+            month: readableMonth,
             totalGrand,
             count: records.length,
         };
     });
+
     return data;
 };

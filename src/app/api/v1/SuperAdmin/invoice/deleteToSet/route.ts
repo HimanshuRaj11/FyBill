@@ -21,14 +21,13 @@ export async function POST(request: Request) {
             InvoiceStatus: "Done",
             BillType: { $ne: "KOT" },
             delete: false,
-            important: { $ne: true }
+            important: { $ne: true },
+            branchId: branchId
         };
-        // const TARGET = 820000;
+
         const invoices = await InvoiceModel.find(invoiceFilter).select("_id grandTotal").lean();
 
         let currentTotal = invoices.reduce((sum, inv) => sum + Number(inv.grandTotal), 0);
-
-        console.log("CURRENT TOTAL:", currentTotal);
 
         if (currentTotal <= TARGET) {
             return NextResponse.json({ message: "Already below target", currentTotal });
@@ -48,23 +47,17 @@ export async function POST(request: Request) {
             pool.splice(randomIndex, 1);
         }
 
-        console.log("FINAL TOTAL AFTER SUBTRACTION:", currentTotal);
-        console.log("INVOICES TO DELETE:", invoicesToDelete.length);
-
-
         await InvoiceModel.updateMany(
             { _id: { $in: invoicesToDelete } },
             { $set: { delete: true } }
         );
 
-        await branchModel.findOneAndUpdate({ _id: branchId }, {
+        const Branch = await branchModel.findOneAndUpdate({ _id: branchId }, {
             lastInvoiceCheck: new Date()
         })
 
-
-
         return NextResponse.json({
-            invoicesToDelete, l: invoicesToDelete.length,
+            branchName: Branch?.branchName,
             message: "Invoices Deleted SuccessFul", success: true
         }, { status: 200 });
 

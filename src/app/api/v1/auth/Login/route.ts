@@ -32,11 +32,20 @@ export async function POST(request: Request) {
             _id: existing._id
         };
 
+
         // Create token
         const token: string = jwt.sign(tokenData, process.env.TOKEN_SECRET as string);
+        const roleToken: string = jwt.sign({ role: existing.role }, process.env.TOKEN_SECRET as string);
 
         const response = NextResponse.json({ message: `Login Successful`, success: true }, { status: 200 });
         response.cookies.set("FyBill_auth_token", token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "strict",
+            path: "/",
+            maxAge: 60 * 60 * 24 * 365
+        });
+        response.cookies.set("FyBill_role_token", roleToken, {
             httpOnly: true,
             secure: process.env.NODE_ENV === "production",
             sameSite: "strict",

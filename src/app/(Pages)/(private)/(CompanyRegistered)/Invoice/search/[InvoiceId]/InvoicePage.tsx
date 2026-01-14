@@ -58,7 +58,6 @@ export default function InvoiceDisplayPage({ invoice }: { invoice: any }) {
 
     if (!invoice) return <div className="p-4 text-center text-gray-500">No invoice data available</div>;
 
-    console.log(invoice);
 
     return (
         <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

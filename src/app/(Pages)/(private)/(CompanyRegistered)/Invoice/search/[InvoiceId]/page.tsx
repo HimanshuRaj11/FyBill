@@ -9,7 +9,6 @@ export default function Page({ params }: { params: Promise<{ InvoiceId: string }
     const [invoice, setInvoice] = useState<IInvoice | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const { InvoiceId } = React.use(params);
-    console.log(InvoiceId);
 
     const fetchInvoice = useCallback(async () => {
         try {

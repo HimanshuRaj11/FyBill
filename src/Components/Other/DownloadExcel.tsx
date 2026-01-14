@@ -21,6 +21,8 @@ export default function DownloadExcel({ data, fileName }: { data: any, fileName:
                 "Payment Mode": invoice.paymentMode,
                 "Currency": invoice.currency,
                 "Issue Date": new Date(invoice.issueDate).toLocaleString(),
+                "Sub Total": invoice.subTotal,
+                "VAT Amount": invoice.totalTaxAmount,
                 "Grand Total": invoice.grandTotal,
                 Products: productString,
             };

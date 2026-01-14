@@ -14,6 +14,8 @@ export async function POST(request: Request) {
 
     try {
 
+        const { startDate, endDate, branchId } = await request.json();
+
         // const user_id = await verifyUser();
         // if (!user_id) return NextResponse.json({ message: "Unauthorized", success: false }, { status: 401 });
 
@@ -30,56 +32,63 @@ export async function POST(request: Request) {
         // console.log("Invoice update result:", updateResult);
 
 
-        const companyId = "6803e4c62a9cdbcaf5b3e6e4"
-        const start = moment('2025-12-01').startOf('day').toDate();
+        // const companyId = "6803e4c62a9cdbcaf5b3e6e4"
+        // const start = moment('2026-01-01').startOf('day').toDate();
         // const end = moment('2025-12-31').endOf('day').toDate();
-        const branchName = "Georgetown"
+        // const branchName = "Georgetown"
         // const branchName = "Berbice"
         const invoiceFilter: any = {
-            createdAt: { $gte: start },
-            companyId: companyId,
+            createdAt: { $gte: startDate },
+            branchId: branchId,
+            // branchName,
             InvoiceStatus: "Done",
-            branchName,
             BillType: { $ne: "KOT" },
             delete: { $ne: true },
-            // important: { $ne: true }
         };
 
-        const branch = await branchModel.findOne({ branchName });
+        const branch = await branchModel.findOne({ _id: branchId });
+
         if (!branch) {
             return NextResponse.json({ message: "Branch not found" }, { status: 404 });
         }
 
-        ////-------code to reset invoiceId to invoiceIdTrack first------
-        // const invoices = await InvoiceModel.find(invoiceFilter)
-
-        // for (let index = 0; index < invoices.length; index++) {
-        //     const inv = invoices[index];
-        //     await InvoiceModel.findByIdAndUpdate({ _id: inv._id }, {
-        //         invoiceId: inv.invoiceIdTrack,
-        //     })
-        // }
-        ////----------------
-
-        // actual code to arrange sequence........
-
         const invoices = await InvoiceModel.find(invoiceFilter)
-            .select("_id branchName createdAt grandTotal invoiceId delete")
+            .select("_id branchName branchId createdAt grandTotal invoiceId delete")
             .lean();
-        for (let index = 0; index < invoices.length; index++) {
-            const inv = invoices[index];
-            await InvoiceModel.findByIdAndUpdate({ _id: inv._id }, {
-                invoiceId: index + 1,
-            })
+
+        if (invoices.length === 0) {
+            return NextResponse.json(
+                { message: "No invoices found to update" },
+                { status: 200 }
+            );
         }
+        const sequenceStart = 620;
+        const bulkOps = invoices.map((inv, index) => ({
+            updateOne: {
+                filter: { _id: inv._id },
+                update: {
+                    $set: {
+                        invoiceId: sequenceStart + index + 1,
+                    },
+                },
+            },
+        }));
 
-        const Branch = await branchModel.findOne({ branchName })
-        Branch.lastInvoiceNo = invoices.length + 1;
-        await Branch.save();
+        await InvoiceModel.bulkWrite(bulkOps);
 
-        return NextResponse.json({ message: "Invoice sequence arranged", }, { status: 200 });
+        // 5️⃣ Update branch sequence
+        const finalSequence = sequenceStart + invoices.length;
+
+        branch.lastInvoiceNo = finalSequence;
+        branch.lastSequenceUpdate = finalSequence;
+
+        await branch.save();
+
+        return NextResponse.json({ message: "Invoice sequence arranged", success: true }, { status: 200 });
 
     } catch (error) {
+        console.log(error);
+
         return NextResponse.json({ message: "Internal server error", error }, { status: 500 });
     }
 

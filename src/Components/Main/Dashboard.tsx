@@ -15,11 +15,14 @@ import BarChartComponent from '../Other/BarChart'
 import BranchSalesPieChart from '../Other/PaiChart'
 import BranchSalesLineChart from '../Other/LineChart'
 import MonthInvoiceLine from '../Other/MonthInvoiceLine'
+import { useRouter } from 'next/navigation'
 
 export default function Dashboard() {
     const dispatch = useDispatch()
+    const router = useRouter();
     const { User } = useSelector((state: any) => state.User)
     const { Company } = useSelector((state: any) => state.Company)
+
     const { Invoices, loading } = useSelector((state: any) => state.Invoices)
 
     const [isLoading, setIsLoading] = useState(false)
@@ -34,8 +37,6 @@ export default function Dashboard() {
 
     const Invoice = Invoices || []
     const [searchQuery, setSearchQuery] = useState('')
-    console.log(startDate, "___", endDate);
-
 
     const dateRangeString = formatDateRange(startDate, endDate)
 

@@ -1,4 +1,4 @@
-"use client"
+
 import Dashboard from '@/Components/Main/Dashboard'
 
 export default function page() {

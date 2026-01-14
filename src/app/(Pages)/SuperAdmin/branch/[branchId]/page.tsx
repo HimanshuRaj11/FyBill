@@ -7,17 +7,16 @@ import { useGlobalContext } from '@/context/contextProvider';
 import ArrangeInvoice from './ArrangeInvoice';
 
 
-export default function Page({ params }: any) {
+export default function Page({ params }: { params: Promise<{ branchId: string }> }) {
     const {
         startDate,
         endDate,
         dateRange
     } = useGlobalContext();
-
-    const { branchId } = params;
+    const { branchId } = React.use(params);
     const [branchData, setBranchData] = useState<any>(null);
     const [invoiceData, setInvoiceData] = useState<any>(null);
-
+    const [Loading, setLoading] = useState<boolean>(false);
 
 
     useEffect(() => {

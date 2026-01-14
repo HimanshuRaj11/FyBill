@@ -1,8 +1,9 @@
 'use client'
 import { useGlobalContext } from '@/context/contextProvider';
 import axios from 'axios';
-import React, { useEffect, useState } from 'react'
+import React, { use, useEffect, useState } from 'react'
 import { AlertCircle, CheckCircle, X, TrendingUp, Calendar, Target as TargetIcon, DollarSign } from 'lucide-react';
+import { toast } from 'react-toastify';
 
 interface AlertState {
     type: 'success' | 'error' | 'warning' | null;
@@ -19,6 +20,18 @@ export default function ArrangeInvoice({ data, invoiceData }: { data: any, invoi
 
     const branchId = data?._id;
     const lastInvoiceCheckDate = new Date(data?.lastInvoiceCheck);
+    const [Loading, setLoading] = useState<boolean>(false);
+    const [percent, setPercent] = useState(10);
+    const [alert, setAlert] = useState<AlertState>({ type: null, message: '' });
+    const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+    const [deleting, setDeleting] = useState(false);
+    const [arranging, setArranging] = useState(false);
+    const [RevenueExceedAlertShown, setRevenueExceedAlertShown] = useState(false);
+
+    useEffect(() => {
+        setStartDate(data?.lastInvoiceCheck);
+    }, []);
+
 
     const daysDifference = React.useMemo(() => {
         if (!startDate || !endDate) return 0;
@@ -29,7 +42,6 @@ export default function ArrangeInvoice({ data, invoiceData }: { data: any, invoi
         return Math.round((e.getTime() - s.getTime()) / 86400000);
     }, [startDate, endDate, dateRange]);
 
-    const [percent, setPercent] = useState(10);
     const Target = React.useMemo(() => {
         if (!invoiceData) return 0;
         const target = daysDifference > 0 ? data.dailyApprox * daysDifference : data.dailyApprox;
@@ -37,10 +49,6 @@ export default function ArrangeInvoice({ data, invoiceData }: { data: any, invoi
         return target + Percent;
     }, [percent, invoiceData, daysDifference, data?.dailyApprox]);
 
-    const [alert, setAlert] = useState<AlertState>({ type: null, message: '' });
-    const [showConfirmDialog, setShowConfirmDialog] = useState(false);
-    const [deleting, setDeleting] = useState(false);
-    const [RevenueExceedAlertShown, setRevenueExceedAlertShown] = useState(false);
 
     useEffect(() => {
         if (invoiceData?.totalRevenue > Target) {
@@ -48,69 +56,67 @@ export default function ArrangeInvoice({ data, invoiceData }: { data: any, invoi
         }
     }, [invoiceData?.totalRevenue, Target]);
 
-    const ArrangingInvoiceData = async () => {
+    const DeleteInvoices = async () => {
         try {
             setDeleting(true);
             setShowConfirmDialog(false);
-
-            const response = await axios.post(
+            const { data } = await axios.post(
                 `${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/SuperAdmin/invoice/deleteToSet`,
                 { startDate, endDate, TARGET: Target, branchId: branchId }
             );
 
-            if (!response.data.success) {
-                setAlert({
-                    type: 'error',
-                    message: 'Failed to delete invoices. Please try again.'
-                });
-                setDeleting(false);
-                return;
+            if (!data.success) {
+                toast.error('Failed to delete invoices to meet the target.');
             }
-
-            setAlert({
-                type: 'success',
-                message: `Successfully deleted, ${data.branchName} invoices to meet the target.`
-            });
-
-            // Refresh invoice data
-            const refreshResponse = await axios.post(
-                `${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/SuperAdmin/invoice/arrange-Invoice-sequence`,
-                { startDate, endDate }
-            );
-
-            if (!refreshResponse.data.success) {
-                setAlert({
-                    type: 'error',
-                    message: 'Failed to refresh invoice data.'
-                });
-                setDeleting(false);
-                return;
-            }
-
-            setAlert({
-                type: 'success',
-                message: 'Invoice data arranged successfully in sequence.'
-            });
-            setDeleting(false);
+            toast.success('Invoices deleted successfully to meet the target.');
 
         } catch (error) {
-            setAlert({
-                type: 'error',
-                message: 'An unexpected error occurred. Please try again.'
-            });
+            toast.error('An unexpected error occurred while deleting invoices.');
+
+        } finally {
             setDeleting(false);
+            setLoading(false);
+        }
+    }
+
+    const ArrangingInvoiceIndex = async () => {
+        try {
+            setArranging(true);
+            const { data } = await axios.post(
+                `${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/SuperAdmin/invoice/arrange-Invoice-sequence`,
+                { startDate, endDate, branchId: branchId }
+            );
+
+            if (!data.success) {
+                toast.error('Failed to arrange invoice data.');
+            }
+            toast.success('Invoice sequence arranged successfully.');
+
+        } catch (error) {
+            toast.error('An unexpected error occurred while arranging invoice sequence.');
+        } finally {
+            setArranging(false);
+            setLoading(false);
         }
     };
+
+    const ArrangingInvoiceData = async () => {
+        setLoading(true);
+        await DeleteInvoices();
+        await ArrangingInvoiceIndex();
+        setLoading(false);
+    }
+
 
     const closeAlert = () => {
         setAlert({ type: null, message: '' });
     };
 
     const handleArrangeClick = () => {
-        if (!startDate || !endDate) {
+        if (!startDate) {
             setAlert({
                 type: 'error',
-                message: 'Please select both start and end dates.'
+                message: 'Please select both start dates.'
             });
             return;
         }
@@ -239,7 +245,7 @@ export default function ArrangeInvoice({ data, invoiceData }: { data: any, invoi
                                 disabled={deleting}
                                 className="flex-1 py-2 px-4 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white rounded-lg font-medium"
                             >
-                                {deleting ? 'Processing...' : 'Confirm'}
+                                {Loading ? 'Processing...' : 'Confirm'}
                             </button>
                         </div>
                     </div>

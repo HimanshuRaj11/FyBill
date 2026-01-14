@@ -1,17 +1,14 @@
 'use client'
-import { Bell, ChevronDown, LogOut, Search, User as UserIcon, Settings, CreditCard, UserCircle, Building2, Crown, Sparkles, Menu, X } from 'lucide-react'
+import { Bell, LogOut, User as UserIcon, Settings, CreditCard, Building2, Crown } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
-import { Input } from '../ui/input'
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@radix-ui/react-dropdown-menu'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@radix-ui/react-dropdown-menu'
 import { Button } from '../ui/button'
-import { Avatar, AvatarFallback, AvatarImage } from '@radix-ui/react-avatar'
 import Link from 'next/link'
 import axios from 'axios'
 import { FetchUser, LogoutUser } from '@/app/Redux/Slice/User.slice'
 import { useDispatch, useSelector } from 'react-redux'
 import { useRouter } from 'next/navigation'
 import { FetchCompany } from '@/app/Redux/Slice/Company.slice'
-import { FetchProductsList } from '@/app/Redux/Slice/Products.slice'
 import { FetchInvoicesList } from '@/app/Redux/Slice/Invoice.slice'
 import { useGlobalContext } from '@/context/contextProvider'
 import { ThemeToggle } from '../ui/theme-toggle'
@@ -24,8 +21,10 @@ export default function Navbar() {
     const { User } = useSelector((state: any) => state.User);
 
     const user = User
+    if (user?.role === "SUPERADMIN") {
+        router.push('/SuperAdmin')
+    }
     const { Company: company } = useSelector((state: any) => state.Company);
-
     const {
         selectedBranch,
         startDate,
@@ -38,7 +37,6 @@ export default function Navbar() {
     const ConnectDb = async () => {
         try {
             await axios.get(`${base_url}/api/v1/db`)
-            // await axios.get(`${base_url}/api/ping`) // for test or any change or update or faltu kaam
         } catch (error) {
             return error
         }
