@@ -751,6 +751,7 @@ export default function BillingComponent({
                                             <option value="upi">UPI</option>
                                             <option value="card">Card</option>
                                             <option value="netBanking">Net Banking</option>
+                                            <option value="cheque">Cheque</option>
                                         </select>
                                     </div>
                                 </div>
