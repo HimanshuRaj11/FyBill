@@ -60,7 +60,7 @@ export async function GET(request: Request) {
 
 const InvoiceKot = async (invoices: any[]) => {
     if (!invoices || invoices.length === 0) return invoices;
-    let InvalidInvoices: any = [];
+    const InvalidInvoices: any = [];
 
     await Promise.all(
         invoices.map(async (inv) => {
