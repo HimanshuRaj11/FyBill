@@ -37,8 +37,6 @@ export async function GET(request: Request) {
         //     invoiceFilter.createdBy = user_id;
         // }
 
-        const total = await InvoiceModel.countDocuments(invoiceFilter);
-
         let invoices = await InvoiceModel.find(invoiceFilter)
             .populate({ path: "branchId", model: branchModel })
             .sort({ createdAt: -1 })
@@ -53,8 +51,6 @@ export async function GET(request: Request) {
         );
 
     } catch (error) {
-        console.log(error);
-
         return NextResponse.json({ message: "Internal server error", success: false }, { status: 500 });
     }
 }
@@ -66,7 +62,7 @@ const InvoiceKot = async (invoices: any[]) => {
     if (!invoices || invoices.length === 0) return invoices;
     let InvalidInvoices: any = [];
 
-    const updatedInvoices = await Promise.all(
+    await Promise.all(
         invoices.map(async (inv) => {
             const kots = await KOTModel.find({ invoiceMongoId: inv._id })
             if (!inv) {
@@ -83,7 +79,6 @@ const InvoiceKot = async (invoices: any[]) => {
             if (invalidKotExists) {
                 const InvalidInvoice = { ...inv, kots };
                 InvalidInvoices.push(InvalidInvoice);
-                // return { ...inv, kots };
             }
 
         })
