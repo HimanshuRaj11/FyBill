@@ -12,7 +12,7 @@ export async function POST(request: Request) {
 
     try {
         const { TARGET, startDate, endDate, branchId } = await request.json();
-
+        //   const startDate = moment('2026-01-01').startOf('day').toDate();
         const start = moment(startDate).startOf('day').toDate();
         const end = moment(endDate).endOf('day').toDate();
 

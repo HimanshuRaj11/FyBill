@@ -1,3 +1,4 @@
+import { result } from "@/data/DATA";
 import { verifyUser } from "@/lib/verifyUser";
 import branchModel from "@/Model/branch.model";
 import CompanyModel from "@/Model/Company.model";
@@ -16,13 +17,13 @@ export async function POST(request: Request) {
 
         const companyId = "6803e4c62a9cdbcaf5b3e6e4"
         const branchId = "6803e4c62a9cdbcaf5b3e6e4"
-        const branchName = "Georgetown" //  1.6 per day
-        // const branchName = "Berbice" // 1.3 per day
+        // const branchName = "Georgetown" //  1.6 per day
+        const branchName = "Berbice" // 1.3 per day
 
-        const start = moment('2025-12-19').startOf('day').toDate();
-        const end = moment('2025-12-31').endOf('day').toDate(); // 23rd December
+        const start = moment('2025-11-01').startOf('day').toDate();
+        const end = moment('2025-11-30').endOf('day').toDate(); // 23rd December
 
-        return NextResponse.json({ message: "Debug stop", }, { status: 200 });
+        // return NextResponse.json({ message: "Debug stop", }, { status: 200 });
 
         const invoiceFilter: any = {
             companyId,
@@ -30,10 +31,10 @@ export async function POST(request: Request) {
             createdAt: { $gte: start, $lte: end },
             InvoiceStatus: "Done",
             BillType: { $ne: "KOT" },
-            delete: false,
+            // delete: false,
             important: { $ne: true }
         };
-        const TARGET = 820000;
+        const TARGET = 370000;
         const invoices = await InvoiceModel.find(invoiceFilter).select("_id grandTotal").lean();
 
         let currentTotal = invoices.reduce((sum, inv) => sum + Number(inv.grandTotal), 0);
@@ -87,3 +88,94 @@ export async function POST(request: Request) {
     }
 }
 
+const a = 444555;
+
+// export async function POST(request: Request) {
+//     try {
+//         const companyId = "6803e4c62a9cdbcaf5b3e6e4"
+//         const branchId = "6803e4c62a9cdbcaf5b3e6e4"
+//         // const branchName = "Georgetown" //  1.6 per day 693
+//         const branchName = "Berbice" // 1.3 per day
+
+//         const start = moment('2025-05-01').startOf('day').toDate();
+//         const end = moment('2025-11-30').endOf('day').toDate();
+
+//         const invoiceFilter: any = {
+//             companyId,
+//             branchName,
+//             createdAt: { $gte: start, $lte: end },
+//             InvoiceStatus: "Done",
+//             BillType: { $ne: "KOT" },
+//         };
+
+//         const result = await InvoiceModel.updateMany(
+//             invoiceFilter,
+//             { $set: { delete: false } }
+//         );
+
+//         // const result = await InvoiceModel.find(invoiceFilter)
+
+//         // const validInvoices: any[] = [];
+//         // let expectedInvoiceId = 694;
+
+//         // for (const invoice of result) {
+//         //     const currentInvoiceId = Number(invoice.invoiceId);
+
+//         //     if (currentInvoiceId === expectedInvoiceId) {
+//         //         validInvoices.push(invoice);
+//         //         expectedInvoiceId++;
+//         //     }
+//         // }
+
+//         // const validInvoiceIds = validInvoices.map(inv => inv._id);
+//         // await InvoiceModel.updateMany(
+//         //     { ...invoiceFilter, _id: { $nin: validInvoiceIds } },
+//         //     { $set: { delete: true } }
+//         // );
+
+//         // // Step 3: ensure valid invoices are active
+//         // await InvoiceModel.updateMany(
+//         //     { _id: { $in: validInvoiceIds } },
+//         //     { $set: { delete: false } }
+//         // );
+
+
+//         // console.log("Updated invoices:", result.modifiedCount);
+
+//         // console.log("Updated invoices count:", result.modifiedCount);
+//         return NextResponse.json({ message: "done", result }, { status: 200 });
+
+//     } catch (error) {
+//         console.log(error);
+
+//         return NextResponse.json({ message: "Internal server error", success: false }, { status: 500 });
+//     }
+// }
+
+
+const b = 44555;
+
+// export async function POST(request: Request) {
+//     try {
+//         const listResult = result; // your invoice list (already ordered by date desc)
+
+//         const validInvoices: any[] = [];
+//         let expectedInvoiceId = 1;
+
+//         // Traverse from bottom (oldest)
+//         for (let i = listResult.length - 1; i >= 0; i--) {
+//             const currentInvoiceId = Number(listResult[i].invoiceId);
+
+//             if (currentInvoiceId === expectedInvoiceId) {
+//                 validInvoices.unshift(listResult[i]); // maintain original order
+//                 expectedInvoiceId++;
+//             }
+//         }
+
+//         return NextResponse.json({ message: "done", validInvoices }, { status: 500 });
+//     } catch (error) {
+//         console.log(error);
+//         return NextResponse.json({ message: "Internal server error", success: false }, { status: 500 });
+//     }
+
+// }

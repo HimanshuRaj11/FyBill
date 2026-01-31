@@ -22,6 +22,9 @@ export async function POST(request: Request) {
         if (!User) {
             return NextResponse.json({ message: "User not found", success: false }, { status: 404 });
         }
+        if (User.role != "SUPERADMIN") {
+
+        }
         const branchId = User.branchId;
         const companyId = User.companyId;
         const company = await CompanyModel.findById({ _id: companyId });
@@ -52,6 +55,8 @@ export async function POST(request: Request) {
         return NextResponse.json({ invoices, success: true }, { status: 200 });
 
     } catch (error) {
+        console.log(error);
+
         return NextResponse.json({ message: "Internal server error", success: false }, { status: 500 });
     }
 }

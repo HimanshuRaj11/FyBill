@@ -34,7 +34,7 @@ export default function SuperAdminSidebar({ isOpen, setIsOpen, isMobileOpen, set
         { name: 'Companies', icon: Building2, path: '/SuperAdmin/Companies' },
         { name: 'Branches', icon: GitBranch, path: '/SuperAdmin/Branches' },
         { name: 'Staffs', icon: Users, path: '/SuperAdmin/Staffs' },
-        { name: 'Invoices', icon: FileText, path: '/SuperAdmin/Invoices' },
+        { name: 'Invoices', icon: FileText, path: '/SuperAdmin/Invoice' },
         { name: 'Sales', icon: TrendingUp, path: '/SuperAdmin/Sales' },
     ];
 

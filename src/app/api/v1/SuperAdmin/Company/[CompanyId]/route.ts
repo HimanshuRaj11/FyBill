@@ -10,13 +10,10 @@ interface IUser {
     role: string;
 }
 
-export async function GET(
-    req: NextRequest,
-    context: any // ✅ CRITICAL FIX
-) {
+export async function GET(req: NextRequest, { params }: { params: Promise<{ CompanyId: string }> }) {
     try {
         const user_id = await verifyUser();
-        const CompanyId = await context.params.CompanyId; // ✅ inferred
+        const { CompanyId } = await params;
 
         const user = (await UserModel.findById(user_id)
             .select("-password")
@@ -39,6 +36,8 @@ export async function GET(
             { status: 200 }
         );
     } catch (error) {
+        console.log(error);
+
         return NextResponse.json(
             InternalServerError(error as Error),
             { status: 503 }

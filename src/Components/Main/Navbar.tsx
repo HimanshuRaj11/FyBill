@@ -7,7 +7,7 @@ import Link from 'next/link'
 import axios from 'axios'
 import { FetchUser, LogoutUser } from '@/app/Redux/Slice/User.slice'
 import { useDispatch, useSelector } from 'react-redux'
-import { useRouter } from 'next/navigation'
+import { useRouter, usePathname } from 'next/navigation'
 import { FetchCompany } from '@/app/Redux/Slice/Company.slice'
 import { FetchInvoicesList } from '@/app/Redux/Slice/Invoice.slice'
 import { useGlobalContext } from '@/context/contextProvider'
@@ -16,12 +16,13 @@ import { ThemeToggle } from '../ui/theme-toggle'
 const base_url = process.env.NEXT_PUBLIC_BASE_URL
 
 export default function Navbar() {
+    const { User } = useSelector((state: any) => state.User);
     const router = useRouter();
     const dispatch = useDispatch();
-    const { User } = useSelector((state: any) => state.User);
-
     const user = User
-    if (user?.role === "SUPERADMIN") {
+    const pathname = usePathname();
+
+    if (user?.role === "SUPERADMIN" && !pathname.startsWith('/SuperAdmin')) {
         router.push('/SuperAdmin')
     }
     const { Company: company } = useSelector((state: any) => state.Company);

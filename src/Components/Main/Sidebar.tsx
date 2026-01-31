@@ -79,6 +79,12 @@ export default function Sidebar() {
                                                     <span className="flex-1 ms-3 whitespace-nowrap">Staff Members</span>
                                                 </Link>
                                             </li>
+                                            <li>
+                                                <Link href="/invalid-kot" className={`flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-300 dark:hover:bg-gray-700 group ${isActive('/invalid-kot') ? 'bg-gray-300 dark:bg-gray-700' : ''}`}>
+                                                    <FaUsers className={`shrink-0 w-5 h-5 transition duration-75 ${isActive('/invalid-kot') ? 'text-gray-900 dark:text-white' : 'text-gray-500 dark:text-gray-400'} group-hover:text-gray-900 dark:group-hover:text-white`} aria-hidden="true" />
+                                                    <span className="flex-1 ms-3 whitespace-nowrap">Invalid Kot</span>
+                                                </Link>
+                                            </li>
                                         </>
                                     )
                                 }
