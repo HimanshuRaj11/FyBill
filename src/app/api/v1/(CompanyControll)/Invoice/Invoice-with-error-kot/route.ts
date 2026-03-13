@@ -21,14 +21,14 @@ export async function GET(request: Request) {
         // if (!company) return NextResponse.json({ message: "Company not found", success: false }, { status: 404 });
 
         // const { selectedBranch, startDate, endDate } = await request.json();
-        const startDate = moment().startOf('month').toDate();
+        const startDate = moment('2026-02-01').startOf('day').toDate();
         const endDate = moment().endOf('month').toDate();
         const invoiceFilter: any = {
             // companyId: companyId,
             createdAt: { $gte: startDate, $lt: endDate },
             InvoiceStatus: "Done",
             BillType: { $ne: "KOT" },
-            delete: false,
+            // delete: false,
         };
 
         // if (User.role === "Owner") {

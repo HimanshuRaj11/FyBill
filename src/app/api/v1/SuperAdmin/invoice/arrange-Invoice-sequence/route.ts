@@ -33,10 +33,10 @@ export async function POST(request: Request) {
 
 
         // const companyId = "6803e4c62a9cdbcaf5b3e6e4"
-        const startDate = moment('2026-01-01').startOf('day').toDate();
+        const startDate = moment('2026-02-01').startOf('day').toDate();
         // const end = moment('2025-12-31').endOf('day').toDate();
-        // const branchName = "Georgetown"
-        const branchName = "Berbice"
+        const branchName = "Georgetown"
+        // const branchName = "Berbice"
         const invoiceFilter: any = {
             createdAt: { $gte: startDate },
             // branchId: branchId,
@@ -46,11 +46,13 @@ export async function POST(request: Request) {
             delete: { $ne: true },
         };
 
+        // const branch = await branchModel.findOne({ _id: branchId });
         const branch = await branchModel.findOne({ branchName });
 
         if (!branch) {
             return NextResponse.json({ message: "Branch not found" }, { status: 404 });
         }
+
 
         const invoices = await InvoiceModel.find(invoiceFilter)
             .select("_id branchName branchId createdAt grandTotal invoiceId delete")
@@ -62,7 +64,10 @@ export async function POST(request: Request) {
                 { status: 200 }
             );
         }
-        const sequenceStart = 620; // B- 620 //G- 694
+        const sequenceStart = 1243 // B- 1163 //G- 1243
+
+
+
         const bulkOps = invoices.map((inv, index) => ({
             updateOne: {
                 filter: { _id: inv._id },

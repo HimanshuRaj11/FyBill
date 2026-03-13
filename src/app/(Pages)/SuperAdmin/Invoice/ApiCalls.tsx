@@ -35,6 +35,7 @@ export default function ApiCalls() {
 
     const [searchResults, setSearchResults] = useState<I_Invoice[]>([]);
     const [loading, setLoading] = useState(false);
+    const [PaymentStatusLoading, setPaymentStatusLoading] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const [error, setError] = useState<string | null>(null);
 
@@ -267,6 +268,8 @@ export default function ApiCalls() {
                 handleSelectInvoice={handleSelectInvoice}
                 Company={Company}
                 InvoiceLoading={InvoiceLoading}
+                PaymentStatusLoading={PaymentStatusLoading}
+                setPaymentStatusLoading={setPaymentStatusLoading}
             />
         </div>
     )

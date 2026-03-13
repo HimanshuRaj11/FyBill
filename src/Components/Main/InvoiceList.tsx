@@ -33,6 +33,9 @@ export default function InvoiceList({ filteredInvoices, searchQuery, Company }: 
                                 Mode of Payment
                             </th>
                             <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                Exempted
+                            </th>
+                            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                                 Date
                             </th>
                             <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
@@ -78,6 +81,9 @@ export default function InvoiceList({ filteredInvoices, searchQuery, Company }: 
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                                         {invoice.paymentMode}
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                                        {invoice.isExempted ? 'Yes' : 'No'}
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                                         {moment(invoice.createdAt).format('MMM DD, YYYY')}

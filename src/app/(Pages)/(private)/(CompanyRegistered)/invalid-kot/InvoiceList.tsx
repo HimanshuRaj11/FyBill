@@ -31,6 +31,12 @@ export default function InvoiceList({ Invoices }: { Invoices: any[] }) {
                                 Amount
                             </th>
                             <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                Last KOT Amount
+                            </th>
+                            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                Exempted
+                            </th>
+                            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                                 Mode of Payment
                             </th>
                             <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
@@ -76,6 +82,12 @@ export default function InvoiceList({ Invoices }: { Invoices: any[] }) {
                                     )}
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                                         {invoice.currency}{invoice.grandTotal}
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                                        {invoice.currency}{invoice.kots[invoice.kots.length - 1]?.grandTotal || "N/A"}
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                                        {invoice.isExempted ? "Yes" : "No"}
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                                         {invoice.paymentMode}

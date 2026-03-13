@@ -51,6 +51,7 @@ export async function POST(request: Request) {
                 BillType,
                 paymentMode,
                 InvoiceStatus,
+                issueDate: new Date(),
                 isExempted,
                 discountValue,
                 discountType,

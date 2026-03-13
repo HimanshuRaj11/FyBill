@@ -1,10 +1,13 @@
 'use client'
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { MapPin, Phone, Mail, Globe, Users, Building2, Calendar, DollarSign, FileText, ChevronDown, ChevronUp } from 'lucide-react';
 import Link from 'next/link';
 import axios from 'axios';
+import DownloadExcel from '@/Components/Other/DownloadExcel';
 
 export default function CompanyProfile({ CompanyId }: { CompanyId: any }) {
+
+    const [ExemptedInvoiceData, setExemptedInvoiceData] = useState<any>();
 
     const [expandedBranch, setExpandedBranch] = useState(null);
     const [companyData, setCompanyData] = useState<any>();
@@ -37,9 +40,27 @@ export default function CompanyProfile({ CompanyId }: { CompanyId: any }) {
         setExpandedBranch(expandedBranch === branchId ? null : branchId);
     };
 
+
+    const GetExemptedInvoice = async () => {
+        try {
+            const { data } = await axios.get(`/api/v1/SuperAdmin/invoice/getExemptedInvoice`, { withCredentials: true });
+            if (data.success) {
+                setExemptedInvoiceData(data.invoice);
+            }
+        } catch (error) {
+            console.log(error);
+            return
+        }
+    }
+
+    useEffect(() => {
+        GetExemptedInvoice();
+    }, [])
+
     if (!companyData) {
         return <div>Loading...</div>;
     }
+
 
     return (
 
@@ -263,6 +284,7 @@ export default function CompanyProfile({ CompanyId }: { CompanyId: any }) {
                     </div>
                 </div>
             </div>
+            <DownloadExcel data={ExemptedInvoiceData} fileName={`${'Invoices'}`} />
         </div>
     );
 }

@@ -20,7 +20,7 @@ export async function POST(request: Request) {
 
         const last6Month = moment().subtract(6, 'months').startOf('day').toDate();
         const lastYear = moment().subtract(1, 'year').startOf('day').toDate();
-        const filterDate = lastYear
+        const filterDate = last6Month
 
         const { dateRange } = await request.json();
 
