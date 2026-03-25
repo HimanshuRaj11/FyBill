@@ -18,7 +18,7 @@ export async function POST(request: Request) {
         const company = await CompanyModel.findById(companyId);
         if (!company) return NextResponse.json({ message: "Company not found", success: false }, { status: 404 });
 
-        const last6Month = moment().subtract(6, 'months').startOf('day').toDate();
+        const last6Month = moment().subtract(3, 'months').startOf('day').toDate();
         const lastYear = moment().subtract(1, 'year').startOf('day').toDate();
         const filterDate = last6Month
 
