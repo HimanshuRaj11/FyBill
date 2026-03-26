@@ -22,16 +22,18 @@ export interface I_Invoice {
     grandTotal: number;
     paymentMode: string;
     createdAt: string;
+    issueDate: string;
     kotCount?: number;
     important?: boolean;
     delete?: boolean;
 }
 
 export default function ApiCalls() {
-    const dispatch = useDispatch();
+    // const dispatch = useDispatch();
     const { User } = useSelector((state: any) => state.User);
     const { Company } = useSelector((state: any) => state.Company)
-    const { Invoices, loading: InvoiceLoading } = useSelector((state: any) => state.Invoices)
+    const [Invoices, setInvoices] = useState([])
+    const [InvoiceLoading, setInvoiceLoading] = useState(false)
 
     const [searchResults, setSearchResults] = useState<I_Invoice[]>([]);
     const [loading, setLoading] = useState(false);
@@ -76,20 +78,24 @@ export default function ApiCalls() {
 
     const currency = displayedInvoices?.[0]?.currency || '';
 
-    // Fetch invoices when filters change
-    const FilterInvoice = useCallback(async () => {
-        try {
-            dispatch(FetchInvoicesList({ selectedBranch, startDate, endDate }) as any);
-        } catch (error) {
-            console.error('Error fetching invoices:', error);
-            setError('Failed to load invoices');
-        }
-    }, [dispatch, selectedBranch, startDate, endDate]);
 
-    // Only fetch on mount and filter changes
+    const GetInvoice = useCallback(async () => {
+        try {
+            setInvoiceLoading(true)
+            const { data } = await axios.post(`/api/v1/SuperAdmin/invoice/get-invoice`, { selectedBranch, startDate, endDate }, { withCredentials: true })
+            setInvoices(data.invoices)
+        } catch (error) {
+            console.log(error);
+
+        } finally {
+            setInvoiceLoading(false)
+        }
+    }, [selectedBranch, startDate, endDate])
+
     useEffect(() => {
-        FilterInvoice();
-    }, [FilterInvoice]);
+        GetInvoice()
+
+    }, [GetInvoice])
 
     // Debounced search
     useEffect(() => {
@@ -178,7 +184,7 @@ export default function ApiCalls() {
             );
 
             if (data.success) {
-                await FilterInvoice();
+                await GetInvoice();
                 setSelectedInvoices([]);
                 alert('Invoices marked as important successfully');
 
@@ -216,7 +222,7 @@ export default function ApiCalls() {
             );
 
             if (data.success) {
-                await FilterInvoice();
+                await GetInvoice();
                 setSelectedInvoices([]);
                 alert('Invoices deleted successfully');
 

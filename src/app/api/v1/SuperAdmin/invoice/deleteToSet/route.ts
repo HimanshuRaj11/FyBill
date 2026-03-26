@@ -6,38 +6,66 @@ import KOTModel from "@/Model/KOT.model";
 import UserModel from "@/Model/User.model";
 import moment from "moment";
 import { NextResponse } from "next/server";
+import { ObjectId } from "mongodb";
 
 
 export async function POST(request: Request) {
 
     try {
         const { TARGET, startDate, endDate, branchId } = await request.json();
-        //   const startDate = moment('2026-01-01').startOf('day').toDate();
+
+        // const startDate = moment('2026-03-01').startOf('day').toDate();
         const start = moment(startDate).startOf('day').toDate();
-        const end = moment(endDate).endOf('day').toDate();
+        // const end = moment(endDate).endOf('day').toDate();
+        // const branchName = "Berbice"
 
-        const invoiceFilter: any = {
-            createdAt: { $gte: startDate, $lte: endDate },
-            InvoiceStatus: "Done",
-            BillType: { $ne: "KOT" },
-            delete: false,
-            important: { $ne: true },
-            branchId: branchId
-        };
+        const agr = [
+            {
+                $match: {
+                    issueDate: {
+                        $gte: start,
+                    },
+                    InvoiceStatus: "Done",
+                    BillType: { $ne: "KOT" },
+                    delete: false,
+                    important: { $ne: true },
+                    branchId: new ObjectId(branchId),
+                },
+            },
+            {
+                $match: {
+                    $expr: {
+                        $gte: [{ $hour: "$issueDate" }, 13]
+                    }
+                }
+            },
+            {
+                $project: {
+                    _id: 1,
+                    branchId: 1,
+                    InvoiceId: 1,
+                    grandTotal: 1,
+                    issueDate: 1
+                }
+            }
+        ];
 
-        const invoices = await InvoiceModel.find(invoiceFilter).select("_id grandTotal").lean();
+        const invoices = await InvoiceModel.aggregate(agr) as any;
 
-        let currentTotal = invoices.reduce((sum, inv) => sum + Number(inv.grandTotal), 0);
 
-        if (currentTotal <= TARGET) {
-            return NextResponse.json({ message: "Already below target", currentTotal });
+        let currentTotal = await invoices.reduce((sum: any, inv: any) => sum + Number(inv.grandTotal), 0);
+
+        const target = TARGET / 2;
+        if (currentTotal <= target) {
+            return NextResponse.json({ message: "Current value is Already below target", currentTotal });
         }
 
-        const invoicesToDelete = [];
+        const invoicesToDelete: any = [];
+        console.log(invoicesToDelete);
 
         const pool = [...invoices];
 
-        while (currentTotal > TARGET && pool.length > 0) {
+        while (currentTotal > target && pool.length > 0) {
             const randomIndex = Math.floor(Math.random() * pool.length);
             const selected = pool[randomIndex];
 
@@ -61,7 +89,7 @@ export async function POST(request: Request) {
             message: "Invoices Deleted SuccessFul", success: true
         }, { status: 200 });
 
-        // return NextResponse.json({ message: "done", }, { status: 200 });
+        // return NextResponse.json({ message: "done", invoices }, { status: 200 });
 
     } catch (error) {
         console.log(error);

@@ -13,23 +13,24 @@ export async function POST(request: Request) {
     try {
         // const { TARGET, startDate, endDate, branchId } = await request.json();
 
-        const start = moment.utc('2026-01-02').startOf('day').toDate();
-        const end = moment.utc('2026-01-02').endOf('day').toDate();
-
+        const start = moment.utc('2026-03-01').startOf('day').toDate();
+        // const end = moment.utc('2026-01-02').endOf('day').toDate();
+        const branchName = "Georgetown"
         const invoiceFilter: any = {
-            issueDate: { $gte: start, $lte: end },
+            issueDate: { $gte: start, },
             delete: true,
             // important: { $ne: true },
             // branchId: branchId,
+            branchName
         };
         const invoices = await InvoiceModel.find(invoiceFilter).select('delete _id branchName clientName invoiceId createdAt issueDate grandTotal').lean();
 
-        // await Promise.all(invoices.map((inv) =>
-        //     InvoiceModel.findByIdAndUpdate(
-        //         inv._id,
-        //         { $set: { delete: false } }
-        //     )
-        // ));
+        await Promise.all(invoices.map((inv) =>
+            InvoiceModel.findByIdAndUpdate(
+                inv._id,
+                { $set: { delete: false } }
+            )
+        ));
 
         return NextResponse.json({ message: "Invoices Recover SuccessFul", invoices, success: true }, { status: 200 });
 

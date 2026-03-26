@@ -295,7 +295,7 @@ export default function List({
 
                                             {/* Date */}
                                             <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400 tabular-nums">
-                                                {moment(invoice.createdAt).format('MMM DD, YYYY')}
+                                                {moment(invoice.issueDate).format('MMM DD, YYYY hh:mm A')}
                                             </td>
 
                                             {/* Action */}

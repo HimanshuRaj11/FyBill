@@ -17,9 +17,9 @@ export async function POST(request: Request) {
         const User = await UserModel.findById(user_id);
         if (!User) return NextResponse.json({ message: "User not found", success: false }, { status: 404 });
 
-        const companyId = User.companyId;
-        const company = await CompanyModel.findById(companyId);
-        if (!company) return NextResponse.json({ message: "Company not found", success: false }, { status: 404 });
+        // const companyId = User.companyId;
+        // const company = await CompanyModel.findById(companyId);
+        // if (!company) return NextResponse.json({ message: "Company not found", success: false }, { status: 404 });
 
 
         const { data } = await request.json()

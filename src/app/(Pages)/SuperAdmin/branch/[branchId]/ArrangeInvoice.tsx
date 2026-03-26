@@ -66,16 +66,21 @@ export default function ArrangeInvoice({ data, invoiceData }: { data: any, invoi
             );
 
             if (!data.success) {
-                toast.error('Failed to delete invoices to meet the target.');
+                toast.error(data.message);
+                return false
             }
-            toast.success('Invoices deleted successfully to meet the target.');
-
+            toast.success(data.message);
+            return true
         } catch (error) {
+            console.log(error);
+
             toast.error('An unexpected error occurred while deleting invoices.');
+            return false
 
         } finally {
             setDeleting(false);
             setLoading(false);
+            return
         }
     }
 
@@ -102,8 +107,10 @@ export default function ArrangeInvoice({ data, invoiceData }: { data: any, invoi
 
     const ArrangingInvoiceData = async () => {
         setLoading(true);
-        await DeleteInvoices();
-        await ArrangingInvoiceIndex();
+        const deleteSuccess = await DeleteInvoices();
+        if (deleteSuccess) {
+            await ArrangingInvoiceIndex();
+        }
         setLoading(false);
     }
 
