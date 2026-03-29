@@ -15,42 +15,22 @@ export async function POST(request: Request) {
         const { TARGET, startDate, endDate, branchId } = await request.json();
 
         // const startDate = moment('2026-03-01').startOf('day').toDate();
-        const start = moment(startDate).startOf('day').toDate();
+        // const start = moment(startDate).startOf('day').toDate();
         // const end = moment(endDate).endOf('day').toDate();
-        // const branchName = "Berbice"
+        const branchName = "Berbice"
 
-        const agr = [
-            {
-                $match: {
-                    issueDate: {
-                        $gte: start,
-                    },
-                    InvoiceStatus: "Done",
-                    BillType: { $ne: "KOT" },
-                    delete: false,
-                    important: { $ne: true },
-                    branchId: new ObjectId(branchId),
-                },
-            },
-            {
-                $match: {
-                    $expr: {
-                        $gte: [{ $hour: "$issueDate" }, 13]
-                    }
-                }
-            },
-            {
-                $project: {
-                    _id: 1,
-                    branchId: 1,
-                    InvoiceId: 1,
-                    grandTotal: 1,
-                    issueDate: 1
-                }
-            }
-        ];
+        const filter = {
+            issueDate: { $gte: startDate },
+            delete: false,
+            important: { $ne: true },
+            BillType: { $ne: "KOT" },
+            // branchName,
+            branchId
+        }
 
-        const invoices = await InvoiceModel.aggregate(agr) as any;
+
+
+        const invoices = await InvoiceModel.find(filter) as any;
 
 
         let currentTotal = await invoices.reduce((sum: any, inv: any) => sum + Number(inv.grandTotal), 0);

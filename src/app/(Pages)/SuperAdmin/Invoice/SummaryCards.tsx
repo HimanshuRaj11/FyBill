@@ -7,7 +7,7 @@ export default function SummaryCards({ User, Company, setSelectedBranch, selecte
         <div className="">
             <div className="flex justify-between items-center mb-4">
                 <div className="">
-                    {User?.role === "Owner" && (
+                    {User?.role === "Owner" || User?.role === "SUPERADMIN" && (
                         <div className="mb-6">
                             <div className="flex flex-wrap gap-2">
                                 <div
