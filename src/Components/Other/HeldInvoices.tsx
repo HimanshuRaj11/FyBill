@@ -70,7 +70,7 @@ const HeldInvoices = ({ HoldInvoices, setHoldInvoiceUpdate, setShowInvoice, setI
                                         <div>
                                             <p className="font-medium text-gray-800">{invoice?.clientName}</p>
 
-                                            <p className="text-xs text-gray-500">Held on {moment(invoice?.updatedAt).format('MMMM Do YYYY, h:mm A')}</p>
+                                            <p className="text-xs text-gray-500">Held on {moment(invoice?.createdAt).format('MMMM Do YYYY, h:mm A')}</p>
 
                                         </div>
                                     </div>

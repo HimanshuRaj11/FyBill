@@ -11,18 +11,18 @@ export async function GET(request: Request) {
 
         // const user_id = await verifyUser();
         // if (!user_id) return NextResponse.json({ message: "Unauthorized", success: false }, { status: 401 });
-        const startDate = moment('2026-01-01').startOf('day').toDate();
-        const branchName = 'Berbice' //  Georgetown
+        const startDate = moment('2026-03-01').startOf('day').toDate();
+        // const branchName = 'Berbice' //  Georgetown
         const filter = {
             isExempted: true,
             issueDate: { $gte: startDate },
             InvoiceStatus: "Done",
             companyId: "6803e4c62a9cdbcaf5b3e6e4"
         }
-        const invoice = await InvoiceModel.find(filter).select("-products -appliedTaxes -important")
+        const invoice = await InvoiceModel.find(filter).select("-products -appliedTaxes -important").sort({ issueDate: -1 }).lean();
 
 
-        return NextResponse.json({ message: "Invoices Deleted SuccessFul", length: invoice.length, success: true, invoice }, { status: 200 });
+        return NextResponse.json({ message: " SuccessFul", length: invoice.length, success: true, invoice }, { status: 200 });
 
     } catch (error) {
         console.log(error);

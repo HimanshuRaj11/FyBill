@@ -56,7 +56,8 @@ export async function POST(request: Request) {
 
         const invoices = await InvoiceModel.find(invoiceFilter)
             .select("_id branchName branchId createdAt grandTotal invoiceId delete")
-            .lean();
+            .sort({ issueDate: -1 }).lean();
+
 
         if (invoices.length === 0) {
             return NextResponse.json(

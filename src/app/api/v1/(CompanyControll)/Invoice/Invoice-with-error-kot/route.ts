@@ -10,21 +10,21 @@ import { NextResponse } from "next/server";
 
 export async function GET(request: Request) {
     try {
-        // const user_id = await verifyUser();
-        // if (!user_id) return NextResponse.json({ message: "Unauthorized", success: false }, { status: 401 });
+        const user_id = await verifyUser();
+        if (!user_id) return NextResponse.json({ message: "Unauthorized", success: false }, { status: 401 });
 
-        // const User = await UserModel.findById(user_id);
-        // if (!User) return NextResponse.json({ message: "User not found", success: false }, { status: 404 });
+        const User = await UserModel.findById(user_id);
+        if (!User) return NextResponse.json({ message: "User not found", success: false }, { status: 404 });
 
-        // const companyId = User.companyId;
-        // const company = await CompanyModel.findById(companyId);
-        // if (!company) return NextResponse.json({ message: "Company not found", success: false }, { status: 404 });
+        const companyId = User.companyId;
+        const company = await CompanyModel.findById(companyId);
+        if (!company) return NextResponse.json({ message: "Company not found", success: false }, { status: 404 });
 
         // const { selectedBranch, startDate, endDate } = await request.json();
-        const startDate = moment('2026-02-01').startOf('day').toDate();
+        const startDate = moment('2026-03-01').startOf('day').toDate();
         const endDate = moment().endOf('month').toDate();
         const invoiceFilter: any = {
-            // companyId: companyId,
+            companyId: companyId,
             createdAt: { $gte: startDate, $lt: endDate },
             InvoiceStatus: "Done",
             BillType: { $ne: "KOT" },

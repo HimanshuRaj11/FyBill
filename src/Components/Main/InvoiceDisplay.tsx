@@ -177,7 +177,7 @@ export default function InvoiceDisplay({ invoice }: { invoice: any }) {
                             <div className="flex flex-col items-start md:items-end space-y-4">
                                 <div className="text-left md:text-right text-gray-500 dark:text-gray-400">
                                     <p className="font-medium">Date Issued:</p>
-                                    <p>{moment(invoice.createdAt).format('DD/MM/YYYY HH:mm A')}</p>
+                                    <p>{moment(invoice.issueDate).format('DD/MM/YYYY hh:mm A')}</p>
                                 </div>
                             </div>
                         </div>
