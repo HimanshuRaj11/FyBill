@@ -23,7 +23,7 @@ export async function POST(request: Request) {
             createdAt: { $gte: startDate, $lt: endDate },
             InvoiceStatus: "Done",
             BillType: { $ne: "KOT" },
-            delete: true,
+            delete: { $ne: true },
             branchName: selectedBranch
         };
 

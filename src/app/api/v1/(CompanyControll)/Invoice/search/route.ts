@@ -32,21 +32,18 @@ export async function POST(request: Request) {
             return NextResponse.json({ message: "Company not found", success: false }, { status: 404 });
         }
 
-        const searchRegex = new RegExp(SearchQuery.query, 'i'); // case-insensitive search
+        const searchRegex = new RegExp(SearchQuery.query, 'i');
 
         const invoiceFilter: any = {
             companyId,
             InvoiceStatus: "Done",
             BillType: { $ne: "KOT" },
-            // delete: { $ne: true },
             $or: [
                 { invoiceIdTrack: searchRegex },
+                { invoiceId: searchRegex },
                 { clientName: searchRegex }
             ]
         };
-        if (User?.role != 'Owner') {
-            invoiceFilter.branchId = branchId
-        }
 
         let invoices = await InvoiceModel.find(invoiceFilter).sort({ createdAt: -1 }).lean()
 

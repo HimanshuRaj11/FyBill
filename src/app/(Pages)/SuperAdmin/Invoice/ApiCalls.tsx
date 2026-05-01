@@ -97,19 +97,6 @@ export default function ApiCalls() {
 
     }, [GetInvoice])
 
-    // Debounced search
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            if (searchQuery.trim()) {
-                fetchInvoices(searchQuery.trim());
-            } else {
-                setSearchResults([]);
-                setError(null);
-            }
-        }, 500);
-
-        return () => clearTimeout(timer);
-    }, [searchQuery]);
 
     const fetchInvoices = async (query: string) => {
         if (!query) {
@@ -119,12 +106,15 @@ export default function ApiCalls() {
 
         setLoading(true);
         setError(null);
+
+
         try {
             const { data } = await axios.post(
                 `${base_url}/api/v1/Invoice/search`,
                 { query },
                 { withCredentials: true }
             );
+
 
             setSearchResults(data.invoices || []);
         } catch (error: any) {
@@ -133,6 +123,17 @@ export default function ApiCalls() {
             setSearchResults([]);
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleSearchSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+
+        if (searchQuery.trim()) {
+            fetchInvoices(searchQuery.trim());
+        } else {
+            setSearchResults([]);
+            setError(null);
         }
     };
 
@@ -276,6 +277,7 @@ export default function ApiCalls() {
                 InvoiceLoading={InvoiceLoading}
                 PaymentStatusLoading={PaymentStatusLoading}
                 setPaymentStatusLoading={setPaymentStatusLoading}
+                handleSearchSubmit={handleSearchSubmit}
             />
         </div>
     )
