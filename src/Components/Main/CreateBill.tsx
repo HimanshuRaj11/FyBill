@@ -38,7 +38,6 @@ import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Badge } from "../ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
-import { FetchProductsList } from "@/app/Redux/Slice/Products.slice";
 import ProductCardSkeleton from "../Skeleton/ProductCardCreateBill";
 
 interface Product {
@@ -65,10 +64,9 @@ export default function BillingComponent({
 }) {
     const { User } = useSelector((state: any) => state.User);
     const { Company } = useSelector((state: any) => state.Company);
-
     const { Products } = useSelector((state: any) => state.Products);
 
-    const dispatch = useDispatch()
+    const dispatch = useDispatch();
     const [invoice, setInvoice] = useState<any>(null);
     const [showInvoice, setShowInvoice] = useState(false);
     const [BillType, setBillType] = useState("BILL");
@@ -91,108 +89,114 @@ export default function BillingComponent({
     const [productCategories, setProductCategories] = useState<string[]>([]);
     const [selectedCategory, setSelectedCategory] = useState<string>("all");
     const [isProcessing, setIsProcessing] = useState(false);
-
     const [isExempted, setIsExempted] = useState(false);
+    const [ProductIsLoading, setProductIsLoading] = useState(true);
+    const [discountType, setDiscountType] = useState("flat");
+    const [discountValue, setDiscountValue] = useState<number>(0);
+    const [ProductDiscountValue, setProductDiscountValue] = useState<number>(0);
 
-
-    const [ProductIsLoading, setProductIsLoading] = useState(true)
-
-    const [discountType, setDiscountType] = useState("percentage");
-    const [discountValue, setDiscountValue] = useState<number | "">("");
 
     const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
     const [highlightedIndex, setHighlightedIndex] = useState<number>(0);
-
     const searchRef = useRef<HTMLInputElement>(null);
+
+    // Initial Data Fetch
+    useEffect(() => {
+        const fetchProduct = async () => {
+            setProductIsLoading(true);
+            try {
+                const { data } = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/company/product/fetch`, { withCredentials: true });
+                setFilteredProducts(data.products);
+                setProductsList(data.products);
+            } catch (error) {
+                toast.error("Failed to fetch products");
+            } finally {
+                setProductIsLoading(false);
+            }
+        };
+        fetchProduct();
+        fetchTaxData();
+    }, []);
+
+    // Initial Hold Invoice Data
     useEffect(() => {
         if (HoldInvoiceUpdate) {
             SetHoldedInvoice(HoldInvoiceUpdate._id);
             setClientName(HoldInvoiceUpdate.clientName);
             setPhoneNumber(HoldInvoiceUpdate.clientPhone);
             setProducts(HoldInvoiceUpdate.products);
-            setTaxes(HoldInvoiceUpdate.appliedTaxes);
             setBillType(HoldInvoiceUpdate.BillType);
             setPaymentMode(HoldInvoiceUpdate.paymentMode);
         }
     }, [HoldInvoiceUpdate]);
 
-    // Extract unique categories from products
+    // Categories Logic
     useEffect(() => {
         if (productsList?.length > 0) {
             const categories = ["all", ...new Set(productsList.map((product: any) => product.category || "uncategorized"))];
             setProductCategories(categories);
         }
-    }, [productsList, Products]);
-    // Tax calculation
+    }, [productsList]);
 
-    const [rawTaxes, setRawTaxes] = useState<number>();
+    // Combined Totals and Taxes Logic (Loop-Safe)
     useEffect(() => {
-        setAppliedTaxes([]);
-        taxes?.forEach((tax) => {
-            const rawTax: number = subTotal * (tax.percentage / 100);
-            const rounded: number = Math.round(rawTax / 50) * 50;
-            const taxAmount: number = parseFloat(rounded.toFixed(1));
-            setRawTaxes(rawTax);
-
-            setAppliedTaxes((prev) => [
-                ...prev,
-                {
-                    taxName: tax.taxName,
-                    percentage: tax.percentage,
-                    amount: taxAmount,
-                },
-            ]);
-        });
-    }, [subTotal, taxes]);
-
-    // Total calculation
-    useEffect(() => {
-        const newSubTotal = products.reduce((sum, product) => sum + product.amount, 0);
+        // 1. Subtotal
+        const newSubTotal = products.reduce((sum, p) => sum + p.amount, 0);
         setSubTotal(newSubTotal);
-        const totalTaxAmount = appliedTaxes.reduce((sum, tax) => sum + tax.amount, 0);
 
+        // 2. Taxes
+        const calculatedTaxes = taxes?.map((tax) => {
+            const rawTax = newSubTotal * (tax.percentage / 100);
+            // const rounded = Math.round(rawTax / 50) * 50;
+            return {
+                taxName: tax.taxName,
+                percentage: tax.percentage,
+                amount: parseFloat(rawTax.toFixed(1)),
+            };
+        }) || [];
+        setAppliedTaxes(calculatedTaxes);
 
-        setGrandTotal(Number((newSubTotal + totalTaxAmount).toFixed(2)));
+        // 3. Grand Total Calculation
+        const totalTaxAmount = calculatedTaxes.reduce((sum, t) => sum + t.amount, 0);
+        let currentGrandTotal = newSubTotal + totalTaxAmount;
 
-        if (discountValue && discountValue > 0) {
-            if (discountType == "percentage") {
-                setGrandTotal((prev: number) => {
-                    const discountAmount = Math.round(((prev * discountValue) / 100) / 50) * 50;
-                    const value = prev - discountAmount;
-                    return value;
-                })
+        if (discountValue > 0) {
+            if (discountType === "percentage") {
+                const discountAmt = Math.round(((currentGrandTotal * discountValue) / 100) / 50) * 50;
+                currentGrandTotal -= discountAmt;
             } else {
-                setGrandTotal((prev: number) => {
-                    return prev - discountValue;
-                })
+                currentGrandTotal -= discountValue;
             }
         }
+        setGrandTotal(Number(currentGrandTotal.toFixed(2)));
+    }, [products, taxes, discountValue, discountType]);
 
+    const fetchTaxData = async () => {
+        try {
+            const { data } = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/company/Tax/fetch`);
+            setTaxes(data?.tax?.taxes || []);
+        } catch (error) {
+            toast.error("Failed to fetch taxes");
+        }
+    };
 
-    }, [products, appliedTaxes, discountValue, discountType]);
-
+    useEffect(() => {
+        if (isExempted) setTaxes([]);
+        else fetchTaxData();
+    }, [isExempted]);
 
     const handleProductSearch = useCallback((searchTerm: string) => {
         setProductName(searchTerm);
-
         let filtered = productsList;
-
-        // Apply category filter if not "all"
         if (selectedCategory !== "all") {
-            filtered = filtered.filter((product: any) =>
-                (product.category || "uncategorized") === selectedCategory
-            );
+            filtered = filtered.filter((p: any) => (p.category || "uncategorized") === selectedCategory);
         }
-
-        // Apply search term filter
         if (searchTerm) {
             const term = searchTerm.toLowerCase();
-            filtered = filtered.filter((product: any) =>
-                product.name.toLowerCase().includes(term) ||
-                product.product_number.toString().toLowerCase().includes(term)
+            filtered = filtered.filter((p: any) =>
+                p.name.toLowerCase().includes(term) || p.product_number?.toString().includes(term)
             );
         }
-
         setFilteredProducts(filtered);
     }, [productsList, selectedCategory]);
 
@@ -203,50 +207,31 @@ export default function BillingComponent({
     }, [handleProductSearch]);
 
     const AddProduct = useCallback((product: any) => {
-        if (products.find((p) => p.name === product.name)) {
-            setProducts(
-                products.map((p) =>
+        setProducts(prev => {
+            const existing = prev.find((p) => p.name === product.name);
+            if (existing) {
+                return prev.map((p) =>
                     p.name === product.name
-                        ? {
-                            ...p,
-                            quantity: p.quantity + 1,
-                            amount: (p.quantity + 1) * p.rate
-                        }
+                        ? { ...p, quantity: p.quantity + 1, amount: (p.quantity + 1) * p.rate }
                         : p
-                )
-            );
-        } else {
-            setProducts([
-                ...products,
-                {
-                    name: product.name,
-                    rate: product.price,
-                    quantity: 1,
-                    amount: product.price,
-                    Specification: product.Specification
-                },
-            ]);
-        }
-
-        // Visual feedback for added product
-        toast.success(`Added ${product.name}`, {
-            position: "bottom-right",
-            autoClose: 1000,
-            hideProgressBar: true,
+                );
+            }
+            return [...prev, {
+                name: product.name,
+                rate: product.price || 0,
+                quantity: 1,
+                amount: product.price || 0,
+                Specification: product.Specification || ""
+            }];
         });
-        ClearSearch()
-    }, [ClearSearch, products])
-
+        toast.success(`Added ${product.name}`, { position: "bottom-right", autoClose: 1000, hideProgressBar: true });
+        ClearSearch();
+    }, [ClearSearch]);
 
     const handleDelete = (index: number) => {
         const deletedProduct = products[index];
         setProducts(products.filter((_, i) => i !== index));
-
-        toast.info(`Removed ${deletedProduct.name}`, {
-            position: "bottom-right",
-            autoClose: 1000,
-            hideProgressBar: true,
-        });
+        toast.info(`Removed ${deletedProduct.name}`, { position: "bottom-right", autoClose: 1000, hideProgressBar: true });
     };
 
     const handleProductEdit = (product: any, index: number) => {
@@ -255,89 +240,46 @@ export default function BillingComponent({
     };
 
     const handleQuantityChange = (product: Product, value: number) => {
-        if (value === 1) {
-            setProducts(
-                products.map((p) =>
-                    p.name === product.name
-                        ? {
-                            ...p,
-                            quantity: p.quantity + 1,
-                            amount: (p.quantity + 1) * p.rate
-                        }
-                        : p
-                )
-            );
-        } else if (value === -1) {
-            if (product.quantity > 1) {
-                setProducts(
-                    products.map((p) =>
-                        p.name === product.name
-                            ? {
-                                ...p,
-                                quantity: p.quantity - 1,
-                                amount: (p.quantity - 1) * p.rate
-                            }
-                            : p
-                    )
-                );
-            } else {
-                setProducts(products.filter((p) => p.name !== product.name));
-            }
-        }
+        setProducts(prev => {
+            return prev.map((p) => {
+                if (p.name === product.name) {
+                    const newQty = p.quantity + value;
+                    if (newQty <= 0) return null;
+                    return { ...p, quantity: newQty, amount: newQty * p.rate };
+                }
+                return p;
+            }).filter(Boolean) as Product[];
+        });
     };
 
+    // show the product Discount if any product has 0 rate
+    useEffect(() => {
+        const totalRate = products
+            .filter((product) => product.amount === 0)
+            .reduce((sum, product) => sum + (product.rate || 0), 0);
+
+        const totalAppliedTax = (taxes.reduce((sum, tax) => sum + tax.percentage
+            , 0));
+
+        const totalWithTax = totalRate + (totalRate * totalAppliedTax) / 100;
+        setProductDiscountValue(totalWithTax);
+    }, [products, taxes]);
+
     const Reset = () => {
-        SetHoldedInvoice("")
+        SetHoldedInvoice("");
         setClientName("");
         setPhoneNumber("");
         setProducts([]);
         setSubTotal(0);
         setGrandTotal(0);
         setBillType("BILL");
-        setPaymentMode("");
-    }
-
-    const fetchTaxData = async () => {
-        try {
-            const { data } = await axios.get(
-                `${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/company/Tax/fetch`
-            );
-            setTaxes(data?.tax?.taxes);
-        } catch (error) {
-            toast.error("Failed to fetch taxes");
-        }
+        setPaymentMode("cash");
+        setDiscountValue(0);
     };
-
-    useEffect(() => {
-        if (isExempted) {
-            setTaxes([]);
-        } else {
-            fetchTaxData();
-        }
-
-    }, [isExempted])
-
 
     const handleCategoryChange = (category: string) => {
         setSelectedCategory(category);
-
-        let filtered = productsList;
-
-        // Apply category filter if not "all"
-        if (category !== "all") {
-            filtered = filtered.filter((product: any) =>
-                (product.category || "uncategorized") === category
-            );
-        }
-
-        // Apply existing search term filter
-        if (productName) {
-            filtered = filtered.filter((product: any) =>
-                product.name.toLowerCase().includes(productName.toLowerCase())
-            );
-        }
-
-        setFilteredProducts(filtered);
+        handleProductSearch(productName);
     };
 
     const invoiceRef = useRef<HTMLDivElement>(null);
@@ -355,489 +297,203 @@ export default function BillingComponent({
         setShowInvoice(false);
     };
 
+    // Actions
     const CreateInvoice = async () => {
+        if (products.length === 0) return toast.error("Please add products");
+        if (BillType !== "KOT" && !paymentMode) return toast.error("Select payment mode");
+        if (User?.role === "Owner" && !selectedBranch && !HoldedInvoice) return toast.error("Select branch");
+
         try {
-            if (products.length === 0) {
-                toast.error("Please add at least one product");
-                return;
-            }
-
-            if (BillType !== "KOT" && paymentMode === "") {
-                toast.error("Please select payment mode");
-                return;
-            }
-
-            if (User?.role === "Owner" && selectedBranch === "" && !HoldedInvoice) {
-                toast.error("Please select branch");
-                return;
-            }
-
             setIsProcessing(true);
-            const totalTaxAmount = (appliedTaxes.reduce((sum, tax) => sum + tax.amount, 0)).toFixed(2);
-
-            const { data } = await axios.post(
-                `${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/Invoice/create`,
-                {
-                    clientName,
-                    phoneNumber,
-                    products,
-                    subTotal,
-                    grandTotal,
-                    paymentMode,
-                    appliedTaxes,
-                    totalTaxAmount,
-                    BillType,
-                    selectedBranch,
-                    HoldedInvoice,
-                    InvoiceStatus: "Done",
-                    discountValue,
-                    discountType,
-                    isExempted,
-                }
-            );
+            const totalTaxAmount = appliedTaxes.reduce((sum, tax) => sum + tax.amount, 0).toFixed(2);
+            const { data } = await axios.post(`${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/Invoice/create`, {
+                clientName, phoneNumber, products, subTotal, grandTotal, paymentMode,
+                appliedTaxes, totalTaxAmount, BillType, selectedBranch, HoldedInvoice,
+                InvoiceStatus: "Done", discountValue, discountType, isExempted, ProductDiscountValue
+            });
 
             if (data.invoice) {
                 setInvoice(data.invoice);
                 setShowInvoice(true);
-                setClientName("");
-                setPhoneNumber("");
-                setProducts([]);
-                setSubTotal(0);
-                setGrandTotal(0);
-                setBillType("BILL");
-                SetHoldedInvoice("")
-                setDiscountValue("")
-                setHoldInvoices((prev: any) => prev.filter((invoice: any) => invoice._id !== data.invoice._id));
+                setHoldInvoices((prev: any) => prev.filter((i: any) => i._id !== data.invoice._id));
+                Reset();
             }
         } catch (error) {
-            toast.error("Something went wrong");
+            toast.error("Invoice creation failed");
         } finally {
             setIsProcessing(false);
         }
     };
 
     const HoldInvoice = async () => {
+        if (!clientName) return toast.error("Enter Client Name");
+        if (products.length === 0) return toast.error("Add at least one product");
+
         try {
-            if (clientName === "") {
-                toast.error("Please Enter Client Name");
-                return;
-            }
-
-            if (products.length === 0) {
-                toast.error("Please add at least one product");
-                return;
-            }
-
             setIsProcessing(true);
-            const totalTaxAmount = appliedTaxes.reduce((sum, tax) => sum + tax.amount, 0);
-
-            const { data } = await axios.post(
-                `${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/Invoice/create`,
-                {
-                    clientName,
-                    phoneNumber,
-                    products,
-                    subTotal,
-                    grandTotal,
-                    paymentMode,
-                    appliedTaxes,
-                    totalTaxAmount,
-                    BillType,
-                    selectedBranch,
-                    InvoiceStatus: "Hold",
-                    discountValue,
-                    discountType,
-                    isExempted,
-                }
-            );
+            const { data } = await axios.post(`${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/Invoice/create`, {
+                clientName, phoneNumber, products, subTotal, grandTotal, paymentMode,
+                appliedTaxes, totalTaxAmount: appliedTaxes.reduce((s, t) => s + t.amount, 0),
+                BillType, selectedBranch, InvoiceStatus: "Hold", discountValue, discountType, isExempted, ProductDiscountValue
+            });
 
             if (data.invoice) {
                 setHoldInvoices((prev: any) => [...prev, data.invoice]);
-                setClientName("");
-                setPhoneNumber("");
-                setProducts([]);
-                setSubTotal(0);
-                setGrandTotal(0);
-                setBillType("BILL");
-                setPaymentMode("");
-                toast.success("Invoice placed on hold", { position: "bottom-right" });
+                Reset();
+                toast.success("Invoice placed on hold");
             }
         } catch (error) {
-            toast.error("Something went wrong");
+            toast.error("Failed to hold invoice");
         } finally {
             setIsProcessing(false);
         }
     };
 
-
     const HandleKOT = async () => {
+        if (!clientName) return toast.error("Enter Client Name");
+        if (products.length === 0) return toast.error("Add products");
+
         try {
-            if (clientName === "") {
-                toast.error("Please Enter Client Name");
-                return;
-            }
-
-            if (products.length === 0) {
-                toast.error("Please add at least one product");
-                return;
-            }
-
-            if (User?.role === "Owner" && selectedBranch === "" && !HoldedInvoice) {
-                toast.error("Please select branch");
-                return;
-            }
-
             setIsProcessing(true);
-
-            setIsProcessing(true);
-            const totalTaxAmount = appliedTaxes.reduce((sum, tax) => sum + tax.amount, 0);
-
-            const { data } = await axios.post(
-                `${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/Invoice/create`,
-                {
-                    clientName,
-                    phoneNumber,
-                    products,
-                    subTotal,
-                    grandTotal,
-                    paymentMode,
-                    appliedTaxes,
-                    totalTaxAmount,
-                    BillType,
-                    selectedBranch,
-                    HoldedInvoice,
-                    InvoiceStatus: "Hold",
-                    discountValue,
-                    discountType,
-                }
-            );
+            const { data } = await axios.post(`${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/Invoice/create`, {
+                clientName, phoneNumber, products, subTotal, grandTotal, paymentMode,
+                appliedTaxes, totalTaxAmount: appliedTaxes.reduce((s, t) => s + t.amount, 0),
+                BillType, selectedBranch, HoldedInvoice, InvoiceStatus: "Hold", discountValue, discountType,
+                ProductDiscountValue
+            });
 
             if (data.invoice) {
-
                 setInvoice(data.invoice);
                 setShowInvoice(true);
-
-                if (!HoldedInvoice) {
-                    setHoldInvoices((prev: any) => [...prev, data.invoice]);
-                }
-                SetHoldedInvoice("")
-                setClientName("");
-                setPhoneNumber("");
-                setProducts([]);
-                setSubTotal(0);
-                setGrandTotal(0);
-                setPaymentMode("");
-                toast.success("KOT Invoice Created", { position: "bottom-right" });
-                handleKotSave(data.invoice)
-                setDiscountValue("")
+                if (!HoldedInvoice) setHoldInvoices((prev: any) => [...prev, data.invoice]);
+                Reset();
+                axios.post(`${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/kot/save`, { Invoice: data.invoice }, { withCredentials: true });
             }
         } catch (error) {
-            toast.error("Something went wrong");
+            toast.error("KOT creation failed");
         } finally {
             setIsProcessing(false);
         }
-    }
-    const handleKotSave = (Invoice: any) => {
-        try {
-            axios.post(`${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/kot/save`, { Invoice }, { withCredentials: true })
-        } catch (error) {
-            return error
-        }
-    }
+    };
 
-
-    // key selection
+    // Keyboard navigation
     useEffect(() => {
-
         const handleKeyDown = (e: KeyboardEvent) => {
-            const el = itemRefs.current[highlightedIndex];
-            if (el) {
-                el.scrollIntoView({ behavior: "smooth", block: "nearest" });
-            }
             if (e.key === "ArrowDown") {
-
-                setHighlightedIndex((prev) =>
-                    prev === filteredProducts.length ? 0 : prev + 1
-                );
+                setHighlightedIndex(p => p < filteredProducts.length ? p + 1 : 0);
             } else if (e.key === "ArrowUp") {
-                setHighlightedIndex((prev) =>
-                    prev === 0 ? 0 : prev - 1
-                );
+                setHighlightedIndex(p => p > 0 ? p - 1 : 0);
+            } else if (e.key === "Enter" && highlightedIndex > 0) {
+                AddProduct(filteredProducts[highlightedIndex - 1]);
             }
-            else if (e.key === "Enter") {
-                if (highlightedIndex == 0) {
-                    return
-                }
-                const selected = filteredProducts[highlightedIndex - 1];
-                AddProduct(selected)
-            }
+            itemRefs.current[highlightedIndex]?.scrollIntoView({ behavior: "smooth", block: "nearest" });
         };
-
         window.addEventListener("keydown", handleKeyDown);
         return () => window.removeEventListener("keydown", handleKeyDown);
-    }, [highlightedIndex, products, filteredProducts, AddProduct]);
+    }, [highlightedIndex, filteredProducts, AddProduct]);
 
-    useEffect(() => {
-        setHighlightedIndex(0)
-    }, [filteredProducts])
-
-    useEffect(() => {
-        const fetchProduct = async () => {
-            setProductIsLoading(true)
-            const { data } = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/company/product/fetch`, { withCredentials: true })
-            setFilteredProducts(data.products);
-            setProductsList(data.products);
-            setProductIsLoading(false)
-
-        }
-        fetchProduct()
-    }, [])
-    useEffect(() => {
-        fetchTaxData();
-    }, []);
     return (
         <div className="container mx-auto pb-8">
+            {/* Invoice Dialog */}
             {showInvoice && invoice && (
                 <Dialog open={showInvoice} onOpenChange={setShowInvoice}>
                     <DialogContent className="max-w-4xl w-full">
                         <DialogTitle className="text-2xl font-bold flex items-center gap-2">
-                            <Receipt className="h-6 w-6" />
-                            Invoice #{invoice.invoiceId}
+                            <Receipt className="h-6 w-6" /> Invoice #{invoice.invoiceId}
                         </DialogTitle>
                         <div ref={invoiceRef} className="max-h-[70vh] overflow-auto p-4 border rounded-lg bg-white">
                             <PrintInvoiceFormate invoice={invoice} />
                         </div>
-
                         <div className="flex justify-end mt-4">
-                            <Button
-                                onClick={handlePrintDocument}
-                                className="cursor-pointer px-8"
-                                size="lg"
-                            >
-                                Print Invoice
-                            </Button>
+                            <Button onClick={handlePrintDocument} className="px-8" size="lg">Print Invoice</Button>
                         </div>
                     </DialogContent>
                 </Dialog>
             )}
 
+            {/* Header */}
             <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-2">
                     <Link href="/Dashboard">
-                        <Button variant="outline" className="cursor-pointer flex gap-2 items-center">
+                        <Button variant="outline" className="flex gap-2 items-center">
                             <ArrowLeft className="h-4 w-4" /> Back to Dashboard
                         </Button>
                     </Link>
                     <h1 className="text-2xl font-bold ml-4">Billing System</h1>
                 </div>
-                {HoldedInvoice && (
-                    <Badge variant="outline" className="px-3 py-1">
-                        Editing Held Invoice
-                    </Badge>
-                )}
+                {HoldedInvoice && <Badge variant="outline" className="px-3 py-1">Editing Held Invoice</Badge>}
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                {/* Left Panel - Customer Info and Branch Selection */}
+                {/* Left Panel: Customer Info */}
                 <Card className="lg:col-span-1">
-                    <CardHeader>
-                        <CardTitle className="text-xl flex items-center gap-2">
-                            <UserIcon className="h-5 w-5" /> Customer Information
-                        </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="space-y-4">
-                            <div className="space-y-1">
-                                <label className="text-sm font-medium">Customer Name</label>
-                                <div className="relative">
-                                    <UserIcon className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                                    <Input
-                                        type="text"
-                                        placeholder="Customer Name"
-                                        value={clientName}
-                                        onChange={(e) => setClientName(e.target.value)}
-                                        className="pl-10"
-                                    />
-                                </div>
-                            </div>
+                    <CardHeader><CardTitle className="text-xl flex items-center gap-2"><UserIcon className="h-5 w-5" /> Customer</CardTitle></CardHeader>
+                    <CardContent className="space-y-4">
+                        <Input placeholder="Customer Name" value={clientName} onChange={(e) => setClientName(e.target.value)} />
+                        <Input placeholder="Phone Number" value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} />
+                        {User?.role === "Owner" && Company?.branch?.length > 0 && !HoldedInvoice && (
+                            <Select onValueChange={setSelectedBranch}>
+                                <SelectTrigger><SelectValue placeholder="Select Branch" /></SelectTrigger>
+                                <SelectContent>
+                                    {Company.branch.map((b: any) => <SelectItem key={b._id} value={b._id}>{b.branchName}</SelectItem>)}
+                                </SelectContent>
+                            </Select>
+                        )}
+                        <div className="flex gap-4">
+                            <label className="flex items-center gap-2 text-sm"><input type="radio" checked={BillType === "BILL"} onChange={() => setBillType("BILL")} /> Bill</label>
+                            <label className="flex items-center gap-2 text-sm"><input type="radio" checked={BillType === "KOT"} onChange={() => setBillType("KOT")} /> KOT</label>
+                        </div>
+                        <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={isExempted} onChange={(e) => setIsExempted(e.target.checked)} /> Exempted</label>
+                        {BillType !== "KOT" && (
 
                             <div className="space-y-1">
-                                <label className="text-sm font-medium">Phone Number</label>
-                                <div className="relative">
-                                    <Phone className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                                    <Input
-                                        placeholder="Phone Number"
-                                        value={phoneNumber}
-                                        onChange={(e) => setPhoneNumber(e.target.value)}
-                                        className="pl-10"
-                                    />
+
+                                <label className="text-sm font-medium">Payment Mode</label>
+
+                                <div className="relative ">
+
+                                    <CreditCard className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+
+                                    <select
+
+                                        className="w-full dark:bg-gray-950 p-2 pl-10 border rounded-md bg-white appearance-none"
+
+                                        onChange={(e) => setPaymentMode(e.target.value)}
+
+                                        value={paymentMode}
+
+                                    >
+
+                                        <option value="cash">Cash</option>
+
+                                        <option value="upi">UPI</option>
+
+                                        <option value="card">Card</option>
+
+                                        <option value="netBanking">Net Banking</option>
+
+                                        <option value="cheque">Cheque</option>
+
+                                    </select>
+
                                 </div>
+
                             </div>
 
-                            {User?.role === "Owner" && Company?.branch?.length > 0 && !HoldedInvoice && (
-                                <div className="space-y-1">
-                                    <label className="text-sm font-medium">Branch</label>
-                                    <Select onValueChange={setSelectedBranch}>
-                                        <SelectTrigger className="w-full">
-                                            <SelectValue placeholder="Select Branch" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            {Company?.branch?.map((branch: any) => (
-                                                <SelectItem key={branch._id} value={branch._id}>
-                                                    {branch.branchName}
-                                                </SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
-                                </div>
-                            )}
-
-                            <div className="space-y-1">
-                                <label className="text-sm font-medium">Bill Type</label>
-                                <div className="flex gap-4 mt-2">
-                                    <div className="flex items-center">
-                                        <input
-                                            type="radio"
-                                            id="bill-type-bill"
-                                            name="billType"
-                                            value="BILL"
-                                            checked={BillType === "BILL"}
-                                            onChange={(e) => setBillType(e.target.value)}
-                                            className="mr-2"
-                                        />
-                                        <label htmlFor="bill-type-bill">Bill</label>
-                                    </div>
-                                    <div className="flex items-center">
-                                        <input
-                                            type="radio"
-                                            id="bill-type-kot"
-                                            name="billType"
-                                            value="KOT"
-                                            checked={BillType === "KOT"}
-                                            onChange={(e) => setBillType(e.target.value)}
-                                            className="mr-2"
-                                        />
-                                        <label htmlFor="bill-type-kot">KOT</label>
-                                    </div>
-                                </div>
+                        )}
+                        <div className="pt-4 border-t space-y-2">
+                            <label className="text-sm font-medium">Discount</label>
+                            <div className="flex gap-2">
+                                <Button variant={discountType === "percentage" ? "default" : "outline"} size="sm" onClick={() => setDiscountType("percentage")}>%</Button>
+                                <Button variant={discountType === "value" ? "default" : "outline"} size="sm" onClick={() => setDiscountType("value")}>Flat</Button>
                             </div>
-
-                            <div className="space-y-1">
-                                <label className="text-sm font-medium">EXEMPTED</label>
-                                <div className="flex items-center gap-2 mt-2">
-                                    <input
-                                        id="exempted"
-                                        type="checkbox"
-                                        checked={isExempted}
-                                        onChange={(e) => setIsExempted(e.target.checked)}
-                                        className="h-4 w-4"
-                                    />
-                                    <label htmlFor="exempted" className="text-sm">EXEMPTED</label>
-                                </div>
-                            </div>
-
-
-                            {BillType !== "KOT" && (
-                                <div className="space-y-1">
-                                    <label className="text-sm font-medium">Payment Mode</label>
-                                    <div className="relative ">
-                                        <CreditCard className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                                        <select
-                                            className="w-full dark:bg-gray-950 p-2 pl-10 border rounded-md bg-white appearance-none"
-                                            onChange={(e) => setPaymentMode(e.target.value)}
-                                            value={paymentMode}
-                                        >
-                                            <option value="cash">Cash</option>
-                                            <option value="upi">UPI</option>
-                                            <option value="card">Card</option>
-                                            <option value="netBanking">Net Banking</option>
-                                            <option value="cheque">Cheque</option>
-                                        </select>
-                                    </div>
-                                </div>
-                            )}
-
-                            {/* Discount Section */}
-                            <div className="space-y-3 pt-4 border-t border-gray-200">
-                                <label className="text-sm font-medium flex items-center gap-2">
-                                    <Percent className="h-4 w-4" />
-                                    Discount
-                                </label>
-
-                                <div className="space-y-3">
-                                    <div className="space-y-1">
-                                        <label className="text-xs text-gray-600">Discount Type</label>
-                                        <div className="flex gap-4">
-                                            <div className="flex items-center">
-                                                <input
-                                                    type="radio"
-                                                    id="discount-type-percentage"
-                                                    name="discountType"
-                                                    value="percentage"
-                                                    checked={discountType === "percentage"}
-                                                    onChange={(e) => setDiscountType(e.target.value)}
-                                                    className="mr-2"
-                                                />
-                                                <label htmlFor="discount-type-percentage" className="text-sm">Percentage (%)</label>
-                                            </div>
-                                            <div className="flex items-center">
-                                                <input
-                                                    type="radio"
-                                                    id="discount-type-value"
-                                                    name="discountType"
-                                                    value="value"
-                                                    checked={discountType === "value"}
-                                                    onChange={(e) => setDiscountType(e.target.value)}
-                                                    className="mr-2"
-                                                />
-                                                <label htmlFor="discount-type-value" className="text-sm">Fixed Value</label>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div className="space-y-1">
-                                        <label className="text-xs text-gray-600">
-                                            Discount {discountType === "percentage" ? "Percentage" : "Amount"}
-                                        </label>
-                                        <div className="relative">
-                                            {discountType === "percentage" ? (
-                                                <Percent className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                                            ) : (
-                                                <span className="absolute left-3 top-3 text-sm text-gray-400">{Company?.currency?.symbol}</span>
-                                            )}
-                                            <Input
-                                                type="number"
-                                                placeholder={
-                                                    discountType === "percentage"
-                                                        ? "Enter percentage (0-100)"
-                                                        : "Enter discount amount"
-                                                }
-                                                value={discountValue}
-                                                onChange={(e) => {
-                                                    const raw = e.target.value;
-
-                                                    let value: number | "" = raw === "" ? "" : Number(raw);
-
-                                                    if (discountType === "percentage" && value !== "") {
-                                                        if (value > 100) value = 100;
-                                                        if (value < 0) value = 0;
-                                                    }
-                                                    setDiscountValue(value);
-                                                }}
-                                                className="pl-10"
-                                                min={0}
-                                                max={discountType === "percentage" ? 100 : undefined}
-                                            />
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
+                            <Input type="number" value={discountValue} onChange={(e) => setDiscountValue(Number(e.target.value))} />
                         </div>
                     </CardContent>
                 </Card>
 
-                {/* Middle Panel - Product Selection */}
+                {/* Middle Panel: Product Selection */}
+
                 <Card className="lg:col-span-1">
                     <CardHeader>
                         <CardTitle className="text-xl">Products</CardTitle>
@@ -944,7 +600,8 @@ export default function BillingComponent({
                     </CardContent>
                 </Card>
 
-                {/* Right Panel - Cart and Summary */}
+
+                {/* Right Panel: Summary */}
                 <Card className="lg:col-span-1">
                     <CardHeader>
                         <CardTitle className="text-xl flex items-center justify-between">
@@ -1037,8 +694,10 @@ export default function BillingComponent({
                                     ))}
                                 </div>
 
+
                                 {BillType !== "KOT" && (
                                     <div className="space-y-3 pt-3 border-t">
+
                                         <div className="flex justify-between">
                                             <span className="text-gray-600">Subtotal</span>
                                             <span>{Company.currency.symbol}{subTotal.toFixed(2)}</span>
@@ -1072,7 +731,7 @@ export default function BillingComponent({
                                         )}
 
 
-                                        {discountValue && discountValue > 0 && (
+                                        {discountValue > 0 && (
                                             <div className="flex justify-between text-sm border-t pt-2">
                                                 <span>Discount</span>
                                                 {
@@ -1089,10 +748,21 @@ export default function BillingComponent({
                                             </div>
                                         )}
 
+
                                         <div className="flex justify-between border-t pt-3 text-lg font-bold">
                                             <span>Grand Total</span>
-                                            <span>{Company.currency.symbol}{grandTotal.toFixed(2)}</span>
+                                            <span>{Company.currency.symbol}{grandTotal.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                                         </div>
+                                        {ProductDiscountValue > 0 && (
+                                            <div className="flex justify-between text-sm border-t pt-2">
+                                                <span>You Saved</span>
+
+                                                <span>
+                                                    {Company.currency.symbol}{ProductDiscountValue.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                                </span>
+
+                                            </div>
+                                        )}
                                     </div>
                                 )}
                                 {BillType == "KOT" ?
@@ -1140,13 +810,9 @@ export default function BillingComponent({
             </div>
 
             <Dialog open={editProductPopUp} onOpenChange={setEditProductPopUp}>
-                <DialogContent className="max-w-md">
-                    <DialogTitle className="text-xl">Edit Product</DialogTitle>
-                    <BillProductEdit
-                        setEditProductPopUp={setEditProductPopUp}
-                        editProduct={editProduct}
-                        setProducts={setProducts}
-                    />
+                <DialogContent>
+                    <DialogTitle>Edit Product Details</DialogTitle>
+                    <BillProductEdit setEditProductPopUp={setEditProductPopUp} editProduct={editProduct} setProducts={setProducts} />
                 </DialogContent>
             </Dialog>
         </div>

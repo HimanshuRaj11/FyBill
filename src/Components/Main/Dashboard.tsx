@@ -4,7 +4,7 @@ import { Button } from '../ui/button'
 import { Search, RefreshCw, X } from 'lucide-react'
 import { useDispatch, useSelector } from 'react-redux'
 import DashboardTopCards from '../Other/DashboardTopCards'
-import "react-datepicker/dist/react-datepicker.css"
+// import "react-datepicker/dist/react-datepicker.css"
 import DownloadExcel from '../Other/DownloadExcel'
 import { FetchInvoicesList } from '@/app/Redux/Slice/Invoice.slice'
 import { useGlobalContext } from '@/context/contextProvider'
@@ -52,7 +52,7 @@ export default function Dashboard() {
         } catch (error) {
             setIsLoading(false)
         }
-    }, [startDate, endDate, selectedBranch])
+    }, [startDate, endDate, selectedBranch, dispatch])
 
     useEffect(() => {
         FilterInvoice()

@@ -36,8 +36,10 @@ export async function POST(request: Request) {
             discountValue,
             discountType,
             isExempted,
+            ProductDiscountValue,
         } = await request.json();
         let invoice
+
 
         if (HoldedInvoice) {
             invoice = await InvoiceModel.findByIdAndUpdate({ _id: HoldedInvoice }, {
@@ -55,6 +57,7 @@ export async function POST(request: Request) {
                 isExempted,
                 discountValue,
                 discountType,
+                ProductDiscountValue,
             }, { returnDocument: "after" })
             await invoice.save();
         }
@@ -97,6 +100,7 @@ export async function POST(request: Request) {
                 discountValue,
                 discountType,
                 isExempted,
+                ProductDiscountValue,
 
             })
             if (User.branchId || selectedBranch) {
@@ -105,6 +109,7 @@ export async function POST(request: Request) {
             }
             await invoice.save();
         }
+
 
         return Response.json({ message: "Invoice created successfully", invoice, success: true }, { status: 200 });
 

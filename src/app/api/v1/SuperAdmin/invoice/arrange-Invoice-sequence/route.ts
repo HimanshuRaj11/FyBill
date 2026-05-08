@@ -38,12 +38,13 @@ export async function POST(request: Request) {
         // const branchName = "Georgetown"
         const branchName = "Berbice"
         const invoiceFilter: any = {
-            createdAt: { $gte: startDate },
+            issueDate: { $gte: startDate },
             // branchId: branchId,
             branchName,
             InvoiceStatus: "Done",
             BillType: { $ne: "KOT" },
             delete: { $ne: true },
+
         };
 
         // const branch = await branchModel.findOne({ _id: branchId });
@@ -56,7 +57,7 @@ export async function POST(request: Request) {
 
         const invoices = await InvoiceModel.find(invoiceFilter)
             .select("_id branchName branchId createdAt grandTotal invoiceId delete")
-            .sort({ issueDate: -1 }).lean();
+            .sort({ issueDate: 1 }).lean();
 
 
         if (invoices.length === 0) {
@@ -65,7 +66,7 @@ export async function POST(request: Request) {
                 { status: 200 }
             );
         }
-        const sequenceStart = 2418 // B- 1663 //G- 2403
+        const sequenceStart = 2418 // B- 2418 //G- 2403
 
 
 
@@ -79,6 +80,7 @@ export async function POST(request: Request) {
                 },
             },
         }));
+
 
         await InvoiceModel.bulkWrite(bulkOps);
 
