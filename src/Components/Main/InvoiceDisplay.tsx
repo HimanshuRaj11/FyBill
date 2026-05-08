@@ -242,7 +242,7 @@ export default function InvoiceDisplay({ invoice }: { invoice: any }) {
                                         <td className="p-4 text-gray-800 dark:text-gray-100 font-bold text-lg" colSpan={3}>GRAND TOTAL</td>
                                         <td className="p-4 text-gray-800 dark:text-gray-100 font-bold text-lg text-right">{invoice.currency} {invoice.grandTotal.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                                     </tr>
-                                    {invoice?.ProductDiscountValue && (
+                                    {invoice?.ProductDiscountValue > 0 && (
                                         <tr >
                                             <td className="p-4 text-gray-700 dark:text-gray-300" colSpan={3}>
                                                 <span>Product Discount</span>
