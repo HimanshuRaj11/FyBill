@@ -39,6 +39,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Badge } from "../ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import ProductCardSkeleton from "../Skeleton/ProductCardCreateBill";
+import { cn } from "@/lib/utils";
 
 interface Product {
     name: string;
@@ -185,11 +186,13 @@ export default function BillingComponent({
         else fetchTaxData();
     }, [isExempted]);
 
-    const handleProductSearch = useCallback((searchTerm: string) => {
+    const handleProductSearch = useCallback((searchTerm: string, categoryOverride?: string) => {
         setProductName(searchTerm);
+        const activeCategory = categoryOverride !== undefined ? categoryOverride : selectedCategory;
         let filtered = productsList;
-        if (selectedCategory !== "all") {
-            filtered = filtered.filter((p: any) => (p.category || "uncategorized") === selectedCategory);
+
+        if (activeCategory && activeCategory !== "all") {
+            filtered = filtered.filter((p: any) => (p.category || "uncategorized") === activeCategory);
         }
         if (searchTerm) {
             const term = searchTerm.toLowerCase();
@@ -202,9 +205,9 @@ export default function BillingComponent({
 
     const ClearSearch = useCallback(() => {
         setProductName("");
-        handleProductSearch("");
+        handleProductSearch("", selectedCategory); // keep active category, just clear text
         searchRef.current?.focus();
-    }, [handleProductSearch]);
+    }, [handleProductSearch, selectedCategory]);
 
     const AddProduct = useCallback((product: any) => {
         setProducts(prev => {
@@ -279,7 +282,7 @@ export default function BillingComponent({
 
     const handleCategoryChange = (category: string) => {
         setSelectedCategory(category);
-        handleProductSearch(productName);
+        handleProductSearch(productName, category); // ← pass category directly, don't rely on state
     };
 
     const invoiceRef = useRef<HTMLDivElement>(null);
@@ -510,88 +513,154 @@ export default function BillingComponent({
                                 <TabsTrigger value="categories">Categories</TabsTrigger>
                             </TabsList>
 
-                            <TabsContent value="products" className="space-y-4">
+                            {/* ── Products Tab ── */}
+                            <TabsContent value="products" className="space-y-3">
+
+                                {/* Search */}
                                 <div className="relative">
-                                    <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
                                     <Input
                                         ref={searchRef}
-                                        placeholder="Search Products"
+                                        placeholder="Search products…"
                                         value={productName}
                                         onChange={(e) => handleProductSearch(e.target.value)}
-                                        className="pl-10 pr-10"
+                                        className="pl-10 pr-9"
+                                        aria-label="Search products"
                                     />
                                     {productName && (
-                                        <X
+                                        <button
                                             onClick={ClearSearch}
-                                            className="absolute right-3 top-2 cursor-pointer text-gray-400 hover:text-gray-600"
-                                        />
+                                            className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded-sm text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+                                            aria-label="Clear search"
+                                        >
+                                            <X className="h-4 w-4" />
+                                        </button>
                                     )}
                                 </div>
 
+                                {/* Active category filter badge */}
+                                {selectedCategory && selectedCategory !== "all" && (
+                                    <div className="flex items-center gap-2">
+                                        <Badge
+                                            variant="secondary"
+                                            className="flex items-center gap-1 cursor-pointer hover:bg-destructive/10 hover:text-destructive transition-colors"
+                                            onClick={() => handleCategoryChange("all")}
+                                        >
+                                            <span className="capitalize">
+                                                {selectedCategory === "uncategorized" ? "Other" : selectedCategory}
+                                            </span>
+                                            <X className="h-3 w-3" />
+                                        </Badge>
+                                    </div>
+                                )}
+
+                                {/* Product grid */}
                                 <div className="grid grid-cols-2 gap-3 overflow-y-auto max-h-[380px] pr-1">
+
+                                    {/* Complement tile */}
                                     <div
+                                        role="button"
+                                        tabIndex={0}
                                         onClick={() => AddProduct(ComplementProduct)}
-                                        className="bg-gray-100 hover:bg-gray-200 dark:bg-gray-950 border border-dashed border-gray-300 rounded-lg p-4 flex flex-col items-center justify-center gap-2 cursor-pointer transition-colors"
+                                        onKeyDown={(e) => e.key === "Enter" && AddProduct(ComplementProduct)}
+                                        className="flex flex-col items-center justify-center gap-2 rounded-lg border border-dashed border-border bg-muted/40 p-4 cursor-pointer transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                                     >
                                         <PlusCircle className="h-8 w-8 text-blue-500" />
                                         <span className="text-sm font-medium">Complement</span>
-                                        <span className="text-xs text-gray-500">{Company?.currency?.symbol}0.00</span>
+                                        <span className="text-xs text-muted-foreground">
+                                            {Company?.currency?.symbol}0.00
+                                        </span>
                                     </div>
-                                    {
-                                        ProductIsLoading && (
-                                            <>
-                                                {[...Array(6)].map((_, index) => (
-                                                    <ProductCardSkeleton key={index} />
-                                                ))}
-                                            </>
-                                        )
-                                    }
-                                    {filteredProducts?.map((product: any, index: any) => (
-                                        <div
-                                            onClick={() => AddProduct(product)}
-                                            ref={(el: any) => (itemRefs.current[index + 1] = el)}
-                                            key={index}
 
-                                            className={`bg-white hover:bg-blue-50 border dark:bg-gray-950 rounded-lg p-2 shadow-sm hover:shadow cursor-pointer transition-all ${index + 1 === highlightedIndex
-                                                ? "border-blue-600"
-                                                : "hover:bg-gray-100"
-                                                }`}
-                                        >
-                                            <div className="span flex flex-row ">
-                                                {
-                                                    product?.product_number &&
-                                                    <h4 className="font-medium px-2 bg-amber-500 w-fit h-8 rounded-full border flex justify-center items-center">{product?.product_number}</h4>
-                                                }
-                                                <h3 className="font-medium">{product.name}</h3>
+                                    {/* Skeletons while loading */}
+                                    {ProductIsLoading &&
+                                        [...Array(5)].map((_, i) => (
+                                            <ProductCardSkeleton key={i} />
+                                        ))}
+
+                                    {/* Product cards */}
+                                    {!ProductIsLoading &&
+                                        filteredProducts?.map((product: any, index: number) => (
+                                            <div
+                                                key={product.id ?? index}
+                                                ref={(el: any) => (itemRefs.current[index + 1] = el)}
+                                                role="button"
+                                                tabIndex={0}
+                                                onClick={() => AddProduct(product)}
+                                                onKeyDown={(e) => e.key === "Enter" && AddProduct(product)}
+                                                className={cn(
+                                                    "rounded-lg border bg-card p-3 shadow-sm cursor-pointer transition-all",
+                                                    "hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/30",
+                                                    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                                                    index + 1 === highlightedIndex
+                                                        ? "border-blue-600 bg-blue-50 dark:bg-blue-950/30"
+                                                        : "border-border"
+                                                )}
+                                            >
+                                                {/* Name row */}
+                                                <div className="flex flex-wrap items-center gap-1.5 mb-1">
+                                                    {product.product_number && (
+                                                        <span className="shrink-0 text-xs font-semibold px-2 py-0.5 rounded-full bg-amber-400 text-amber-900">
+                                                            {product.product_number}
+                                                        </span>
+                                                    )}
+                                                    <h3 className="text-sm font-medium leading-snug line-clamp-2">
+                                                        {product.name}
+                                                    </h3>
+                                                </div>
+
+                                                {/* Price */}
+                                                <p className="text-sm font-semibold text-blue-600 dark:text-blue-400">
+                                                    {Company?.currency?.symbol}{product.price.toFixed(2)}
+                                                </p>
+
+                                                {/* Category badge */}
+                                                {product.category && (
+                                                    <Badge variant="outline" className="mt-1.5 text-xs">
+                                                        {product.category}
+                                                    </Badge>
+                                                )}
                                             </div>
-                                            <p className="text-blue-600 font-semibold mt-1">{Company?.currency?.symbol}{product.price.toFixed(2)}</p>
-                                            {product.category && (
-                                                <Badge variant="outline" className="mt-2 text-xs">
-                                                    {product.category}
-                                                </Badge>
-                                            )}
+                                        ))}
+
+                                    {/* Empty state */}
+                                    {!ProductIsLoading && filteredProducts?.length === 0 && (
+                                        <div className="col-span-2 py-10 flex flex-col items-center gap-2 text-muted-foreground">
+                                            <Search className="h-6 w-6 opacity-40" />
+                                            <p className="text-sm">No products found</p>
                                         </div>
-                                    ))}
+                                    )}
                                 </div>
                             </TabsContent>
 
+                            {/* ── Categories Tab ── */}
                             <TabsContent value="categories">
                                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 overflow-y-auto max-h-[430px]">
                                     {productCategories.map((category, index) => (
                                         <div
                                             key={index}
+                                            role="button"
+                                            tabIndex={0}
                                             onClick={() => {
                                                 handleCategoryChange(category);
                                                 setActiveTab("products");
                                             }}
-                                            className={`border rounded-lg p-3 dark:bg-gray-950 cursor-pointer transition-all flex items-center justify-center text-center ${selectedCategory === category
-                                                ? "bg-blue-100 border-blue-300"
-                                                : "bg-white hover:bg-gray-50"
-                                                }`}
+                                            onKeyDown={(e) => {
+                                                if (e.key === "Enter") {
+                                                    handleCategoryChange(category);
+                                                    setActiveTab("products");
+                                                }
+                                            }}
+                                            className={cn(
+                                                "rounded-lg border p-3 cursor-pointer transition-all",
+                                                "flex items-center justify-center text-center text-sm font-medium capitalize",
+                                                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                                                selectedCategory === category
+                                                    ? "bg-blue-100 border-blue-400 text-blue-700 dark:bg-blue-950/40 dark:border-blue-600 dark:text-blue-300"
+                                                    : "bg-card border-border hover:bg-muted"
+                                            )}
                                         >
-                                            <span className="font-medium capitalize">
-                                                {category === "uncategorized" ? "Other" : category}
-                                            </span>
+                                            {category === "uncategorized" ? "Other" : category}
                                         </div>
                                     ))}
                                 </div>
