@@ -186,6 +186,8 @@ export default function BillingComponent({
         else fetchTaxData();
     }, [isExempted]);
 
+
+    //  search and filter logic combined with category filtering
     const handleProductSearch = useCallback((searchTerm: string, categoryOverride?: string) => {
         setProductName(searchTerm);
 
@@ -204,6 +206,36 @@ export default function BillingComponent({
         }
         setFilteredProducts(filtered);
     }, [productsList, selectedCategory]);
+
+
+
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            // Ignore shortcuts
+            if (e.ctrlKey || e.metaKey || e.altKey) return;
+
+            // Ignore if already typing in input
+            if (document.activeElement === searchRef.current) return;
+
+            // Match letters and numbers
+            if (/^[a-zA-Z0-9]$/.test(e.key)) {
+                e.preventDefault();
+
+                searchRef.current?.focus();
+
+                const value = e.key;
+
+                setProductName(value);
+                handleProductSearch(value);
+            }
+        };
+
+        window.addEventListener("keydown", handleKeyDown);
+
+        return () => {
+            window.removeEventListener("keydown", handleKeyDown);
+        };
+    }, [handleProductSearch]);
 
     const ClearSearch = useCallback(() => {
         setProductName("");
