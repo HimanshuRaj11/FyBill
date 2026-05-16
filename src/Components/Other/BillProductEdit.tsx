@@ -52,7 +52,7 @@ export default function BillProductEdit({
         } else {
             setName((prev: any) => prev.replace(/\s*\(free\)/i, ''));
         }
-    }, [isFree]);
+    }, [isFree, name]);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
