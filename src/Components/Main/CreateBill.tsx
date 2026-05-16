@@ -1,5 +1,5 @@
 "use client";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { use, useCallback, useEffect, useRef, useState } from "react";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Dialog, DialogContent } from "../ui/dialog";
@@ -396,6 +396,14 @@ export default function BillingComponent({
         window.addEventListener("keydown", handleKeyDown);
         return () => window.removeEventListener("keydown", handleKeyDown);
     }, [highlightedIndex, filteredProducts, AddProduct]);
+
+
+    useEffect(() => {
+        if (editProductPopUp) {
+            setHighlightedIndex(0);
+        }
+    }, [editProductPopUp]);
+
 
     return (
         <div className="container mx-auto pb-8">
