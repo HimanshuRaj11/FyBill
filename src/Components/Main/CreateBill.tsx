@@ -188,6 +188,8 @@ export default function BillingComponent({
 
     const handleProductSearch = useCallback((searchTerm: string, categoryOverride?: string) => {
         setProductName(searchTerm);
+
+        setHighlightedIndex(1);
         const activeCategory = categoryOverride !== undefined ? categoryOverride : selectedCategory;
         let filtered = productsList;
 
