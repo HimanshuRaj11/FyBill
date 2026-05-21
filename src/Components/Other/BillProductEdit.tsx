@@ -38,21 +38,27 @@ export default function BillProductEdit({
     const [rate, setRate] = useState(product.rate);
     const [quantity, setQuantity] = useState(product.quantity);
     const [Specification, setSpecification] = useState(product.Specification);
-    const [isFree, setIsFree] = useState(product.amount === 0);
+
+    // ✅ Initialize state by checking if it ends with "(free)"
+    const [isFree, setIsFree] = useState(() =>
+        product.name.toLowerCase().endsWith("(free)")
+    );
 
     /** ✅ Amount logic */
     const amount = rate * quantity;
 
-    /** Handle Free toggle (NAME ONLY) */
+    /** ✅ Handle Free toggle strictly aligning with .endsWith("(free)") */
     useEffect(() => {
-        if (isFree) {
-            if (!name.toLowerCase().includes('(free)')) {
-                setName((prev: any) => `${prev} (free)`);
-            }
-        } else {
-            setName((prev: any) => prev.replace(/\s*\(free\)/i, ''));
+        const hasFreeSuffix = name.toLowerCase().endsWith('(free)');
+
+        if (isFree && !hasFreeSuffix) {
+            // Only append if it doesn't already end with it
+            setName((prev: string) => `${prev} (free)`);
+        } else if (!isFree && hasFreeSuffix) {
+            // Remove the suffix cleanly if unchecked
+            setName((prev: string) => prev.replace(/\s*\(free\)$/i, ''));
         }
-    }, [isFree, name]);
+    }, [isFree]); // 👈 Only run when checkbox changes to prevent text input collision loops
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -154,7 +160,7 @@ export default function BillProductEdit({
 
                 <button
                     type="submit"
-                    className="w-full bg-blue-500 font-semibold py-2 rounded-md hover:bg-blue-600"
+                    className="w-full bg-blue-500 text-white font-semibold py-2 rounded-md hover:bg-blue-600"
                 >
                     Save Changes
                 </button>

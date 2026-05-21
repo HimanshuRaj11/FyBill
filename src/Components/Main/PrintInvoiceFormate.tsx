@@ -140,19 +140,20 @@ export default function PrintInvoiceFormate({ invoice }: { invoice: any }) {
                             }
                         </div>
                     )}
+                    {invoice.ProductDiscountValue > 0 && (
+
+                        <div className="flex justify-between border-t border-gray-400 pt-1 font-bold">
+                            <span>Discount (Free Products):</span>
+                            <span>{invoice.currency} {invoice.ProductDiscountValue.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                        </div>
+                    )
+                    }
 
                     <div className="flex justify-between border-t border-gray-400 pt-1 font-bold">
                         <span>TOTAL:</span>
                         <span>{invoice.currency} {invoice.grandTotal.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                     </div>
-                    {invoice.ProductDiscountValue > 0 && (
 
-                        <div className="flex justify-between border-t border-gray-400 pt-1 font-bold">
-                            <span>You Saved:</span>
-                            <span>{invoice.currency} {invoice.ProductDiscountValue.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-                        </div>
-                    )
-                    }
                 </div>
             }
 

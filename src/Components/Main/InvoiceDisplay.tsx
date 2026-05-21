@@ -236,22 +236,23 @@ export default function InvoiceDisplay({ invoice }: { invoice: any }) {
                                             </td>
                                         </tr>
                                     )}
-
-
-                                    <tr className="border-t-2 border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800">
-                                        <td className="p-4 text-gray-800 dark:text-gray-100 font-bold text-lg" colSpan={3}>GRAND TOTAL</td>
-                                        <td className="p-4 text-gray-800 dark:text-gray-100 font-bold text-lg text-right">{invoice.currency} {invoice.grandTotal.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
-                                    </tr>
                                     {invoice?.ProductDiscountValue > 0 && (
                                         <tr >
                                             <td className="p-4 text-gray-700 dark:text-gray-300" colSpan={3}>
-                                                <span>Product Discount</span>
+                                                <span>Discount (Free Products):</span>
                                             </td>
                                             <td className="p-4 text-gray-800 uppercase dark:text-gray-200 text-right">
                                                 {invoice.currency} {invoice.ProductDiscountValue.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                             </td>
                                         </tr>
                                     )}
+
+
+                                    <tr className="border-t-2 border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800">
+                                        <td className="p-4 text-gray-800 dark:text-gray-100 font-bold text-lg" colSpan={3}>GRAND TOTAL</td>
+                                        <td className="p-4 text-gray-800 dark:text-gray-100 font-bold text-lg text-right">{invoice.currency} {invoice.grandTotal.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                                    </tr>
+
                                 </tfoot>
                             </table>
                         </div>

@@ -289,17 +289,21 @@ export default function BillingComponent({
         });
     };
 
-    // show the product Discount if any product has 0 rate
+    // show the product Discount if any product name ends with "free"
     useEffect(() => {
-        const totalRate = products
-            .filter((product) => product.amount === 0)
-            .reduce((sum, product) => sum + (product.rate || 0), 0);
+        const freeProducts = products.filter((product) =>
+            product.name.toLowerCase().endsWith("(free)")
+        );
 
-        const totalAppliedTax = (taxes.reduce((sum, tax) => sum + tax.percentage
-            , 0));
+        const totalRate = freeProducts
+            .reduce((sum, product) => sum + (product.amount), 0);
+
+        const totalAppliedTax = taxes.reduce((sum, tax) => sum + tax.percentage, 0);
 
         const totalWithTax = totalRate + (totalRate * totalAppliedTax) / 100;
         setProductDiscountValue(totalWithTax);
+        console.log(freeProducts);
+        setGrandTotal((prev) => Number((prev - totalWithTax).toFixed(2)));
     }, [products, taxes]);
 
     const Reset = () => {
@@ -863,22 +867,22 @@ export default function BillingComponent({
                                                 }
                                             </div>
                                         )}
+                                        {ProductDiscountValue > 0 && (
+                                            <div className="flex justify-between text-sm border-t pt-2">
+                                                <span>Discount (Free Products):</span>
 
+                                                <span>
+                                                    - {Company.currency.symbol}{ProductDiscountValue.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                                </span>
+
+                                            </div>
+                                        )}
 
                                         <div className="flex justify-between border-t pt-3 text-lg font-bold">
                                             <span>Grand Total</span>
                                             <span>{Company.currency.symbol}{grandTotal.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                                         </div>
-                                        {ProductDiscountValue > 0 && (
-                                            <div className="flex justify-between text-sm border-t pt-2">
-                                                <span>You Saved</span>
 
-                                                <span>
-                                                    {Company.currency.symbol}{ProductDiscountValue.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                                                </span>
-
-                                            </div>
-                                        )}
                                     </div>
                                 )}
                                 {BillType == "KOT" ?
