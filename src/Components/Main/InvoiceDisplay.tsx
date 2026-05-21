@@ -239,7 +239,7 @@ export default function InvoiceDisplay({ invoice }: { invoice: any }) {
                                     {invoice?.ProductDiscountValue > 0 && (
                                         <tr >
                                             <td className="p-4 text-gray-700 dark:text-gray-300" colSpan={3}>
-                                                <span>Discount (Free Products):</span>
+                                                <span>-Discount (Free Products):</span>
                                             </td>
                                             <td className="p-4 text-gray-800 uppercase dark:text-gray-200 text-right">
                                                 {invoice.currency} {invoice.ProductDiscountValue.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
