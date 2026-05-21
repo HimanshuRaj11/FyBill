@@ -41,7 +41,7 @@ export default function BillProductEdit({
     const [isFree, setIsFree] = useState(product.amount === 0);
 
     /** ✅ Amount logic */
-    const amount = isFree ? 0 : rate * quantity;
+    const amount = rate * quantity;
 
     /** Handle Free toggle (NAME ONLY) */
     useEffect(() => {
@@ -62,9 +62,9 @@ export default function BillProductEdit({
             updated[index] = {
                 ...updated[index],
                 name,
-                rate,          // ✅ unchanged
+                rate,
                 quantity,
-                amount,        // ✅ only amount changes
+                amount,
                 Specification,
             };
             return updated;

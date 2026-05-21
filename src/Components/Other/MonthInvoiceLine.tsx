@@ -130,11 +130,9 @@ export default function MonthInvoiceLine() {
         }
     }, [dateRange])
 
-    console.log(data);
-
     useEffect(() => {
         fetchMonthInvoice()
-    }, [])
+    }, [fetchMonthInvoice])
 
     if (loading) {
         return (

@@ -470,6 +470,8 @@ export default function BillingComponent({
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+
                 {/* Left Panel: Customer Info */}
                 <Card className="lg:col-span-1">
                     <CardHeader><CardTitle className="text-xl flex items-center gap-2"><UserIcon className="h-5 w-5" /> Customer</CardTitle></CardHeader>
@@ -488,7 +490,7 @@ export default function BillingComponent({
                             <label className="flex items-center gap-2 text-sm"><input type="radio" checked={BillType === "BILL"} onChange={() => setBillType("BILL")} /> Bill</label>
                             <label className="flex items-center gap-2 text-sm"><input type="radio" checked={BillType === "KOT"} onChange={() => setBillType("KOT")} /> KOT</label>
                         </div>
-                        <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={isExempted} onChange={(e) => setIsExempted(e.target.checked)} /> Exempted</label>
+
                         {BillType !== "KOT" && (
 
                             <div className="space-y-1">
@@ -534,6 +536,9 @@ export default function BillingComponent({
                             </div>
                             <Input type="number" value={discountValue} onChange={(e) => setDiscountValue(Number(e.target.value))} />
                         </div>
+                        <label className="flex items-center gap-2 text-sm">
+                            <input type="checkbox" checked={isExempted} onChange={(e) => setIsExempted(e.target.checked)} /> Exempted
+                        </label>
                     </CardContent>
                 </Card>
 
@@ -776,7 +781,7 @@ export default function BillingComponent({
                                             <div className="flex items-center gap-1">
                                                 {BillType !== "KOT" && (
                                                     <span className="text-right w-fit font-medium">
-                                                        ₹{product.amount.toFixed(2)}
+                                                        {Company?.currency?.symbol}{product.amount.toFixed(2)}
                                                     </span>
                                                 )}
 
