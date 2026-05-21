@@ -143,7 +143,7 @@ export default function PrintInvoiceFormate({ invoice }: { invoice: any }) {
                     {invoice.ProductDiscountValue > 0 && (
 
                         <div className="flex justify-between border-t border-gray-400 pt-1 font-bold">
-                            <span>Discount (Free Products):</span>
+                            <span>-Discount (Free Products):</span>
                             <span>{invoice.currency} {invoice.ProductDiscountValue.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                         </div>
                     )
