@@ -20,7 +20,7 @@ export default function PrintInvoiceFormate({ invoice }: { invoice: any }) {
     }
 
     return (
-        <div className={`w-[20rem] mx-auto p-2 text-black uppercase bg-white ${roboto.variable} print: ${roboto.variable}`}>
+        <div className={` print-area w-[20rem] mx-auto p-2 text-black uppercase bg-white ${roboto.variable} print: ${roboto.variable}`}>
             <div className="flex justify-end">
                 {
                     invoice?.BillType == "KOT" ?

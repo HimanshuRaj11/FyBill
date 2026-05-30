@@ -2,23 +2,18 @@
 import BillingComponent from '@/Components/Main/CreateBill'
 import PrintInvoiceFormate from '@/Components/Main/PrintInvoiceFormate';
 import HeldInvoices from '@/Components/Other/HeldInvoices';
-import PreLoader from '@/Components/Other/PreLoader';
 
 import { Button } from '@/Components/ui/button'
 import { Dialog, DialogContent, DialogTitle } from '@/Components/ui/dialog';
 import axios from 'axios';
 import { Receipt } from 'lucide-react';
-import Link from 'next/link'
 import React, { useEffect, useRef, useState } from 'react'
-import { useReactToPrint } from 'react-to-print';
 
 export default function Page() {
     const [HoldInvoices, setHoldInvoices] = useState<any>(null);
     const [HoldInvoiceUpdate, setHoldInvoiceUpdate] = useState<any>(null)
     const [invoice, setInvoice] = useState<any>(null);
     const [showInvoice, setShowInvoice] = useState(false);
-
-
 
 
     const FetchHoldInvoices = async () => {
@@ -33,22 +28,49 @@ export default function Page() {
     }
     const invoiceRef = useRef<HTMLDivElement>(null);
 
-    const handlePrintDocument = useReactToPrint({
-        contentRef: invoiceRef,
-    });
+    const handlePrintDocument = (e?: React.MouseEvent<HTMLButtonElement>) => {
+        e?.preventDefault();
+        if (!invoiceRef.current) return;
 
-    // const handlePrintDocument = (event: React.MouseEvent) => {
-    //     event.preventDefault();
-    //     if (invoiceRef.current) {
-    //         const printContents = invoiceRef.current.innerHTML;
-    //         const originalContents = document.body.innerHTML;
-    //         document.body.innerHTML = printContents;
-    //         window.print();
-    //         document.body.innerHTML = originalContents;
-    //         window.location.reload();
-    //     }
-    //     setShowInvoice(false);
-    // };
+        const iframe = document.createElement("iframe");
+
+        iframe.style.display = "none";
+
+        document.body.appendChild(iframe);
+
+        const doc = iframe.contentWindow?.document;
+
+        if (!doc) return;
+
+        doc.open();
+        doc.write(`
+        <html>
+        <head>
+            ${Array.from(
+            document.querySelectorAll('link[rel="stylesheet"], style')
+        )
+                .map(el => el.outerHTML)
+                .join("")}
+        </head>
+        <body>
+            ${invoiceRef.current.outerHTML}
+        </body>
+        </html>
+    `);
+        doc.close();
+
+        iframe.onload = () => {
+            iframe.contentWindow?.focus();
+            iframe.contentWindow?.print();
+
+            const cleanup = () => {
+                document.body.removeChild(iframe);
+                window.removeEventListener("afterprint", cleanup);
+            };
+
+            window.addEventListener("afterprint", cleanup);
+        };
+    };
 
     useEffect(() => {
         FetchHoldInvoices()
@@ -76,6 +98,7 @@ export default function Page() {
 
                         <div className="flex justify-end mt-4">
                             <Button
+                                type="button"
                                 onClick={handlePrintDocument}
                                 className="cursor-pointer px-8"
                                 size="lg"

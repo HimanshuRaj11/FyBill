@@ -81,9 +81,11 @@
 
 
 .dark {
-  --background: oklch(0.10 0.02 260); /* Deep Slate Black */
+  --background: oklch(0.10 0.02 260);
+  /* Deep Slate Black */
   --foreground: oklch(0.985 0 0);
-  --card: oklch(0.13 0.03 260); /* Slightly lighter slate for cards */
+  --card: oklch(0.13 0.03 260);
+  /* Slightly lighter slate for cards */
   --card-foreground: oklch(0.985 0 0);
   --popover: oklch(0.13 0.03 260);
   --popover-foreground: oklch(0.985 0 0);
@@ -151,4 +153,22 @@ input[type="number"]::-webkit-outer-spin-button {
 input[type="number"] {
   -mox-appearance: textfield;
   appearance: textfield;
+}
+
+@media print {
+  body * {
+    visibility: hidden;
+  }
+
+  .print-area,
+  .print-area * {
+    visibility: visible;
+  }
+
+  .print-area {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+  }
 }

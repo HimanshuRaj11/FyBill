@@ -13,11 +13,10 @@ import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
 import { Dialog, DialogContent, DialogTitle } from "../ui/dialog";
 import PrintInvoiceFormate from "./PrintInvoiceFormate";
-import { useReactToPrint } from "react-to-print";
 
 export default function InvoiceDisplay({ invoice }: { invoice: any }) {
     const { Company } = useSelector((state: any) => state.Company)
-    const { User } = useSelector((state: any) => state.User);
+    // const { User } = useSelector((state: any) => state.User);
     const Branch = invoice?.branchId;
     const Address = Branch?.address.street + " " + Branch?.address.city + " " + Branch?.address.state
 
@@ -29,10 +28,53 @@ export default function InvoiceDisplay({ invoice }: { invoice: any }) {
     const invoiceRef = useRef<HTMLDivElement>(null);
 
 
+    const handlePrintDocument = () => {
+        if (!invoiceRef.current) return;
 
-    const handlePrintDocument = useReactToPrint({
-        contentRef: invoiceRef,
-    });
+        const printContents = invoiceRef.current.outerHTML;
+
+        const iframe = document.createElement("iframe");
+        iframe.style.position = "absolute";
+        iframe.style.width = "0";
+        iframe.style.height = "0";
+        iframe.style.border = "none";
+
+        document.body.appendChild(iframe);
+
+        const doc =
+            iframe.contentWindow?.document ||
+            iframe.contentDocument;
+
+        if (!doc) return;
+
+        doc.open();
+
+        doc.write(`
+        <html>
+            <head>
+                <title>Print</title>
+                ${Array.from(document.querySelectorAll('link[rel="stylesheet"], style'))
+                .map((el) => el.outerHTML)
+                .join("")}
+            </head>
+            <body>
+                ${printContents}
+            </body>
+        </html>
+    `);
+
+        doc.close();
+
+        iframe.onload = () => {
+            iframe.contentWindow?.focus();
+            iframe.contentWindow?.print();
+
+            setTimeout(() => {
+                document.body.removeChild(iframe);
+                setIsPrinting(false);
+            }, 1000);
+        };
+    };
 
     // const handlePrintDocument = (event: React.MouseEvent) => {
     //     event.preventDefault();
