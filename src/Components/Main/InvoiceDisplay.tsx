@@ -13,7 +13,7 @@ import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
 import { Dialog, DialogContent, DialogTitle } from "../ui/dialog";
 import PrintInvoiceFormate from "./PrintInvoiceFormate";
-
+import { useReactToPrint } from "react-to-print";
 
 export default function InvoiceDisplay({ invoice }: { invoice: any }) {
     const { Company } = useSelector((state: any) => state.Company)
@@ -28,18 +28,50 @@ export default function InvoiceDisplay({ invoice }: { invoice: any }) {
     };
     const invoiceRef = useRef<HTMLDivElement>(null);
 
-    const handlePrintDocument = (event: React.MouseEvent) => {
-        event.preventDefault();
-        if (invoiceRef.current) {
-            const printContents = invoiceRef.current.innerHTML;
-            const originalContents = document.body.innerHTML;
-            document.body.innerHTML = printContents;
-            window.print();
-            document.body.innerHTML = originalContents;
-            window.location.reload();
-        }
-        setIsPrinting(false)
-    };
+
+
+    const handlePrintDocument = useReactToPrint({
+        contentRef: invoiceRef,
+    });
+
+    // const handlePrintDocument = (event: React.MouseEvent) => {
+    //     event.preventDefault();
+
+    //     if (invoiceRef.current) {
+    //         const printWindow = window.open('', '_blank', 'width=900,height=650');
+
+    //         if (printWindow) {
+    //             printWindow.document.write(`
+    //             <!DOCTYPE html>
+    //             <html>
+    //                 <head>
+    //                     <title>Invoice Print</title>
+    //                     <style>
+    //                         body {
+    //                             margin: 0;
+    //                             padding: 20px;
+    //                             font-family: Arial, sans-serif;
+    //                         }
+    //                     </style>
+    //                 </head>
+    //                 <body>
+    //                     ${invoiceRef.current.innerHTML}
+    //                 </body>
+    //             </html>
+    //         `);
+
+    //             printWindow.document.close();
+    //             printWindow.focus();
+
+    //             setTimeout(() => {
+    //                 printWindow.print();
+    //                 printWindow.close();
+    //             }, 300);
+    //         }
+    //     }
+
+    //     setIsPrinting(false);
+    // };
 
     const handleDownload = async () => {
         const element = document.getElementById('invoice-content');

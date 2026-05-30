@@ -36,23 +36,28 @@ export default function PrintInvoiceFormate({ invoice }: { invoice: any }) {
             {/* Header */}
             <div className="text-center mb-2">
                 <h2 className="text-2xl font-bold">{invoice.companyName}</h2>
-
-                <h3 className='font-semibold'>{Company?.vatId || ''}</h3>
-
                 {
-                    Address ?
-                        <p className="text-sm font-semibold">{Address}</p>
-                        :
-                        <p className="text-sm font-semibold">{invoice.companyAddress}</p>
+                    invoice?.BillType !== "KOT" &&
+                    <div className="">
+                        <h3 className='font-semibold'>{Company?.vatId || ''}</h3>
 
+                        {
+                            Address ?
+                                <p className="text-sm font-semibold">{Address}</p>
+                                :
+                                <p className="text-sm font-semibold">{invoice.companyAddress}</p>
+
+                        }
+                        <div className="text-center mb-2 flex gap-1 justify-center">
+
+                            <p className='text-sm font-semibold w-[15rem]'>
+                                {Company?.phone}
+                            </p>
+
+                        </div>
+                    </div>
                 }
-                <div className="text-center mb-2 flex gap-1 justify-center">
 
-                    <p className='text-sm font-semibold w-[15rem]'>
-                        {Company?.phone}
-                    </p>
-
-                </div>
                 <div className="text-sm font-bold mt-1">TAX INVOICE: {invoice.invoiceId}</div>
                 <div className="text-sm font-semibold">
                     Date: {moment(invoice.issueDate).format('DD/MM/YYYY hh:mm A')}

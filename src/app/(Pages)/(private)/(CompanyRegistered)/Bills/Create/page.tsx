@@ -10,6 +10,7 @@ import axios from 'axios';
 import { Receipt } from 'lucide-react';
 import Link from 'next/link'
 import React, { useEffect, useRef, useState } from 'react'
+import { useReactToPrint } from 'react-to-print';
 
 export default function Page() {
     const [HoldInvoices, setHoldInvoices] = useState<any>(null);
@@ -32,18 +33,22 @@ export default function Page() {
     }
     const invoiceRef = useRef<HTMLDivElement>(null);
 
-    const handlePrintDocument = (event: React.MouseEvent) => {
-        event.preventDefault();
-        if (invoiceRef.current) {
-            const printContents = invoiceRef.current.innerHTML;
-            const originalContents = document.body.innerHTML;
-            document.body.innerHTML = printContents;
-            window.print();
-            document.body.innerHTML = originalContents;
-            window.location.reload();
-        }
-        setShowInvoice(false);
-    };
+    const handlePrintDocument = useReactToPrint({
+        contentRef: invoiceRef,
+    });
+
+    // const handlePrintDocument = (event: React.MouseEvent) => {
+    //     event.preventDefault();
+    //     if (invoiceRef.current) {
+    //         const printContents = invoiceRef.current.innerHTML;
+    //         const originalContents = document.body.innerHTML;
+    //         document.body.innerHTML = printContents;
+    //         window.print();
+    //         document.body.innerHTML = originalContents;
+    //         window.location.reload();
+    //     }
+    //     setShowInvoice(false);
+    // };
 
     useEffect(() => {
         FetchHoldInvoices()
