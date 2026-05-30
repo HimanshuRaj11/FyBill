@@ -52,7 +52,7 @@ export default function Page() {
                 .map(el => el.outerHTML)
                 .join("")}
         </head>
-        <body>
+         <body class="text-xs text-sm p-1 p-2>
             ${invoiceRef.current.outerHTML}
         </body>
         </html>

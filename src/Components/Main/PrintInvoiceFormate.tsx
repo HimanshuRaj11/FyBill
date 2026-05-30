@@ -5,8 +5,8 @@ import { useSelector } from 'react-redux';
 import { Roboto } from 'next/font/google';
 const roboto = Roboto({
     subsets: ['latin'],
-    weight: ['400', '700'], // Specify the weights you need
-    variable: '--font-roboto', // Define a CSS variable name
+    weight: ['400', '700'],
+    variable: '--font-roboto',
 });
 
 export default function PrintInvoiceFormate({ invoice }: { invoice: any }) {
@@ -171,11 +171,14 @@ export default function PrintInvoiceFormate({ invoice }: { invoice: any }) {
             }
 
             {/* Footer */}
-            <div className="text-center mt-3 mb-1">
-                <p className='text-sm'>Save our number for offers & menu updates</p>
-                <p className="font-bold text-sm">THANK YOU</p>
-                <p className="text-sm font-semibold">For your business!</p>
-            </div>
+            {
+                invoice?.BillType !== "KOT" &&
+                <div className="text-center mt-3 mb-1">
+                    <p className='text-sm'>Save our number for offers & menu updates</p>
+                    <p className="font-bold text-sm">THANK YOU</p>
+                    <p className="text-sm font-semibold">For your business!</p>
+                </div>
+            }
         </div>
     )
 }

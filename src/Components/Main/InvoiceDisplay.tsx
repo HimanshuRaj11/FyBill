@@ -57,7 +57,7 @@ export default function InvoiceDisplay({ invoice }: { invoice: any }) {
                 .map((el) => el.outerHTML)
                 .join("")}
             </head>
-            <body>
+              <body class="text-xs text-sm p-1 p-2>
                 ${printContents}
             </body>
         </html>
@@ -72,7 +72,7 @@ export default function InvoiceDisplay({ invoice }: { invoice: any }) {
             setTimeout(() => {
                 document.body.removeChild(iframe);
                 setIsPrinting(false);
-            }, 1000);
+            }, 100);
         };
     };
 

@@ -320,7 +320,7 @@ export default function BillingComponent({
 
     const handleCategoryChange = (category: string) => {
         setSelectedCategory(category);
-        handleProductSearch(productName, category); // ← pass category directly, don't rely on state
+        handleProductSearch(productName, category);
     };
 
     const invoiceRef = useRef<HTMLDivElement>(null);
@@ -354,7 +354,7 @@ export default function BillingComponent({
                 .map((el) => el.outerHTML)
                 .join("")}
             </head>
-            <body>
+            <body class="text-xs text-sm p-1 p-2>
                 ${printContents}
             </body>
         </html>
@@ -368,11 +368,14 @@ export default function BillingComponent({
 
             setTimeout(() => {
                 document.body.removeChild(iframe);
-            }, 1000);
+            }, 100);
         };
     };
 
-    // Actions
+
+
+
+
     const CreateInvoice = async () => {
         if (products.length === 0) return toast.error("Please add products");
         if (BillType !== "KOT" && !paymentMode) return toast.error("Select payment mode");
