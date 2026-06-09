@@ -20,8 +20,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "FyBill",
-  description: "FyBill",
+  title: "Aarna Indian Food",
+  description: "Aarna Indian Food is a restaurant management system built using Next.js, React, and Tailwind CSS. It offers features such as order management, inventory tracking, and customer relationship management to help streamline restaurant operations and enhance the dining experience.",
 };
 
 export default function RootLayout({

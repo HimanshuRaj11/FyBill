@@ -28,92 +28,66 @@ export default function InvoiceDisplay({ invoice }: { invoice: any }) {
     const invoiceRef = useRef<HTMLDivElement>(null);
 
 
-    const handlePrintDocument = () => {
-        if (!invoiceRef.current) return;
+    // const handlePrintDocument = () => {
+    //     if (!invoiceRef.current) return;
 
-        const printContents = invoiceRef.current.outerHTML;
+    //     const printContents = invoiceRef.current.outerHTML;
 
-        const iframe = document.createElement("iframe");
-        iframe.style.position = "absolute";
-        iframe.style.width = "0";
-        iframe.style.height = "0";
-        iframe.style.border = "none";
+    //     const iframe = document.createElement("iframe");
+    //     iframe.style.position = "absolute";
+    //     iframe.style.width = "0";
+    //     iframe.style.height = "0";
+    //     iframe.style.border = "none";
 
-        document.body.appendChild(iframe);
+    //     document.body.appendChild(iframe);
 
-        const doc =
-            iframe.contentWindow?.document ||
-            iframe.contentDocument;
+    //     const doc =
+    //         iframe.contentWindow?.document ||
+    //         iframe.contentDocument;
 
-        if (!doc) return;
+    //     if (!doc) return;
 
-        doc.open();
+    //     doc.open();
 
-        doc.write(`
-        <html>
-            <head>
-                <title>Print</title>
-                ${Array.from(document.querySelectorAll('link[rel="stylesheet"], style'))
-                .map((el) => el.outerHTML)
-                .join("")}
-            </head>
-              <body class="text-xs text-sm p-1 p-2>
-                ${printContents}
-            </body>
-        </html>
-    `);
+    //     doc.write(`
+    //     <html>
+    //         <head>
+    //             <title>Print</title>
+    //             ${Array.from(document.querySelectorAll('link[rel="stylesheet"], style'))
+    //             .map((el) => el.outerHTML)
+    //             .join("")}
+    //         </head>
+    //           <body class="text-xs text-sm p-1 p-2>
+    //             ${printContents}
+    //         </body>
+    //     </html>
+    // `);
 
-        doc.close();
+    //     doc.close();
 
-        iframe.onload = () => {
-            iframe.contentWindow?.focus();
-            iframe.contentWindow?.print();
+    //     iframe.onload = () => {
+    //         iframe.contentWindow?.focus();
+    //         iframe.contentWindow?.print();
 
-            setTimeout(() => {
-                document.body.removeChild(iframe);
-                setIsPrinting(false);
-            }, 100);
-        };
-    };
-
-    // const handlePrintDocument = (event: React.MouseEvent) => {
-    //     event.preventDefault();
-
-    //     if (invoiceRef.current) {
-    //         const printWindow = window.open('', '_blank', 'width=900,height=650');
-
-    //         if (printWindow) {
-    //             printWindow.document.write(`
-    //             <!DOCTYPE html>
-    //             <html>
-    //                 <head>
-    //                     <title>Invoice Print</title>
-    //                     <style>
-    //                         body {
-    //                             margin: 0;
-    //                             padding: 20px;
-    //                             font-family: Arial, sans-serif;
-    //                         }
-    //                     </style>
-    //                 </head>
-    //                 <body>
-    //                     ${invoiceRef.current.innerHTML}
-    //                 </body>
-    //             </html>
-    //         `);
-
-    //             printWindow.document.close();
-    //             printWindow.focus();
-
-    //             setTimeout(() => {
-    //                 printWindow.print();
-    //                 printWindow.close();
-    //             }, 300);
-    //         }
-    //     }
-
-    //     setIsPrinting(false);
+    //         setTimeout(() => {
+    //             document.body.removeChild(iframe);
+    //             setIsPrinting(false);
+    //         }, 100);
+    //     };
     // };
+
+    const handlePrintDocument = (event: React.MouseEvent<HTMLButtonElement>) => {
+        event.preventDefault();
+        if (invoiceRef.current) {
+            const printContents = invoiceRef.current.innerHTML;
+            const originalContents = document.body.innerHTML;
+            document.body.innerHTML = printContents;
+            window.print();
+            document.body.innerHTML = originalContents;
+            window.location.reload();
+        }
+        setIsPrinting(false);
+    };
 
     const handleDownload = async () => {
         const element = document.getElementById('invoice-content');

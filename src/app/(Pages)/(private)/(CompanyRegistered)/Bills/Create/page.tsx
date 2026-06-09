@@ -29,50 +29,62 @@ export default function Page() {
     }
     const invoiceRef = useRef<HTMLDivElement>(null);
 
-    const handlePrintDocument = (e?: React.MouseEvent<HTMLButtonElement>) => {
-        e?.preventDefault();
-        if (!invoiceRef.current) return;
+    // const handlePrintDocument = (e?: React.MouseEvent<HTMLButtonElement>) => {
+    //     e?.preventDefault();
+    //     if (!invoiceRef.current) return;
 
-        const iframe = document.createElement("iframe");
+    //     const iframe = document.createElement("iframe");
 
-        iframe.style.display = "none";
+    //     iframe.style.display = "none";
 
-        document.body.appendChild(iframe);
+    //     document.body.appendChild(iframe);
 
-        const doc = iframe.contentWindow?.document;
+    //     const doc = iframe.contentWindow?.document;
 
-        if (!doc) return;
+    //     if (!doc) return;
 
-        doc.open();
-        doc.write(`
-        <html>
-        <head>
-            ${Array.from(
-            document.querySelectorAll('link[rel="stylesheet"], style')
-        )
-                .map(el => el.outerHTML)
-                .join("")}
-        </head>
-         <body class="text-xs text-sm p-1 p-2>
-            ${invoiceRef.current.outerHTML}
-        </body>
-        </html>
-    `);
-        doc.close();
+    //     doc.open();
+    //     doc.write(`
+    //     <html>
+    //     <head>
+    //         ${Array.from(
+    //         document.querySelectorAll('link[rel="stylesheet"], style')
+    //     )
+    //             .map(el => el.outerHTML)
+    //             .join("")}
+    //     </head>
+    //      <body class="text-xs text-sm p-1 p-2>
+    //         ${invoiceRef.current.outerHTML}
+    //     </body>
+    //     </html>
+    // `);
+    //     doc.close();
 
-        iframe.onload = () => {
-            iframe.contentWindow?.focus();
-            iframe.contentWindow?.print();
+    //     iframe.onload = () => {
+    //         iframe.contentWindow?.focus();
+    //         iframe.contentWindow?.print();
 
-            const cleanup = () => {
-                document.body.removeChild(iframe);
-                window.removeEventListener("afterprint", cleanup);
-            };
+    //         const cleanup = () => {
+    //             document.body.removeChild(iframe);
+    //             window.removeEventListener("afterprint", cleanup);
+    //         };
 
-            window.addEventListener("afterprint", cleanup);
-        };
+    //         window.addEventListener("afterprint", cleanup);
+    //     };
+    // };
+
+    const handlePrintDocument = (event: React.MouseEvent<HTMLButtonElement>) => {
+        event.preventDefault();
+        if (invoiceRef.current) {
+            const printContents = invoiceRef.current.innerHTML;
+            const originalContents = document.body.innerHTML;
+            document.body.innerHTML = printContents;
+            window.print();
+            document.body.innerHTML = originalContents;
+            window.location.reload();
+        }
+        // setIsPrinting(false);
     };
-
     useEffect(() => {
         FetchHoldInvoices()
     }, [])
