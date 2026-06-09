@@ -16,6 +16,7 @@ export default function Page() {
     const [showInvoice, setShowInvoice] = useState(false);
 
 
+
     const FetchHoldInvoices = async () => {
         try {
             const { data } = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/Invoice/fetchHoldInvoices`)
@@ -79,7 +80,7 @@ export default function Page() {
     return (
         <div className=''>
 
-            <BillingComponent HoldInvoiceUpdate={HoldInvoiceUpdate} setHoldInvoices={setHoldInvoices} />
+            <BillingComponent HoldInvoiceUpdate={HoldInvoiceUpdate} setHoldInvoices={setHoldInvoices} FetchHoldInvoices={FetchHoldInvoices} />
             {
                 HoldInvoices?.length > 0 && (
                     <HeldInvoices setShowInvoice={setShowInvoice} setInvoice={setInvoice} HoldInvoices={HoldInvoices} setHoldInvoiceUpdate={setHoldInvoiceUpdate} />

@@ -59,10 +59,12 @@ const ComplementProduct = {
 
 export default function BillingComponent({
     HoldInvoiceUpdate,
-    setHoldInvoices
+    setHoldInvoices,
+    FetchHoldInvoices
 }: {
     HoldInvoiceUpdate: any,
     setHoldInvoices: any
+    FetchHoldInvoices: () => Promise<void>;
 }) {
     const { User } = useSelector((state: any) => state.User);
     const { Company } = useSelector((state: any) => state.Company);
@@ -449,6 +451,7 @@ export default function BillingComponent({
                 Reset();
                 axios.post(`${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/kot/save`, { Invoice: data.invoice }, { withCredentials: true });
             }
+            await FetchHoldInvoices();
         } catch (error) {
             toast.error("KOT creation failed");
         } finally {

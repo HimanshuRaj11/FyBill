@@ -42,27 +42,40 @@ export async function POST(request: Request) {
 
 
         if (HoldedInvoice) {
-            invoice = await InvoiceModel.findByIdAndUpdate({ _id: HoldedInvoice }, {
-                clientName,
-                clientPhone: phoneNumber,
-                products: products.map((product: any) => ({
-                    ...product,
-                    kot_completed: true,
-                })),
-                subTotal,
-                appliedTaxes,
-                totalTaxAmount,
-                grandTotal,
-                BillType,
-                paymentMode,
-                InvoiceStatus,
-                issueDate: new Date(),
-                isExempted,
-                discountValue,
-                discountType,
-                ProductDiscountValue,
-            }, { returnDocument: "after" })
-            await invoice.save();
+            const oldInvoice = await InvoiceModel.findById(HoldedInvoice);
+
+            const updatedProducts = products.map((newProduct: any) => {
+                const existingProduct = oldInvoice?.products.find(
+                    (oldProduct: any) => oldProduct._id?.toString() === newProduct._id?.toString()
+                );
+
+                return {
+                    ...newProduct,
+                    kot_completed: existingProduct ? true : false,
+                };
+            });
+
+            invoice = await InvoiceModel.findByIdAndUpdate(
+                HoldedInvoice,
+                {
+                    clientName,
+                    clientPhone: phoneNumber,
+                    products: updatedProducts,
+                    subTotal,
+                    appliedTaxes,
+                    totalTaxAmount,
+                    grandTotal,
+                    BillType,
+                    paymentMode,
+                    InvoiceStatus,
+                    issueDate: new Date(),
+                    isExempted,
+                    discountValue,
+                    discountType,
+                    ProductDiscountValue,
+                },
+                { new: true }
+            );
         }
         if (!HoldedInvoice) {
             let companyAddress = ''
@@ -92,7 +105,7 @@ export async function POST(request: Request) {
                 issueDate: new Date(),
                 products: products.map((product: any) => ({
                     ...product,
-                    kot_completed: true,
+                    kot_completed: false,
                 })),
                 subTotal,
                 appliedTaxes,
