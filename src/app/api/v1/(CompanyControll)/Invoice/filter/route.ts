@@ -40,7 +40,7 @@ export async function POST(request: Request) {
 
         let invoices = await InvoiceModel.find(invoiceFilter)
             .populate({ path: "branchId", model: branchModel })
-            .sort({ createdAt: -1 })
+            .sort({ invoiceId: -1 })
             .lean();
 
         invoices = await InvoiceKot(invoices);

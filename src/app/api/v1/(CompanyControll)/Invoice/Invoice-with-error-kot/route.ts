@@ -21,7 +21,7 @@ export async function GET(request: Request) {
         if (!company) return NextResponse.json({ message: "Company not found", success: false }, { status: 404 });
 
         // const { selectedBranch, startDate, endDate } = await request.json();
-        const startDate = moment('2026-04-01').startOf('month').toDate();
+        const startDate = moment('2026-05-01').startOf('month').toDate();
         const endDate = moment().endOf('month').toDate();
         const invoiceFilter: any = {
             companyId: companyId,
@@ -39,7 +39,7 @@ export async function GET(request: Request) {
 
         let invoices = await InvoiceModel.find(invoiceFilter)
             .populate({ path: "branchId", model: branchModel })
-            .sort({ createdAt: -1 })
+            .sort({ invoiceId: -1 })
             .lean();
 
         invoices = await InvoiceKot(invoices);

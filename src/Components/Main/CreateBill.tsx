@@ -47,6 +47,7 @@ interface Product {
     quantity: number;
     amount: number;
     Specification: string;
+    kot_completed?: boolean;
 }
 
 const ComplementProduct = {
@@ -302,7 +303,6 @@ export default function BillingComponent({
 
         const totalWithTax = totalRate + (totalRate * totalAppliedTax) / 100;
         setProductDiscountValue(totalWithTax);
-        console.log(freeProducts);
         setGrandTotal((prev) => Number((prev - totalWithTax).toFixed(2)));
     }, [products, taxes]);
 
@@ -442,6 +442,8 @@ export default function BillingComponent({
 
             if (data.invoice) {
                 setInvoice(data.invoice);
+                console.log(data.invoice);
+
                 setShowInvoice(true);
                 if (!HoldedInvoice) setHoldInvoices((prev: any) => [...prev, data.invoice]);
                 Reset();

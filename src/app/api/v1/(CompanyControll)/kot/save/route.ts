@@ -24,11 +24,16 @@ export async function POST(request: Request) {
         }
         const { Invoice } = await request.json();
 
-        const { _id, ...rest } = Invoice
+        const { _id, products, ...rest } = Invoice
 
-        await InvoiceKotModel.create({
+        const kotsaved = await InvoiceKotModel.create({
             ...rest,
             invoiceMongoId: _id,
+            products: products.map((product: any) => ({
+                ...product,
+                kot_completed: true,
+            })),
+
         });
 
         return NextResponse.json({ success: true }, { status: 200 })

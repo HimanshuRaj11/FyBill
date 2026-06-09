@@ -45,7 +45,10 @@ export async function POST(request: Request) {
             invoice = await InvoiceModel.findByIdAndUpdate({ _id: HoldedInvoice }, {
                 clientName,
                 clientPhone: phoneNumber,
-                products,
+                products: products.map((product: any) => ({
+                    ...product,
+                    kot_completed: true,
+                })),
                 subTotal,
                 appliedTaxes,
                 totalTaxAmount,
@@ -87,7 +90,10 @@ export async function POST(request: Request) {
                 companyName: Company.name,
                 companyAddress,
                 issueDate: new Date(),
-                products,
+                products: products.map((product: any) => ({
+                    ...product,
+                    kot_completed: true,
+                })),
                 subTotal,
                 appliedTaxes,
                 totalTaxAmount,
@@ -108,6 +114,8 @@ export async function POST(request: Request) {
                 invoice.branchName = Branch.branchName;
             }
             await invoice.save();
+
+            console.log(invoice);
         }
 
 

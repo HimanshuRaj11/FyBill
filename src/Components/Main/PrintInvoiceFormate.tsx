@@ -3,6 +3,7 @@ import moment from 'moment'
 import React from 'react'
 import { useSelector } from 'react-redux';
 import { Roboto } from 'next/font/google';
+import { CircleCheck } from 'lucide-react';
 const roboto = Roboto({
     subsets: ['latin'],
     weight: ['400', '700'],
@@ -18,6 +19,7 @@ export default function PrintInvoiceFormate({ invoice }: { invoice: any }) {
     if (Branch?.address) {
         Address = Branch?.address?.street + " " + Branch?.address?.city + " " + Branch?.address?.state
     }
+    console.log(invoice);
 
     return (
         <div className={` print-area w-[20rem] mx-auto p-2 text-black uppercase bg-white ${roboto.variable} print: ${roboto.variable}`}>
@@ -88,7 +90,11 @@ export default function PrintInvoiceFormate({ invoice }: { invoice: any }) {
                 <tbody>
                     {invoice.products.map((product: any, index: any) => (
                         <tr key={index} className="border-b border-gray-200">
-                            <td className="text-left py-1 mx-1 font-semibold">{product.name}
+                            <td className="text-left py-1 mx-1 font-semibold flex flex-row">
+                                {invoice?.BillType === "KOT" && product.kot_completed && (
+                                    <CircleCheck />
+                                )}
+                                {product.name}
                                 {
                                     product?.Specification && <p className="text-sm font-semibold">({product.Specification})</p>
                                 }

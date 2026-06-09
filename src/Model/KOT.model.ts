@@ -5,6 +5,7 @@ interface Product {
     rate: number;
     quantity: number;
     amount: number;
+    kot_completed?: boolean;
 }
 
 interface Tax {
@@ -44,6 +45,7 @@ const ProductSchema: Schema = new Schema({
     quantity: { type: Number, required: true },
     amount: { type: Number, required: true },
     Specification: { type: String },
+    kot_completed: { type: Boolean, default: false },
 });
 
 const TaxSchema: Schema = new Schema({
