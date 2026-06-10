@@ -327,53 +327,17 @@ export default function BillingComponent({
 
     const invoiceRef = useRef<HTMLDivElement>(null);
 
-    const handlePrintDocument = () => {
-        if (!invoiceRef.current) return;
-
-        const printContents = invoiceRef.current.outerHTML;
-
-        const iframe = document.createElement("iframe");
-        iframe.style.position = "absolute";
-        iframe.style.width = "0";
-        iframe.style.height = "0";
-        iframe.style.border = "none";
-
-        document.body.appendChild(iframe);
-
-        const doc =
-            iframe.contentWindow?.document ||
-            iframe.contentDocument;
-
-        if (!doc) return;
-
-        doc.open();
-
-        doc.write(`
-        <html>
-            <head>
-                <title>Print</title>
-                ${Array.from(document.querySelectorAll('link[rel="stylesheet"], style'))
-                .map((el) => el.outerHTML)
-                .join("")}
-            </head>
-            <body class="text-xs text-sm p-1 p-2>
-                ${printContents}
-            </body>
-        </html>
-    `);
-
-        doc.close();
-
-        iframe.onload = () => {
-            iframe.contentWindow?.focus();
-            iframe.contentWindow?.print();
-
-            setTimeout(() => {
-                document.body.removeChild(iframe);
-            }, 100);
-        };
+    const handlePrintDocument = (event: React.MouseEvent<HTMLButtonElement>) => {
+        event.preventDefault();
+        if (invoiceRef.current) {
+            const printContents = invoiceRef.current.innerHTML;
+            const originalContents = document.body.innerHTML;
+            document.body.innerHTML = printContents;
+            window.print();
+            document.body.innerHTML = originalContents;
+            window.location.reload();
+        }
     };
-
 
 
 
@@ -444,7 +408,6 @@ export default function BillingComponent({
 
             if (data.invoice) {
                 setInvoice(data.invoice);
-                console.log(data.invoice);
 
                 setShowInvoice(true);
                 if (!HoldedInvoice) setHoldInvoices((prev: any) => [...prev, data.invoice]);

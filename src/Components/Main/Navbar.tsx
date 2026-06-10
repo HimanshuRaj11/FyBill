@@ -68,7 +68,7 @@ export default function Navbar() {
                 <div className="flex items-center justify-between h-16">
 
                     {/* Logo Section */}
-                    <Link href={'/'} className="flex-shrink-0">
+                    {/* <Link href={'/'} className="flex-shrink-0">
                         <div className="flex items-center space-x-2 group">
                             <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-2 rounded-xl group-hover:shadow-lg transition-all duration-300">
                                 <CreditCard className="h-6 w-6 text-white" />
@@ -77,16 +77,16 @@ export default function Navbar() {
                                 FyBill
                             </div>
                         </div>
-                    </Link>
+                    </Link> */}
 
                     {/* Company Section - Center */}
                     {company && (
                         <div className="hidden md:flex flex-1 justify-center">
-                            <Link href={'/Dashboard'} className="group">
+                            <Link href={'/'} className="group">
                                 <div className="flex items-center space-x-2 px-4 py-2 rounded-xl bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700 hover:from-blue-50 hover:to-purple-50 dark:hover:from-blue-900/20 dark:hover:to-purple-900/20 border border-gray-200 dark:border-gray-700 hover:border-blue-200 transition-all duration-300 shadow-sm hover:shadow-md">
                                     <Building2 className="h-5 w-5 text-gray-600 dark:text-gray-300 group-hover:text-blue-600 transition-colors" />
                                     <span className="font-semibold text-gray-800 dark:text-gray-200 group-hover:text-blue-800 dark:group-hover:text-blue-400 transition-colors text-lg">
-                                        {company?.name}
+                                        AARNA INDIAN FOOD
                                     </span>
                                     {User?.role === "Owner" && (
                                         <Crown className="h-4 w-4 text-yellow-500" />
