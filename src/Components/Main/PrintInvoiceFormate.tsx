@@ -17,12 +17,11 @@ export default function PrintInvoiceFormate({ invoice }: { invoice: any }) {
 
 
     if (Branch?.address) {
-        Address = Branch?.address?.street + " " + Branch?.address?.city + " " + Branch?.address?.state
+        Address = Branch?.address?.street + " " + Branch?.address?.city
     }
-    console.log(invoice);
 
     return (
-        <div className={` print-area w-[20rem] mx-auto p-2 text-black uppercase bg-white ${roboto.variable} print: ${roboto.variable}`}>
+        <div className={` print-area w-[30rem] mx-auto p-2 text-black uppercase bg-white ${roboto.variable} print: ${roboto.variable}`}>
             <div className="flex justify-end">
                 {
                     invoice?.BillType == "KOT" ?
