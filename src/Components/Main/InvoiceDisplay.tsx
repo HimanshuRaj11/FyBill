@@ -14,9 +14,10 @@ import html2canvas from 'html2canvas';
 import { Dialog, DialogContent, DialogTitle } from "../ui/dialog";
 import PrintInvoiceFormate from "./PrintInvoiceFormate";
 
+
 export default function InvoiceDisplay({ invoice }: { invoice: any }) {
     const { Company } = useSelector((state: any) => state.Company)
-    // const { User } = useSelector((state: any) => state.User);
+    const { User } = useSelector((state: any) => state.User);
     const Branch = invoice?.branchId;
     const Address = Branch?.address.street + " " + Branch?.address.city + " " + Branch?.address.state
 
@@ -27,56 +28,7 @@ export default function InvoiceDisplay({ invoice }: { invoice: any }) {
     };
     const invoiceRef = useRef<HTMLDivElement>(null);
 
-
-    // const handlePrintDocument = () => {
-    //     if (!invoiceRef.current) return;
-
-    //     const printContents = invoiceRef.current.outerHTML;
-
-    //     const iframe = document.createElement("iframe");
-    //     iframe.style.position = "absolute";
-    //     iframe.style.width = "0";
-    //     iframe.style.height = "0";
-    //     iframe.style.border = "none";
-
-    //     document.body.appendChild(iframe);
-
-    //     const doc =
-    //         iframe.contentWindow?.document ||
-    //         iframe.contentDocument;
-
-    //     if (!doc) return;
-
-    //     doc.open();
-
-    //     doc.write(`
-    //     <html>
-    //         <head>
-    //             <title>Print</title>
-    //             ${Array.from(document.querySelectorAll('link[rel="stylesheet"], style'))
-    //             .map((el) => el.outerHTML)
-    //             .join("")}
-    //         </head>
-    //           <body class="text-xs text-sm p-1 p-2>
-    //             ${printContents}
-    //         </body>
-    //     </html>
-    // `);
-
-    //     doc.close();
-
-    //     iframe.onload = () => {
-    //         iframe.contentWindow?.focus();
-    //         iframe.contentWindow?.print();
-
-    //         setTimeout(() => {
-    //             document.body.removeChild(iframe);
-    //             setIsPrinting(false);
-    //         }, 100);
-    //     };
-    // };
-
-    const handlePrintDocument = (event: React.MouseEvent<HTMLButtonElement>) => {
+    const handlePrintDocument = (event: React.MouseEvent) => {
         event.preventDefault();
         if (invoiceRef.current) {
             const printContents = invoiceRef.current.innerHTML;
@@ -86,7 +38,7 @@ export default function InvoiceDisplay({ invoice }: { invoice: any }) {
             document.body.innerHTML = originalContents;
             window.location.reload();
         }
-        setIsPrinting(false);
+        setIsPrinting(false)
     };
 
     const handleDownload = async () => {
@@ -118,7 +70,6 @@ export default function InvoiceDisplay({ invoice }: { invoice: any }) {
             toast.error("Failed to delete invoice");
         }
     }
-
     return (
         <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             {isPrinting && invoice && (
@@ -226,7 +177,7 @@ export default function InvoiceDisplay({ invoice }: { invoice: any }) {
                             <div className="flex flex-col items-start md:items-end space-y-4">
                                 <div className="text-left md:text-right text-gray-500 dark:text-gray-400">
                                     <p className="font-medium">Date Issued:</p>
-                                    <p>{moment(invoice.issueDate).format('DD/MM/YYYY hh:mm A')}</p>
+                                    <p>{moment(invoice.createdAt).format('DD/MM/YYYY HH:mm A')}</p>
                                 </div>
                             </div>
                         </div>
@@ -254,15 +205,15 @@ export default function InvoiceDisplay({ invoice }: { invoice: any }) {
                                         <tr key={index} className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-150">
                                             <td className="p-4 text-gray-800 dark:text-gray-200">{product.name}</td>
                                             <td className="p-4 text-gray-800 dark:text-gray-200 text-right">{product.quantity}</td>
-                                            <td className="p-4 text-gray-800 dark:text-gray-200 text-right">{invoice.currency} {product.rate.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
-                                            <td className="p-4 text-gray-800 dark:text-gray-200 text-right font-medium">{invoice.currency} {product.amount.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                                            <td className="p-4 text-gray-800 dark:text-gray-200 text-right">{invoice.currency} {product.rate.toFixed(2)}</td>
+                                            <td className="p-4 text-gray-800 dark:text-gray-200 text-right font-medium">{invoice.currency} {product.amount.toFixed(2)}</td>
                                         </tr>
                                     ))}
                                 </tbody>
                                 <tfoot className="bg-gray-50 dark:bg-gray-900">
                                     <tr className="border-t-2 border-gray-200 dark:border-gray-700">
                                         <td className="p-4 text-gray-700 dark:text-gray-300 font-medium" colSpan={3}>SUBTOTAL</td>
-                                        <td className="p-4 text-gray-800 dark:text-gray-200 text-right font-bold">{invoice.currency} {invoice.subTotal.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                                        <td className="p-4 text-gray-800 dark:text-gray-200 text-right font-bold">{invoice.currency} {invoice.subTotal.toFixed(2)}</td>
                                     </tr>
                                     {invoice?.appliedTaxes?.map((tax: any, index: any) => (
                                         <tr key={index}>
@@ -270,7 +221,7 @@ export default function InvoiceDisplay({ invoice }: { invoice: any }) {
                                                 {tax.taxName} ({tax.percentage}%)
                                             </td>
                                             <td className="p-4 text-gray-800 dark:text-gray-200 text-right">
-                                                {invoice.currency} {tax.amount.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                                {invoice.currency} {tax.amount.toFixed(2)}
                                             </td>
                                         </tr>
                                     ))}
@@ -284,23 +235,11 @@ export default function InvoiceDisplay({ invoice }: { invoice: any }) {
                                             </td>
                                         </tr>
                                     )}
-                                    {invoice?.ProductDiscountValue > 0 && (
-                                        <tr >
-                                            <td className="p-4 text-gray-700 dark:text-gray-300" colSpan={3}>
-                                                <span>-Discount (Free Products):</span>
-                                            </td>
-                                            <td className="p-4 text-gray-800 uppercase dark:text-gray-200 text-right">
-                                                {invoice.currency} {invoice.ProductDiscountValue.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                                            </td>
-                                        </tr>
-                                    )}
-
 
                                     <tr className="border-t-2 border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800">
                                         <td className="p-4 text-gray-800 dark:text-gray-100 font-bold text-lg" colSpan={3}>GRAND TOTAL</td>
-                                        <td className="p-4 text-gray-800 dark:text-gray-100 font-bold text-lg text-right">{invoice.currency} {invoice.grandTotal.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                                        <td className="p-4 text-gray-800 dark:text-gray-100 font-bold text-lg text-right">{invoice.currency} {invoice.grandTotal.toFixed(2)}</td>
                                     </tr>
-
                                 </tfoot>
                             </table>
                         </div>

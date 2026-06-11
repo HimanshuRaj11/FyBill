@@ -156,19 +156,36 @@ input[type="number"] {
 }
 
 @media print {
+
+  /* Hide absolutely everything by default */
   body * {
     visibility: hidden;
   }
 
+  /* Select your print component container and its children to be visible */
   .print-area,
   .print-area * {
     visibility: visible;
   }
 
+  /* Position the print area perfectly at the top-left of the printed page */
   .print-area {
     position: absolute;
     left: 0;
     top: 0;
     width: 100%;
+    background-color: white !important;
+    color: black !important;
+  }
+
+  /* Unset shadcn dialog restrictions that compress or overflow hidden elements */
+  [data-radix-portal],
+  .fixed,
+  [role="dialog"] {
+    position: absolute !important;
+    overflow: visible !important;
+    display: block !important;
+    background: transparent !important;
+    box-shadow: none !important;
   }
 }

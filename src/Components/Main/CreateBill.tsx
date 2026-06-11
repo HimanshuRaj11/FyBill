@@ -326,6 +326,8 @@ export default function BillingComponent({
     };
 
     const invoiceRef = useRef<HTMLDivElement>(null);
+    console.log(invoiceRef);
+
 
     const handlePrintDocument = (event: React.MouseEvent<HTMLButtonElement>) => {
         event.preventDefault();
