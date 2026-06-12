@@ -32,10 +32,10 @@ export default function PrintInvoiceFormate({ invoice }: { invoice: any }) {
             </div>
             {/* Header */}
             <div className="text-center mb-2">
-                <h2 className="text-2xl font-bold">{invoice.companyName}</h2>
                 {
                     invoice?.BillType !== "KOT" &&
                     <div className="">
+                        <h2 className="text-2xl font-bold">{invoice.companyName}</h2>
                         <h3 className='font-semibold'>{Company?.vatId || ''}</h3>
 
                         {

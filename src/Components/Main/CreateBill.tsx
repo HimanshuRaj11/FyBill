@@ -104,6 +104,7 @@ export default function BillingComponent({
     const [highlightedIndex, setHighlightedIndex] = useState<number>(0);
     const searchRef = useRef<HTMLInputElement>(null);
 
+
     // Initial Data Fetch
     useEffect(() => {
         const fetchProduct = async () => {
@@ -210,7 +211,17 @@ export default function BillingComponent({
         setFilteredProducts(filtered);
     }, [productsList, selectedCategory]);
 
-
+    const handleKOTToggle = (index: number, checked: boolean) => {
+        setProducts(prev =>
+            prev.map((product, i) =>
+                i === index ? { ...product, kot_completed: checked } : product
+            )
+        );
+        toast.info(
+            checked ? `Marked ${products[index].name} as completed` : `Marked ${products[index].name} as pending`,
+            { position: "bottom-right", autoClose: 1000, hideProgressBar: true }
+        );
+    };
 
     // useEffect(() => {
     //     const handleKeyDown = (e: KeyboardEvent) => {
@@ -261,7 +272,8 @@ export default function BillingComponent({
                 rate: product.price || 0,
                 quantity: 1,
                 amount: product.price || 0,
-                Specification: product.Specification || ""
+                Specification: product.Specification || "",
+                kot_completed: product.kot_completed || false,
             }];
         });
         toast.success(`Added ${product.name}`, { position: "bottom-right", autoClose: 1000, hideProgressBar: true });
@@ -326,7 +338,6 @@ export default function BillingComponent({
     };
 
     const invoiceRef = useRef<HTMLDivElement>(null);
-    console.log(invoiceRef);
 
 
     const handlePrintDocument = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -752,12 +763,18 @@ export default function BillingComponent({
                             <>
                                 <div className="max-h-[280px] pr-1 overflow-y-auto " >
                                     {products.map((product, index) => (
-                                        <div
-                                            key={index}
-                                            className="flex items-center justify-between border-b py-3 h-auto relative"
-                                        >
+                                        <div key={index} className="flex items-center justify-between border-b py-3 h-auto relative">
 
-                                            <div className="flex-1">
+                                            <div className="flex justify-center items-center gap-1">
+                                                {BillType === "KOT" && (
+                                                    <Input
+                                                        name="kot_completed"
+                                                        type="checkbox"
+                                                        className="size-5 cursor-pointer"
+                                                        checked={product.kot_completed || false}
+                                                        onChange={(e) => handleKOTToggle(index, e.target.checked)}
+                                                    />
+                                                )}
                                                 <p className="font-medium">{product.name}</p>
                                                 {
                                                     product?.Specification && <p className="text-sm">({product.Specification})</p>

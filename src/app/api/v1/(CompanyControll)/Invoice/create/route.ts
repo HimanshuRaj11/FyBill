@@ -42,25 +42,13 @@ export async function POST(request: Request) {
 
 
         if (HoldedInvoice) {
-            const oldInvoice = await InvoiceModel.findById(HoldedInvoice);
-
-            const updatedProducts = products.map((newProduct: any) => {
-                const existingProduct = oldInvoice?.products.find(
-                    (oldProduct: any) => oldProduct._id?.toString() === newProduct._id?.toString()
-                );
-
-                return {
-                    ...newProduct,
-                    kot_completed: existingProduct ? true : false,
-                };
-            });
 
             invoice = await InvoiceModel.findByIdAndUpdate(
                 HoldedInvoice,
                 {
                     clientName,
                     clientPhone: phoneNumber,
-                    products: updatedProducts,
+                    products,
                     subTotal,
                     appliedTaxes,
                     totalTaxAmount,
@@ -103,10 +91,7 @@ export async function POST(request: Request) {
                 companyName: Company.name,
                 companyAddress,
                 issueDate: new Date(),
-                products: products.map((product: any) => ({
-                    ...product,
-                    kot_completed: false,
-                })),
+                products,
                 subTotal,
                 appliedTaxes,
                 totalTaxAmount,
@@ -128,7 +113,6 @@ export async function POST(request: Request) {
             }
             await invoice.save();
 
-            console.log(invoice);
         }
 
 
